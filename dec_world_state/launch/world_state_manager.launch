@@ -1,0 +1,5 @@
+<launch>
+
+  <node pkg="dec_world_state" type="world_state_manager" name="WorldStateManager" output="screen">
+  </node>
+</launch>

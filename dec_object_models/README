@@ -1,0 +1,3 @@
+In new versions of blender, when exporting the model to obj format:
+-uncheck all of the options except for "normals"
+-for the axes, choose "Y forward" and "Z up"

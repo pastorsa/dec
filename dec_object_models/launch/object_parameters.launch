@@ -1,0 +1,8 @@
+<launch>
+  <arg name="dec_object_models_dir" value="$(find dec_object_models)"/>
+
+  <group ns="/objects">
+    <rosparam command="load" file="$(arg dec_object_models_dir)/config/ball.yaml" />
+  </group>
+</launch>
+

@@ -1,0 +1,19 @@
+<package>
+  <description brief="dec_command_line">
+
+     dec_command_line
+
+  </description>
+  <author>Mrinal Kalakrishnan, Peter Pastor</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+
+  <depend package="rospy"/>
+  <depend package="visualization_msgs"/>
+
+  <depend package="dec_msgs"/>
+  <depend package="dec_world_state"/>
+
+</package>
+
+

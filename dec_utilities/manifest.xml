@@ -1,0 +1,25 @@
+<package>
+  <description brief="dec_utilities">
+
+     utilities contain utility functions used across several packages
+
+  </description>
+  <author>Mrinal Kalakrishnan, Peter Pastor</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+
+  <depend package="rosconsole"/>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+  <depend package="sensor_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="visualization_msgs"/>
+  <depend package="rosbag"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec_utilities"/>
+  </export>
+
+</package>
+
+

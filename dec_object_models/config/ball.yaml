@@ -1,0 +1,84 @@
+ball:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_0:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_1:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_2:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_3:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_4:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_5:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_6:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_7:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_8:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_9:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+
+ball_10:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_11:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_12:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_13:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_14:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_15:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_16:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_17:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_18:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+
+ball_19:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]

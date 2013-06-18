@@ -1,0 +1,7 @@
+<launch>
+
+	<test test-name="dec_utilities_test" pkg="dec_utilities" type="dec_utilities_test">
+		<rosparam command="load" file="$(find dec_utilities)/launch/dec_utilities_test.yaml"/>
+	</test>
+
+</launch>

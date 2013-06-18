@@ -1,0 +1,12 @@
+<launch>
+
+  <include file="$(find dec_object_models)/launch/object_parameters.launch" />
+
+<!--
+  <include file="$(find dec_world_state)/launch/world_state_manager.launch" />
+-->
+
+  <node pkg="dec_visualization" type="dec_visualization" name="DECVisualization" output="screen">
+    <rosparam command="load" file="$(find dec_visualization)/config/config.yaml" />
+  </node>
+</launch>

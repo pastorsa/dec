@@ -1,0 +1,59 @@
+Background\ ColorB=0
+Background\ ColorG=0
+Background\ ColorR=0
+Camera\ Config=0.307795 5.30079 3.1061 0.565794 0.713948 0.104002
+Camera\ Type=rviz::OrbitViewController
+Fixed\ Frame=/BASE
+Grid.Alpha=0.5
+Grid.Cell\ Size=0.5
+Grid.ColorB=0.5
+Grid.ColorG=0.5
+Grid.ColorR=0.5
+Grid.Enabled=1
+Grid.Line\ Style=0
+Grid.Line\ Width=0.03
+Grid.Normal\ Cell\ Count=0
+Grid.OffsetX=0
+Grid.OffsetY=0
+Grid.OffsetZ=0
+Grid.Plane=0
+Grid.Plane\ Cell\ Count=20
+Grid.Reference\ Frame=/BASE
+InteractiveMarker.Enabled=1
+InteractiveMarker.Show\ Axes=0
+InteractiveMarker.Show\ Descriptions=1
+InteractiveMarker.Show\ Tool\ Tips=1
+InteractiveMarker.Update\ Topic=/world_state/interactive_markers/update
+Property\ Grid\ Splitter=78,78
+Property\ Grid\ State=expanded=Structure.Enabled,Structure.Namespaces,InteractiveMarker.Enabled,InteractiveMarker.Status;splitterratio=0.5
+QMainWindow=000000ff00000000fd00000003000000000000019f00000437fc0200000001fb000000100044006900730070006c006100790073020000065b0000003800000125000000f6000000010000012a00000307fc0200000003fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073000000001d000000c80000006700fffffffb0000000a00560069006500770073000000001d000001f0000000bb00fffffffb0000001200530065006c0065006300740069006f006e000000001d000003070000006700ffffff00000003000003880000003efc0100000001fb0000000800540069006d00650000000000000003880000029100ffffff000003880000033400000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+Structure.Enabled=1
+Structure.Marker\ Array\ Topic=/DECVisualization/visualization_marker
+Structure.Queue\ Size=100
+Structure.beams=1
+Structure.beams_text=1
+Structure.light_beams=1
+Structure.light_beams_text=1
+Structure.light_nodes=1
+Structure.light_nodes_text=1
+Structure.nodes=1
+Structure.nodes_text=1
+Structure.sensors=1
+Structure.sensors_text=1
+Target\ Frame=<Fixed Frame>
+Tool\ 2D\ Nav\ GoalTopic=/move_base_simple/goal
+Tool\ 2D\ Pose\ EstimateTopic=initialpose
+[Display0]
+ClassName=rviz::GridDisplay
+Name=Grid
+[Display1]
+ClassName=rviz::MarkerArrayDisplay
+Name=Structure
+[Display2]
+ClassName=rviz::InteractiveMarkerDisplay
+Name=InteractiveMarker
+[Window]
+Height=849
+Width=904
+X=1002
+Y=-82

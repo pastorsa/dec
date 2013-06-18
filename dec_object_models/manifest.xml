@@ -1,0 +1,23 @@
+<package>
+  <description brief="dec_object_models">
+
+     dec_object_models
+
+  </description>
+  <author>Peter Pastor</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_object_models</url>
+
+  <depend package="roscpp"/>
+  <depend package="dec_utilities"/>
+  <depend package="dec_msgs"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec_object_models"/>
+  </export>
+
+
+</package>
+
+

@@ -1,0 +1,3 @@
+#!/bin/bash
+SCRIPT_LOCATION=`rospack find dec_command_line`/src/dec_command_line.py
+ipython --i --no-banner --PromptManager.in_template="dec> " --no-confirm-exit $SCRIPT_LOCATION

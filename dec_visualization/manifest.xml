@@ -1,0 +1,22 @@
+<package>
+  <description brief="dec_visualization">
+
+     dec_visualization
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_visualization</url>
+
+  <depend package="roscpp"/>
+  <depend package="visualization_msgs"/>
+  <depend package="tf"/>
+  
+  <depend package="dec_utilities"/>
+  <depend package="dec_msgs"/>
+  <depend package="dec_world_state"/>
+
+</package>
+
+
