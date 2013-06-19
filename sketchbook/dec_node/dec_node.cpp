@@ -5,47 +5,54 @@
 /*! Custom variable
  * DEC_NODE_ID must be within [1, DEC_NUM_NODES]
  */
-static const uint8_t DEC_NODE_ID = 1;
+static const uint8_t DEC_NODE_ID = 0;
 
-/*!
+/*! Communication interface used to generate/parse messages
  */
 DECInterface dec_interface;
 
-/*!
- * @param source Sender id
- * @param command
- * @param length
- * @param data
- */
+// Local variables
+boolean error = false;
+
+// Local variables for debugging
+const int led_pin = 13;         // the number of the LED pin
+int led_state = LOW;             // ledState used to set the LED
+long previous_millis = 0;        // will store last time LED was updated
+unsigned long interval = 500;   // interval at which to blink (milliseconds)
+
+// This function is called whenever a broadcast was send
 void receive_broadcast(unsigned char source, char command, unsigned char length, char *data)
 {
   if (command == DEC_SETUP_DATA)
   {
     // parse data into local memory
     dec_interface.parseSetupData(data);
-    //
-
     // check whether it's my turn to broadcast my data
     if (dec_interface.token_ == DEC_NODE_ID)
     {
-      // dec_interface.getData(dec_interface.length_, dec_interface.data_entries_);
-      // ICSC.broadcast(DEC_DATA, dec_interface.length_, dec_interface.data_entries_);
-    }
+      // setup the node
+      // Adafruit_NeoPixel test(13);
 
-    // Adafruit_NeoPixel test(13);
+      // acknowledge
+      dec_interface.generateSetupData(DEC_NODE_ID);
+      // send back for now
+      dec_interface.setTokenToController();
+      ICSC.broadcast(command, dec_interface.length_, dec_interface.data_);
+    }
   }
 
   else if (command == DEC_SENSOR_DATA)
   {
     // parse data into local memory
     dec_interface.parseSensorData(source, data);
-    //
 
     // check whether it's my turn to broadcast my data
     if (dec_interface.token_ == DEC_NODE_ID)
     {
-      // dec_interface.getData(dec_interface.length_, dec_interface.data_entries_);
-      // ICSC.broadcast(DEC_DATA, dec_interface.length_, dec_interface.data_entries_);
+      dec_interface.generateSensorData(DEC_NODE_ID);
+      // send back for now
+      dec_interface.setTokenToController();
+      ICSC.broadcast(DEC_SENSOR_DATA, dec_interface.length_, dec_interface.data_);
     }
   }
 
@@ -58,9 +65,25 @@ void receive_broadcast(unsigned char source, char command, unsigned char length,
     // check whether it's my turn to broadcast my data
     if (dec_interface.token_ == DEC_NODE_ID)
     {
-      // dec_interface.getData(dec_interface.length_, dec_interface.data_entries_);
-      // ICSC.broadcast(DEC_DATA, dec_interface.length_, dec_interface.data_entries_);
+      dec_interface.generateLightData(DEC_NODE_ID);
+      // send back for now
+      dec_interface.setTokenToController();
+      ICSC.broadcast(DEC_LIGHT_DATA, dec_interface.length_, dec_interface.data_);
     }
+  }
+}
+
+void blink()
+{
+  unsigned long current_millis = millis();
+  if(current_millis - previous_millis > interval)
+  {
+    previous_millis = current_millis;
+    if (led_state == LOW)
+      led_state = HIGH;
+    else
+      led_state = LOW;
+    digitalWrite(led_pin, led_state);
   }
 }
 
@@ -68,24 +91,25 @@ void receive_broadcast(unsigned char source, char command, unsigned char length,
  */
 void setup()
 {
-  /*
+  // setup led blinking for debugging
+  pinMode(led_pin, OUTPUT);
+
+  // setup communication
   ICSC.begin(DEC_NODE_ID, DEC_BAUD_RATE);
-  // Make sure that the size of our message obeys the limits
-  if(sizeof(DECInterface::data_entry_t) > MAX_MESSAGE)
-  {
-    // BREAK OR SOMTHING
-  }
   ICSC.registerCommand(ICSC_BROADCAST, &receive_broadcast);
-  */
 }
 
 /*!
  */
 void loop()
 {
-  ICSC.process();
+  if (!error)
+  {
+    // only react
+    ICSC.process();
+    blink();
+  }
 }
-
 
 // Only used for development in eclipse
 #ifdef ECLIPSE_ONLY

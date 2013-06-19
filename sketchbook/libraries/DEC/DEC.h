@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 // Constants to be adjusted
-static const uint8_t DEC_NUM_NODES = 5;
+static const uint8_t DEC_NUM_NODES = 1;
 
 // Configuration TODO: this needs to be corrected
 static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = 4;
@@ -12,8 +12,9 @@ static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = 4;
 static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = 5;
 
 // Fixed constants
-#define DEC_CONTROLLER_ID 0xff
-#define DEC_LAPTOP_ID 0xfe
+static const uint8_t DEC_CONTROLLER_ID = 255;
+static const uint8_t DEC_LAPTOP_ID = 254;
+// Note station id 0xFD == 253 is used for broadcasting
 
 // TODO: play with this
 #define DEC_BAUD_RATE 115200
@@ -148,6 +149,7 @@ public:
    *                  is being used to generate/fill the "data" message
    */
   void generateSensorData(uint8_t token);
+
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_SENSOR_DATA <<<<<<<<<<<<<<<<<<<<<<<<< */
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
@@ -186,8 +188,28 @@ public:
     */
    void generateLightData(uint8_t token);
 
+
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_LIGHT_DATA <<<<<<<<<<<<<<<<<<<<<<<<<< */
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
+
+   /*! Prepares an empty message to be send out by the master
+    * @param token : Token of the >next< node
+    */
+   void generateRequest(uint8_t token = 0);
+
+   /*! Update token in this->data_
+    * @param token : Token for the next station
+    */
+   void setToken(uint8_t token)
+   {
+     data_[0] = token;
+   }
+   /*! Update token in this->data_ to be DEC_CONTROLLER_ID
+    */
+   void setTokenToController()
+   {
+     setToken(DEC_CONTROLLER_ID);
+   }
 
   /*!
    */

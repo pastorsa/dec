@@ -175,6 +175,14 @@ void DECInterface::generateSensorData(uint8_t token)
   length_ = byte_count;
 }
 
+void DECInterface::generateRequest(uint8_t token)
+{
+  uint8_t byte_count = 0;
+  data_[byte_count] = token;
+  byte_count++;
+  length_ = byte_count;
+}
+
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_SENSOR_DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
