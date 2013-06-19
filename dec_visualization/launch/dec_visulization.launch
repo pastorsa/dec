@@ -1,12 +1,23 @@
 <launch>
 
+  <arg name="debug" default="false"/>
+  <arg if="$(arg debug)" name="launch_prefix" value="xterm -rv -e gdb -ex run -args"/>
+  <arg unless="$(arg debug)" name="launch_prefix" value=""/>
+
+  <arg name="valgrind" default="false"/>
+  <arg if="$(arg valgrind)" name="valgrind_launch_prefix" value="valgrind --leak-check=full --log-file=/tmp/valgrind.txt"/>
+  <arg unless="$(arg valgrind)" name="valgrind_launch_prefix" value=""/>
+
   <include file="$(find dec_object_models)/launch/object_parameters.launch" />
 
 <!--
   <include file="$(find dec_world_state)/launch/world_state_manager.launch" />
 -->
 
-  <node pkg="dec_visualization" type="dec_visualization" name="DECVisualization" output="screen">
+  <node pkg="dec_visualization" type="dec_visualization" name="DECVisualization" output="screen"  launch-prefix="$(arg launch_prefix) $(arg valgrind_launch_prefix)">
     <rosparam command="load" file="$(find dec_visualization)/config/config.yaml" />
+    <rosparam command="load" file="$(find dec_visualization)/config/structure.yaml" />
+    <rosparam command="load" file="$(find dec_visualization)/config/simulation.yaml" />
+    <rosparam command="load" file="$(find dec_visualization)/config/communication.yaml" />
   </node>
 </launch>

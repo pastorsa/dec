@@ -36,7 +36,6 @@ bool DECCommunication::initialize(ros::NodeHandle node_handle)
 
 bool DECCommunication::process()
 {
-
   return DECProcessor::update();
 }
 

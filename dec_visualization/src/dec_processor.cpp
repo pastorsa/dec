@@ -63,7 +63,7 @@ bool DECProcessor::init(ros::NodeHandle node_handle)
   {
     for (unsigned int j = 0; j < arduino_to_light_node_map_[i].size(); ++j)
     {
-      const int INDEX = arduino_to_light_beam_map_[i][j];
+      const int INDEX = arduino_to_light_node_map_[i][j];
       const int ENTRY = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (arduino_to_light_beam_map_[i].size() * 4) + (j * 4);
       data_(i, ENTRY + RED_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.r * COLOR_RESOLUTION);
       data_(i, ENTRY + GREEN_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.g * COLOR_RESOLUTION);
