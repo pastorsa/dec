@@ -64,61 +64,6 @@ void receive_broadcast(unsigned char source, char command, unsigned char length,
   }
 }
 
-void run_test()
-{
-
-  // fill setup data
-  dec_interface.setup_data_[DEC_NODE_ID]->num_led_strips = 3;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[0].num_leds = 10;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[0].pin = 1;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[1].num_leds = 11;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[1].pin = 2;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[2].num_leds = 12;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[2].pin = 3;
-  dec_interface.setup_data_[DEC_NODE_ID]->num_sensors = 3;
-  dec_interface.setup_data_[DEC_NODE_ID]->sensors[0].pin = 4;
-  dec_interface.setup_data_[DEC_NODE_ID]->sensors[1].pin = 5;
-  dec_interface.setup_data_[DEC_NODE_ID]->sensors[2].pin = 6;
-
-  // generate message
-  dec_interface.generateSetupData(DEC_NODE_ID);
-  // message being send... and received...
-
-  // zero out local memory for testing
-  dec_interface.setup_data_[DEC_NODE_ID]->num_led_strips = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[0].num_leds = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[0].pin = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[1].num_leds = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[1].pin = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[2].num_leds = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->led_strips[2].pin = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->num_sensors = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->sensors[0].pin = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->sensors[1].pin = 0;
-  dec_interface.setup_data_[DEC_NODE_ID]->sensors[2].pin = 0;
-
-  // parse message
-  dec_interface.parseSetupData(dec_interface.data_);
-
-  // test
-  if ((dec_interface.setup_data_[DEC_NODE_ID]->num_led_strips != 3)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->led_strips[0].num_leds != 10)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->led_strips[0].pin != 1)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->led_strips[1].num_leds != 11)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->led_strips[1].pin != 2)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->led_strips[2].num_leds != 12)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->led_strips[2].pin != 3)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->num_sensors != 3)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->sensors[0].pin != 4)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->sensors[1].pin != 5)
-   || (dec_interface.setup_data_[DEC_NODE_ID]->sensors[2].pin != 6))
-  {
-    Serial.prin
-  }
-
-}
-
-
 /*!
  */
 void setup()
@@ -138,9 +83,7 @@ void setup()
  */
 void loop()
 {
-  // ICSC.process();
-  run_test();
-
+  ICSC.process();
 }
 
 
