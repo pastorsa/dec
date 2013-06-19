@@ -3,6 +3,7 @@
 
   <group ns="/objects">
     <rosparam command="load" file="$(arg dec_object_models_dir)/config/ball.yaml" />
+    <rosparam command="load" file="$(arg dec_object_models_dir)/config/structure.yaml" />
   </group>
 </launch>
 

@@ -1,0 +1,4 @@
+structure:
+  collision_model: BOX
+  collision_model_dimensions: [0.001, 0.001]
+

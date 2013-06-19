@@ -31,6 +31,7 @@ beams:
   - nodes: [3, 7]
   - nodes: [5, 7]
   - nodes: [5, 8]
+  - nodes: [6, 8]
 
 # Which beams are sensors
 # nodes: [0, 1] constructs a sensor from node 0 to node 1

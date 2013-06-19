@@ -366,7 +366,11 @@ void WorldStateManager::getObjectMarkers(const std::string& name, std::vector<vi
     bool mesh_disabled = false;
     object_parameters_.getMeshDisplayColor(name, marker.color, mesh_disabled);
     if (!mesh_disabled)
+    {
       markers.push_back(marker);
+      ROS_WARN("package_rel_file_name %s", package_rel_file_name.c_str());
+    }
+    ROS_WARN("package_rel_file_name %s", package_rel_file_name.c_str());
   }
   if (object_parameters_.getCollisionModel(name, collision_shape, collision_shape_offsets))
   { // add collision object if it exists
