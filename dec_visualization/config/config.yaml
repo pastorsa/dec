@@ -12,7 +12,7 @@ number_of_arduinos: 2
 max_number_of_sensors_per_arduino: 5
 # Maximum number of lights that can be hooked
 # up with each arduino
-max_number_of_light_strips_per_arduino: 6
+max_number_of_light_strips_per_arduino: 100
 # Maximum number of leds that can be controlled by each arduino
 max_number_of_leds_per_light_strip: 24
 

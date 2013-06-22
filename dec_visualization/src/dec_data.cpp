@@ -49,12 +49,20 @@ bool DECData::init(ros::NodeHandle node_handle)
   ROS_VERIFY(dec_utilities::read(node_handle, "interaction_mode", interaction_mode_));
 
   ROS_VERIFY(read(node_handle, "node_positions", node_positions_));
+  ROS_ASSERT_MSG(!node_positions_.empty(), "No node positions specified. Structure must contain at least one node.");
+
+  int offset_node_index = 0;
+  ROS_VERIFY(dec_utilities::read(node_handle, "offset_node_index", offset_node_index));
+  ROS_ASSERT_MSG(offset_node_index >= 0 && offset_node_index < (int)node_positions_.size(),
+             "Offset node index >%i< needs to be within [0..%i].", offset_node_index, (int)node_positions_.size()-1);
+  offsetNodePositions(node_positions_, offset_node_index);
+
   ROS_VERIFY(dec_utilities::read(node_handle, "light_nodes", light_nodes_));
   light_node_positions_.clear();
   for (unsigned int i = 0; i < light_nodes_.size(); ++i)
   {
     ROS_ASSERT_MSG(light_nodes_[i] >= 0 && light_nodes_[i] < (int)node_positions_.size(),
-                   "Invalid light node specified >%i<. Must be within [0..%i].", light_nodes_[i], (int)node_positions_.size());
+                   "Invalid light node specified >%i<. Must be within [0..%i].", light_nodes_[i], (int)node_positions_.size()-1);
     light_node_positions_.push_back(node_positions_[light_nodes_[i]]);
   }
 
@@ -131,7 +139,7 @@ bool DECData::read(ros::NodeHandle node_handle,
   {
     ROS_ASSERT_MSG(values[i] >= 0 && values[i] < number_of_arduinos_,
                    ">%s< >%i< is >%i< and therefore invalid. Must be within [0, %i]",
-                   array_name.c_str(), (int)i, values[i], number_of_arduinos_);
+                   array_name.c_str(), (int)i, values[i], number_of_arduinos_-1);
   }
 
   index_values.resize(values.size(), -1);
@@ -156,7 +164,6 @@ bool DECData::read(ros::NodeHandle node_handle,
   {
     ROS_ASSERT_MSG(index_values[i] >= 0, "Invalid index value >%i<.", index_values[i]);
   }
-
   return true;
 }
 
@@ -202,13 +209,12 @@ bool DECData::read(ros::NodeHandle node_handle,
     array.push_back(point);
   }
 
-  offsetNodePositions(array);
   return true;
 }
 
 bool DECData::read(ros::NodeHandle node_handle,
-                        const std::string& array_name,
-                            std::vector<std::pair<int, int> >& nodes)
+                   const std::string& array_name,
+                   std::vector<std::pair<int, int> >& nodes)
 {
   XmlRpc::XmlRpcValue rpc_values;
   if (!node_handle.getParam(array_name, rpc_values))
@@ -238,28 +244,34 @@ bool DECData::read(ros::NodeHandle node_handle,
       return false;
     }
     std::pair<int, int> values(rpc_value[0], rpc_value[1]);
-    if ( (values.first < 0) || (values.first >= (int)node_positions_.size()) ||
-        (values.second < 0) || (values.second >= (int)node_positions_.size()) )
-    {
-      ROS_ERROR("Invalid >%s< read >%i< >%i<. It must be within [0, %i].",
-                array_name.c_str(), values.first, values.second, (int)node_positions_.size());
-      return false;
-    }
+    ROS_ASSERT_MSG((values.first >= 0) && (values.first < (int)node_positions_.size())
+        && (values.second >= 0) && (values.second < (int)node_positions_.size()),
+        "Invalid >%s< index read at row %i: from >%i< to >%i<. It must be within [0, %i].",
+                array_name.c_str(), i, values.first, values.second, (int)(node_positions_.size()-1));
+    ROS_ASSERT_MSG(values.first != values.second, "Invalid beam read row %i. Node indices must differ.", i);
+
     nodes.push_back(values);
   }
   return true;
 }
 
-void DECData::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions)
+void DECData::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
+                                  const int node_index)
 {
   ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
-  std::vector<tf::Vector3> vectors(node_positions.size());
+  ROS_ASSERT_MSG(node_index >= 0 && node_index < node_positions.size(),
+                 "Provided node index >%i< is invalid. Need to be within [0..%i]. Cannot offset node positions.",
+                 node_index, node_positions.size()-1);
+
+  double offset_x = node_positions[node_index].x;
+  double offset_y = node_positions[node_index].y;
+  double offset_z = node_positions[node_index].z;
   for (unsigned int i = 0; i < node_positions.size(); ++i)
-    convert(node_positions[i], vectors[i]);
-  for (unsigned int i = 0; i < vectors.size(); ++i)
-    vectors[i] = vectors[i] - vectors[0];
-  for (unsigned int i = 0; i < node_positions.size(); ++i)
-    convert(vectors[i], node_positions[i]);
+  {
+    node_positions[i].x -= offset_x;
+    node_positions[i].y -= offset_y;
+    node_positions[i].z -= offset_z;
+  }
 }
 
 int DECData::getNumArduinos() const

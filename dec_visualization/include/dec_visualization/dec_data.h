@@ -118,6 +118,8 @@ protected:
   std::vector<int> light_node_connections_;
   std::vector<int> sensor_connections_;
 
+  /*!
+   */
   std::vector<int> light_beam_index_counter_;
   std::vector<int> light_node_index_counter_;
   std::vector<int> sensor_index_counter_;
@@ -148,10 +150,12 @@ private:
             std::vector<std::vector<int> >& map,
             const unsigned int& num);
 
-  /*! Offset all nodes such that the first node is at (0.0, 0.0, 0.0)
+  /*! Offset all nodes such that the node node_index is at (0.0, 0.0, 0.0)
    * @param node_positions
+   * @param node_index
    */
-  void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions);
+  void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
+                           const int node_index);
 
   /*!
    */
