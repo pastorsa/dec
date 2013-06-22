@@ -1,0 +1,14 @@
+<package>
+  <description brief="DEC">
+
+     DEC
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/DEC</url>
+
+</package>
+
+

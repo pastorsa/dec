@@ -7,22 +7,74 @@ DECInterface dec_interface;
 
 // Local variables
 boolean error = false;
+boolean msg_received = false;
 
 // Local variables for debugging
 const int led_pin = 13;         // the number of the LED pin
 int led_state = LOW;             // ledState used to set the LED
 long previous_millis = 0;        // will store last time LED was updated
 unsigned long interval = 500;   // interval at which to blink (milliseconds)
+void blink()
+{
+  unsigned long current_millis = millis();
+  if(current_millis - previous_millis > interval)
+  {
+    previous_millis = current_millis;
+    if (led_state == LOW)
+      led_state = HIGH;
+    else
+      led_state = LOW;
+    digitalWrite(led_pin, led_state);
+  }
+}
 
-/*!
- * @param source
- * @param command
- * @param length
- * @param data
- */
+// This function is called whenever a broadcast was send
 void receive_broadcast(unsigned char source, char command, unsigned char length, char *data)
 {
+  blink();
 
+  if (command == DEC_SETUP_DATA)
+  {
+    // parse data into local memory
+    dec_interface.parseSetupData(data);
+    // check whether it's for me
+    if (dec_interface.token_ == DEC_CONTROLLER_ID)
+    {
+
+
+      // start the sensor data loop
+      // dec_interface.generateRequest(0); // token = 0
+      // ICSC.broadcast(DEC_SETUP_DATA, dec_interface.length_, dec_interface.data_);
+    }
+  }
+
+  else if (command == DEC_SENSOR_DATA)
+  {
+    // parse data into local memory
+    dec_interface.parseSensorData(source, data);
+
+    // check whether it's for me
+    if (dec_interface.token_ == DEC_CONTROLLER_ID)
+    {
+      // continue the sensor data loop
+      dec_interface.generateRequest(0); // token = 0
+      ICSC.broadcast(DEC_SETUP_DATA, dec_interface.length_, dec_interface.data_);
+    }
+  }
+
+  else if (command == DEC_LIGHT_DATA)
+  {
+    // parse data into local memory
+    dec_interface.parseLightData(source, data);
+
+    // check whether it's my turn to broadcast my data
+    if (dec_interface.token_ == DEC_CONTROLLER_ID)
+    {
+      // not implemented yet
+    }
+  }
+
+  msg_received = true;
 }
 
 void setSetupData(uint8_t node_id, uint8_t num_led_strips,
@@ -75,42 +127,37 @@ void setup()
   loadSetupData();
   if(dec_interface.generateSetupData(0)) // token = 0
   {
-    // send
     ICSC.broadcast(0, dec_interface.length_, dec_interface.data_);
   }
-  else
-  {
-    error = true;
-  }
-}
-
-void blink()
-{
-  unsigned long current_millis = millis();
-  if(current_millis - previous_millis > interval)
-  {
-    previous_millis = current_millis;
-    if (led_state == LOW)
-      led_state = HIGH;
-    else
-      led_state = LOW;
-    digitalWrite(led_pin, led_state);
-  }
+  // else
+  // {
+  //   error = true;
+  // }
 }
 
 /*!
  */
 void loop()
 {
+  ICSC.process();
+
+  static unsigned long ts = millis();
+  if (millis() - ts >= 1000)
+  {
+    ts = millis();
+    if(dec_interface.generateSetupData(0)) // token = 0
+    {
+      ICSC.broadcast(0, dec_interface.length_, dec_interface.data_);
+    }
+  }
+
   if(!error)
   {
-    ICSC.process();
-
-    uint8_t node_id = 0;
-    dec_interface.generateRequest(node_id);
-
-    ICSC.broadcast(node_id, dec_interface.length_, dec_interface.data_);
-    blink();
+    if(msg_received)
+    {
+      msg_received = false;
+      ts = millis();
+    }
   }
 }
 

@@ -304,13 +304,21 @@ void DECProcessor::setupBeamMarkers(ros::NodeHandle& node_handle,
     convert(center, marker.pose.position);
 
     tf::Vector3 p12 = p2 - p1;
+    tf::Vector3 p12_normalized = p12;
+    p12_normalized.normalize();
     tf::Vector3 z_world = tf::Vector3(0.0, 0.0, 1.0);
     tf::Quaternion q;
-    tf::Vector3 p1_cross_p2 = p12.cross(z_world);
+    tf::Vector3 p1_cross_p2 = p12_normalized.cross(z_world);
     q.setX(p1_cross_p2.getX());
     q.setY(p1_cross_p2.getY());
     q.setZ(p1_cross_p2.getZ());
-    q.setW(sqrt((p12.length2()) * (z_world.length2())) + p12.dot(z_world));
+
+    if (fabs(p12.dot(z_world)) < 0.0001) // vectors are orthogonal
+    {
+
+    }
+
+    q.setW(sqrt((p12.length2()) * (z_world.length2())) / p12.dot(z_world));
     q.normalize();
     convert(q, marker.pose.orientation);
 

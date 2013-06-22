@@ -13,16 +13,32 @@ DECInterface dec_interface;
 
 // Local variables
 boolean error = false;
+boolean msg_received = false;
 
 // Local variables for debugging
 const int led_pin = 13;         // the number of the LED pin
 int led_state = LOW;             // ledState used to set the LED
 long previous_millis = 0;        // will store last time LED was updated
 unsigned long interval = 500;   // interval at which to blink (milliseconds)
+void blink()
+{
+  unsigned long current_millis = millis();
+  if(current_millis - previous_millis > interval)
+  {
+    previous_millis = current_millis;
+    if (led_state == LOW)
+      led_state = HIGH;
+    else
+      led_state = LOW;
+    digitalWrite(led_pin, led_state);
+  }
+}
 
 // This function is called whenever a broadcast was send
 void receive_broadcast(unsigned char source, char command, unsigned char length, char *data)
 {
+  blink();
+
   if (command == DEC_SETUP_DATA)
   {
     // parse data into local memory
@@ -52,7 +68,7 @@ void receive_broadcast(unsigned char source, char command, unsigned char length,
       dec_interface.generateSensorData(DEC_NODE_ID);
       // send back for now
       dec_interface.setTokenToController();
-      ICSC.broadcast(DEC_SENSOR_DATA, dec_interface.length_, dec_interface.data_);
+      ICSC.broadcast(command, dec_interface.length_, dec_interface.data_);
     }
   }
 
@@ -68,23 +84,11 @@ void receive_broadcast(unsigned char source, char command, unsigned char length,
       dec_interface.generateLightData(DEC_NODE_ID);
       // send back for now
       dec_interface.setTokenToController();
-      ICSC.broadcast(DEC_LIGHT_DATA, dec_interface.length_, dec_interface.data_);
+      ICSC.broadcast(command, dec_interface.length_, dec_interface.data_);
     }
   }
-}
 
-void blink()
-{
-  unsigned long current_millis = millis();
-  if(current_millis - previous_millis > interval)
-  {
-    previous_millis = current_millis;
-    if (led_state == LOW)
-      led_state = HIGH;
-    else
-      led_state = LOW;
-    digitalWrite(led_pin, led_state);
-  }
+  msg_received = true;
 }
 
 /*!
@@ -97,17 +101,23 @@ void setup()
   // setup communication
   ICSC.begin(DEC_NODE_ID, DEC_BAUD_RATE);
   ICSC.registerCommand(ICSC_BROADCAST, &receive_broadcast);
+
+  blink();
 }
 
 /*!
  */
 void loop()
 {
+  ICSC.process();
+
   if (!error)
   {
     // only react
-    ICSC.process();
-    blink();
+    if(msg_received)
+    {
+      msg_received = false;
+    }
   }
 }
 

@@ -23,7 +23,7 @@ class DECData
 {
 
 public:
-  DECData() : interaction_mode_(0), initialized_(false) {};
+  DECData();
   virtual ~DECData() {};
 
   /*!
@@ -35,7 +35,7 @@ public:
   /*!
    * @return number of arduinos
    */
-  int getNumArduinos();
+  int getNumArduinos() const;
 
   /*!
    * @param arduino_index
@@ -87,7 +87,8 @@ protected:
   Eigen::MatrixXi data_;
 
   int number_of_arduinos_;
-  int max_number_of_lights_per_arduino_;
+  int max_number_of_light_strips_per_arduino_;
+  int max_number_of_leds_per_light_strip_;
   int max_number_of_sensors_per_arduino_;
 
   std::vector<geometry_msgs::Point> node_positions_;
@@ -97,13 +98,21 @@ protected:
   std::vector<int> light_nodes_;
   std::vector<geometry_msgs::Point> light_node_positions_;;
 
-  /*! pairs of nodes in node_positions_ (indexed from 0)
+  /*! Pairs of nodes in node_positions_ (indexed from 0)
    */
   std::vector<std::pair<int, int> > beams_;
   std::vector<std::pair<int, int> > sensors_;
   std::vector<std::pair<int, int> > light_beams_;
 
-  /*! which light_beam or sensor is connected to which arduino
+  /*! Number of LEDs for each light beam and node
+   */
+  std::vector<int> num_leds_of_each_light_beam_;
+  std::vector<int> num_leds_of_each_light_node_;
+
+  /*! Which light_beam/light_node/sensor is connected to which arduino
+   * The size of each vector is equal to the size of
+   * light_beams/light_nodes/sensors. The stored number is the
+   * id of the arduino to which this thing is connected
    */
   std::vector<int> light_beam_connections_;
   std::vector<int> light_node_connections_;
@@ -113,6 +122,11 @@ protected:
   std::vector<int> light_node_index_counter_;
   std::vector<int> sensor_index_counter_;
 
+  /*! Number of light beams/light nodes/sensor for each arduino
+   * The size of these maps is equal to the number of arduinos in the network
+   * each entry contains a list of indices into light beams/light nodes/sensors
+   * to which this arduino is connected
+   */
   std::vector<std::vector<int> > arduino_to_light_beam_map_;
   std::vector<std::vector<int> > arduino_to_light_node_map_;
   std::vector<std::vector<int> > arduino_to_sensor_map_;
@@ -134,6 +148,15 @@ private:
             std::vector<std::vector<int> >& map,
             const unsigned int& num);
 
+  /*! Offset all nodes such that the first node is at (0.0, 0.0, 0.0)
+   * @param node_positions
+   */
+  void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions);
+
+  /*!
+   */
+  bool generateConfigurationFile(const std::string& abs_file_name);
+  bool generateStructureFile(const std::string& abs_file_name);
 };
 
 }

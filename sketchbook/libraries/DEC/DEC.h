@@ -1,15 +1,9 @@
 #ifndef _DEC_H
 #define _DEC_H
 
-#include <Arduino.h>
-
-// Constants to be adjusted
-static const uint8_t DEC_NUM_NODES = 1;
-
-// Configuration TODO: this needs to be corrected
-static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = 4;
-static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = 4;
-static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = 5;
+// File generated from dec_visualization/config/structure.yaml
+#include "dec_config.h"
+// #include <Arduino.h>
 
 // Fixed constants
 static const uint8_t DEC_CONTROLLER_ID = 255;

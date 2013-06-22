@@ -5,6 +5,11 @@
  *      Author: pastor
  */
 
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
+#include <ros/package.h>
 #include <tf/transform_datatypes.h>
 #include <conversions/ros_to_tf.h>
 #include <conversions/tf_to_ros.h>
@@ -13,17 +18,33 @@
 
 #include <dec_visualization/dec_data.h>
 
+using namespace std;
+using namespace conversions;
+
 namespace dec_visualization
 {
+
+DECData::DECData() : interaction_mode_(0), number_of_arduinos_(0),
+    max_number_of_light_strips_per_arduino_(0), max_number_of_leds_per_light_strip_(0),
+    max_number_of_sensors_per_arduino_(0), initialized_(false)
+{
+};
+
 
 bool DECData::init(ros::NodeHandle node_handle)
 {
   ROS_VERIFY(dec_utilities::read(node_handle, "number_of_arduinos", number_of_arduinos_));
-  ROS_ASSERT(number_of_arduinos_ > 0);
+  ROS_ASSERT_MSG(number_of_arduinos_ > 0 && number_of_arduinos_ <= 30,
+                 "Number of arduinos specified >%i< is invalid. It need to be within [1..30].", number_of_arduinos_);
   ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_sensors_per_arduino", max_number_of_sensors_per_arduino_));
-  ROS_ASSERT(max_number_of_sensors_per_arduino_ > 0);
-  ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_lights_per_arduino", max_number_of_lights_per_arduino_));
-  ROS_ASSERT(max_number_of_lights_per_arduino_ > 0);
+  ROS_ASSERT_MSG(max_number_of_sensors_per_arduino_ > 0 && max_number_of_sensors_per_arduino_ <= 255,
+                 "Maximum number of sensors specified >%i< is invalid.", max_number_of_sensors_per_arduino_);
+  ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_light_strips_per_arduino", max_number_of_light_strips_per_arduino_));
+  ROS_ASSERT_MSG(max_number_of_light_strips_per_arduino_ > 0 && max_number_of_light_strips_per_arduino_ <= 255,
+                 "Maximum number of light strips specified >%i< is invalid.", max_number_of_light_strips_per_arduino_);
+  ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_leds_per_light_strip", max_number_of_leds_per_light_strip_));
+  ROS_ASSERT_MSG(max_number_of_leds_per_light_strip_ > 0 && max_number_of_leds_per_light_strip_ <= 255,
+                 "Maximum number of leds per light strip specified >%i< is invalid.", max_number_of_leds_per_light_strip_);
 
   ROS_VERIFY(dec_utilities::read(node_handle, "interaction_mode", interaction_mode_));
 
@@ -41,16 +62,18 @@ bool DECData::init(ros::NodeHandle node_handle)
   ROS_VERIFY(read(node_handle, "light_beams", light_beams_));
   ROS_VERIFY(read(node_handle, "sensors", sensors_));
 
-  ROS_VERIFY(read(node_handle, "light_beam_connections", light_beam_connections_, light_beam_index_counter_, arduino_to_light_beam_map_, light_beams_.size()));
-  ROS_VERIFY(read(node_handle, "light_node_connections", light_node_connections_, light_node_index_counter_, arduino_to_light_node_map_, light_nodes_.size()));
+  ROS_VERIFY(read(node_handle, "light_beam_connections", light_beam_connections_, light_beam_index_counter_,
+                  arduino_to_light_beam_map_, light_beams_.size()));
+  ROS_VERIFY(read(node_handle, "light_node_connections", light_node_connections_, light_node_index_counter_,
+                  arduino_to_light_node_map_, light_nodes_.size()));
   ROS_ASSERT(arduino_to_light_beam_map_.size() == arduino_to_light_node_map_.size() &&
              (int)arduino_to_light_beam_map_.size() == number_of_arduinos_);
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
     ROS_ASSERT_MSG(static_cast<int>(arduino_to_light_beam_map_[i].size()) + static_cast<int>(arduino_to_light_node_map_[i].size())
-               < max_number_of_lights_per_arduino_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
+               < max_number_of_light_strips_per_arduino_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
                (int)arduino_to_light_beam_map_[i].size(), (int)arduino_to_light_node_map_[i].size(),
-               max_number_of_lights_per_arduino_);
+               max_number_of_light_strips_per_arduino_);
   }
 
   ROS_VERIFY(read(node_handle, "sensor_connections", sensor_connections_, sensor_index_counter_, arduino_to_sensor_map_, sensors_.size()));
@@ -59,11 +82,36 @@ bool DECData::init(ros::NodeHandle node_handle)
     ROS_ASSERT(static_cast<int>(arduino_to_sensor_map_[i].size()) < max_number_of_sensors_per_arduino_);
   }
 
+  ROS_VERIFY(dec_utilities::read(node_handle, "num_leds_of_each_light_beam", num_leds_of_each_light_beam_));
+  ROS_ASSERT_MSG(num_leds_of_each_light_beam_.size() == light_beams_.size(),
+                 "Number of LEDs for each light beam is incorrect >%i<. It should equal the number of light beams >%i<.",
+                 (int)num_leds_of_each_light_beam_.size(), (int)light_beams_.size());
+  ROS_VERIFY(dec_utilities::read(node_handle, "num_leds_of_each_light_node", num_leds_of_each_light_node_));
+  ROS_ASSERT_MSG(num_leds_of_each_light_node_.size() == light_nodes_.size(),
+                 "Number of LEDs for each light node is incorrect >%i<. It should equal the number of light nodes >%i<.",
+                 (int)num_leds_of_each_light_node_.size(), (int)light_nodes_.size());
+
+  bool generate_configuration_file = false;
+  ROS_VERIFY(dec_utilities::read(node_handle, "generate_configuration_file", generate_configuration_file));
+  if (generate_configuration_file)
+  {
+    std::string path = ros::package::getPath("DEC");
+    dec_utilities::appendTrailingSlash(path);
+    generateConfigurationFile(path + "dec_config.h");
+  }
+  bool generate_structure_file = false;
+  ROS_VERIFY(dec_utilities::read(node_handle, "generate_structure_file", generate_structure_file));
+  if (generate_structure_file)
+  {
+    std::string path = ros::package::getPath("DEC");
+    dec_utilities::appendTrailingSlash(path);
+    generateStructureFile(path + "../../dec_controller/dec_structure.h");
+  }
 
   const int NUM_ENTRIES_PER_ARDUINO =
       + NUM_ENTRIES_FOR_ARDUINO_LEVEL
       + max_number_of_sensors_per_arduino_
-      + 4 * max_number_of_lights_per_arduino_; // for RGBA
+      + 4 * max_number_of_light_strips_per_arduino_; // for RGBA
 
   data_ = Eigen::MatrixXi::Zero(number_of_arduinos_, NUM_ENTRIES_PER_ARDUINO);
   return (initialized_ = true);
@@ -113,8 +161,8 @@ bool DECData::read(ros::NodeHandle node_handle,
 }
 
 bool DECData::read(ros::NodeHandle node_handle,
-                        const std::string& array_name,
-                            std::vector<geometry_msgs::Point>& array)
+                   const std::string& array_name,
+                   std::vector<geometry_msgs::Point>& array)
 {
   XmlRpc::XmlRpcValue rpc_values;
   if (!node_handle.getParam(array_name, rpc_values))
@@ -153,6 +201,8 @@ bool DECData::read(ros::NodeHandle node_handle,
     point.z = values[2];
     array.push_back(point);
   }
+
+  offsetNodePositions(array);
   return true;
 }
 
@@ -200,7 +250,19 @@ bool DECData::read(ros::NodeHandle node_handle,
   return true;
 }
 
-int DECData::getNumArduinos()
+void DECData::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions)
+{
+  ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
+  std::vector<tf::Vector3> vectors(node_positions.size());
+  for (unsigned int i = 0; i < node_positions.size(); ++i)
+    convert(node_positions[i], vectors[i]);
+  for (unsigned int i = 0; i < vectors.size(); ++i)
+    vectors[i] = vectors[i] - vectors[0];
+  for (unsigned int i = 0; i < node_positions.size(); ++i)
+    convert(vectors[i], node_positions[i]);
+}
+
+int DECData::getNumArduinos() const
 {
   ROS_ASSERT(initialized_);
   return number_of_arduinos_;
@@ -224,6 +286,62 @@ void DECData::setSensorValue(const int arduino_index,
                                 const int sensor_value)
 {
   data_(arduino_index, NUM_ENTRIES_FOR_ARDUINO_LEVEL + sensor_index) = sensor_value;
+}
+
+bool DECData::generateConfigurationFile(const std::string& abs_file_name)
+{
+  std::ofstream header_file;
+  header_file.open(abs_file_name.c_str(), std::ios::out);
+  ROS_ASSERT_MSG(header_file.is_open(), "Problem when opening header file >%s<.", abs_file_name.c_str());
+
+  header_file << "// This configuration file is generated from dec_visualization/config/config.yaml.\n";
+  header_file << "// Please do not edit.\n";
+  header_file << "// Instead edit dec_visualization/config/structure.yaml and regenerate this file.\n\n";
+
+  header_file << "#ifndef _DEC_CONFIG_H" << endl;
+  header_file << "#define _DEC_CONFIG_H" << endl;
+
+  header_file << "static const uint8_t DEC_NUM_NODES  = " << number_of_arduinos_ << ";\n";
+  header_file << "static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = " << max_number_of_sensors_per_arduino_ << ";\n";
+  header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = " << max_number_of_light_strips_per_arduino_ << ";\n";
+  header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = " << max_number_of_leds_per_light_strip_ << ";\n";
+
+  header_file << "#endif // _DEC_CONFIG_H" << endl;
+  header_file.close();
+
+  return true;
+}
+
+bool DECData::generateStructureFile(const std::string& abs_file_name)
+{
+  std::ofstream header_file;
+  header_file.open(abs_file_name.c_str(), std::ios::out);
+  ROS_ASSERT_MSG(header_file.is_open(), "Problem when opening header file >%s<.", abs_file_name.c_str());
+
+  header_file << "// This configuration file is generated from dec_visualization/config/structure.yaml.\n";
+  header_file << "// Please do not edit.\n";
+  header_file << "// Instead edit dec_visualization/config/structure.yaml and regenerate this file.\n\n";
+
+  header_file << "#ifndef _DEC_STRUCTURE_H" << endl;
+  header_file << "#define _DEC_STRUCTURE_H" << endl;
+  header_file << endl;
+
+  header_file << "uint8_t num_led_strips_per_arduino[" << number_of_arduinos_ << "];\n";
+  for (int i = 0; i < number_of_arduinos_; ++i)
+  {
+    int num_light_strips = 0;
+    num_light_strips += (int)arduino_to_light_beam_map_[i].size();
+    num_light_strips += (int)arduino_to_light_node_map_[i].size();
+    header_file << "num_led_strips_per_arduino[" << i << "] = " << num_light_strips << ";\n";
+  }
+  header_file << endl;
+
+
+
+  header_file << "#endif // _DEC_STRUCTURE_H" << endl;
+  header_file.close();
+
+  return true;
 }
 
 }
