@@ -1,6 +1,9 @@
 #include <ICSC.h>
 #include <DEC.h>
 
+// include generated file
+#include "dec_structure.h"
+
 /*! Communication interface used to generate/parse messages
  */
 DECInterface dec_interface;

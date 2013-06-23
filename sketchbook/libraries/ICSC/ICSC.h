@@ -32,41 +32,8 @@
 
 #include <Arduino.h>
 
-// Uncomment the definition of ICSC_DYNAMIC if you want to use
-// dynamic memory allocation
-//#define ICSC_DYNAMIC
-
-// Uncomment the definition of ICSC_NO_STATS if you don't need stats
-// and need to save space
-#define ICSC_NO_STATS
-
-// Uncomment the ICSC_COLLISION_DETECTION if collision detection is needed
-// On Arduino the transmit and receive are isolated and therefore not needed
-// #define ICSC_COLLISION_DETECTION
-
-#ifndef ICSC_DYNAMIC
-// This defines the maximum size of any message that can be sent
-// between chips.  Reduce this to conserve memory at the cost
-// of smaller packet sizes.  Note that this only affects the
-// size of packets that can be received - you can always send
-// up to 255 bytes.  If the remote end can't receive them all
-// the packet will be silently discarded.
-#define MAX_MESSAGE 50
-
-// The maximum number of registered commands.  If you're not
-// going to have many commands reducing this can save memory.
-// If you want lots of commands you may need to increase this
-// value.  Note that this only affects the commands registerable
-// at the receiving end
-// TODO: keep this in mind and revisit
-#define MAX_COMMANDS 10
-#endif
-
-// If this StationId is used during send(broadcast)
-// the message will be picked up by all devices
-#define ICSC_BROADCAST  0xFD
-
-#define ICSC_CMD_SYS    0x1F
+// include config
+#include "ICSC_config.h"
 
 // Shouldn't use anything that would conflict with the header characters.
 #define ICSC_SYS_PING   0x05
@@ -75,7 +42,6 @@
 #define ICSC_SYS_RSTAT  0x08
 //Used when message is relayed to other station via a other station
 #define ICSC_SYS_RELAY  0x09
-
 
 // When this is used during registerCommand all message will pushed
 // to the callback function
@@ -147,8 +113,8 @@ class _ICSC {
         unsigned char _recCS;
         unsigned char _recCalcCS;
 
-        // Timestamp of last byte to pass through the
-        // fsm.  Used to help avoid colisions.
+        // Time stamp of last byte to pass through the
+        // fsm.  Used to help avoid collisions.
         unsigned long _lastByteSeen;
 
         // My station ID
@@ -178,7 +144,7 @@ class _ICSC {
     public:
         _ICSC();
         ~_ICSC();
-        void begin(unsigned char station, unsigned long baud=9600);
+        // void begin(unsigned char station, unsigned long baud=9600);
         void begin(unsigned char station, unsigned long baud, int dePin);
         void begin(unsigned char station, unsigned long baud, HardwareSerial *sdev);
         void begin(unsigned char station, unsigned long baud, HardwareSerial *sdev, int dePin);
@@ -203,12 +169,6 @@ class _ICSC {
         boolean isRelay();
 
 };
-
-// Packet wrapping characters, defined in standard ASCII table
-#define SOH 1
-#define STX 2
-#define ETX 3
-#define EOT 4
 
 // Global object for interacting with the class
 extern _ICSC ICSC;

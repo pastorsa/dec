@@ -71,10 +71,10 @@ _ICSC::~_ICSC()
 
 // Initialize the system.  Set up the serial port to the right baud rate
 // and initialize my variables.
-void _ICSC::begin(unsigned char station, unsigned long baud)
-{
-    begin(station, baud, &Serial, -1);
-}
+// void _ICSC::begin(unsigned char station, unsigned long baud)
+// {
+//    begin(station, baud, &Serial, -1);
+// }
 
 void _ICSC::begin(unsigned char station, unsigned long baud, int dePin)
 {

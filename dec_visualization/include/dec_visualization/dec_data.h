@@ -133,6 +133,11 @@ protected:
   std::vector<std::vector<int> > arduino_to_light_node_map_;
   std::vector<std::vector<int> > arduino_to_sensor_map_;
 
+  /*! This vector contains the pin settings of the DE pin of the RS-485 interace
+   * of each arduino. Thus, the size of this vector must be the same as number_of_arduino
+   */
+  std::vector<int> icsc_de_pins_;
+
 private:
   bool initialized_;
 

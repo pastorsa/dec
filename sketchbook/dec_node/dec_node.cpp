@@ -6,6 +6,7 @@
  * DEC_NODE_ID must be within [1, DEC_NUM_NODES]
  */
 static const uint8_t DEC_NODE_ID = 0;
+static const uint8_t DEC_ICSC_DE_PIN = 7;
 
 /*! Communication interface used to generate/parse messages
  */
@@ -99,7 +100,7 @@ void setup()
   pinMode(led_pin, OUTPUT);
 
   // setup communication
-  ICSC.begin(DEC_NODE_ID, DEC_BAUD_RATE);
+  ICSC.begin(DEC_NODE_ID, DEC_BAUD_RATE, DEC_ICSC_DE_PIN);
   ICSC.registerCommand(ICSC_BROADCAST, &receive_broadcast);
 
   blink();

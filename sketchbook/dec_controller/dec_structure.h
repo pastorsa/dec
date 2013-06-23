@@ -9,4 +9,8 @@ uint8_t num_led_strips_per_arduino[2];
 num_led_strips_per_arduino[0] = 53;
 num_led_strips_per_arduino[1] = 0;
 
+uint8_t icsc_de_pins[2];
+icsc_de_pins[0] = 7;
+icsc_de_pins[1] = 7;
+
 #endif // _DEC_STRUCTURE_H

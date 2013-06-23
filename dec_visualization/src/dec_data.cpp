@@ -99,13 +99,32 @@ bool DECData::init(ros::NodeHandle node_handle)
                  "Number of LEDs for each light node is incorrect >%i<. It should equal the number of light nodes >%i<.",
                  (int)num_leds_of_each_light_node_.size(), (int)light_nodes_.size());
 
+  ROS_VERIFY(dec_utilities::read(node_handle, "icsc_de_pins", icsc_de_pins_));
+  ROS_ASSERT_MSG((int)icsc_de_pins_.size() ==  number_of_arduinos_,
+                 "Number of DE pins for the RS-485 interface >%i< must be equal to the number of arduinos >%i<.",
+                 (int)icsc_de_pins_.size(), number_of_arduinos_);
+  for (unsigned int i = 0; i < icsc_de_pins_.size(); ++i)
+  {
+    ROS_ASSERT_MSG(icsc_de_pins_[i] >= 0 && icsc_de_pins_[i] <= 255,
+                   "DE pin specified for arduino >%i< is invalid >%i<. Check icsc_de_pins parameter.",
+                   (int)i, icsc_de_pins_[i]);
+  }
+
+  const int NUM_ENTRIES_PER_ARDUINO =
+      + NUM_ENTRIES_FOR_ARDUINO_LEVEL
+      + max_number_of_sensors_per_arduino_
+      + 4 * max_number_of_light_strips_per_arduino_; // for RGBA
+
+  data_ = Eigen::MatrixXi::Zero(number_of_arduinos_, NUM_ENTRIES_PER_ARDUINO);
+
+  // Lastly, generate the configuration file
   bool generate_configuration_file = false;
   ROS_VERIFY(dec_utilities::read(node_handle, "generate_configuration_file", generate_configuration_file));
   if (generate_configuration_file)
   {
     std::string path = ros::package::getPath("DEC");
     dec_utilities::appendTrailingSlash(path);
-    generateConfigurationFile(path + "dec_config.h");
+    generateConfigurationFile(path + "DEC_config.h");
   }
   bool generate_structure_file = false;
   ROS_VERIFY(dec_utilities::read(node_handle, "generate_structure_file", generate_structure_file));
@@ -116,12 +135,6 @@ bool DECData::init(ros::NodeHandle node_handle)
     generateStructureFile(path + "../../dec_controller/dec_structure.h");
   }
 
-  const int NUM_ENTRIES_PER_ARDUINO =
-      + NUM_ENTRIES_FOR_ARDUINO_LEVEL
-      + max_number_of_sensors_per_arduino_
-      + 4 * max_number_of_light_strips_per_arduino_; // for RGBA
-
-  data_ = Eigen::MatrixXi::Zero(number_of_arduinos_, NUM_ENTRIES_PER_ARDUINO);
   return (initialized_ = true);
 }
 
@@ -259,9 +272,9 @@ void DECData::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positi
                                   const int node_index)
 {
   ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
-  ROS_ASSERT_MSG(node_index >= 0 && node_index < node_positions.size(),
+  ROS_ASSERT_MSG(node_index >= 0 && node_index < (int)node_positions.size(),
                  "Provided node index >%i< is invalid. Need to be within [0..%i]. Cannot offset node positions.",
-                 node_index, node_positions.size()-1);
+                 node_index, int(node_positions.size())-1);
 
   double offset_x = node_positions[node_index].x;
   double offset_y = node_positions[node_index].y;
@@ -311,14 +324,14 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   header_file << "// Instead edit dec_visualization/config/structure.yaml and regenerate this file.\n\n";
 
   header_file << "#ifndef _DEC_CONFIG_H" << endl;
-  header_file << "#define _DEC_CONFIG_H" << endl;
+  header_file << "#define _DEC_CONFIG_H\n" << endl;
 
-  header_file << "static const uint8_t DEC_NUM_NODES  = " << number_of_arduinos_ << ";\n";
+  header_file << "static const uint8_t DEC_NUMBER_OF_ARDUINOS  = " << number_of_arduinos_ << ";\n";
   header_file << "static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = " << max_number_of_sensors_per_arduino_ << ";\n";
   header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = " << max_number_of_light_strips_per_arduino_ << ";\n";
   header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = " << max_number_of_leds_per_light_strip_ << ";\n";
 
-  header_file << "#endif // _DEC_CONFIG_H" << endl;
+  header_file << "\n#endif // _DEC_CONFIG_H" << endl;
   header_file.close();
 
   return true;
@@ -338,19 +351,23 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
   header_file << "#define _DEC_STRUCTURE_H" << endl;
   header_file << endl;
 
-  header_file << "uint8_t num_led_strips_per_arduino[" << number_of_arduinos_ << "];\n";
+  header_file << "static const uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_arduinos_ << "];\n";
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
     int num_light_strips = 0;
     num_light_strips += (int)arduino_to_light_beam_map_[i].size();
     num_light_strips += (int)arduino_to_light_node_map_[i].size();
-    header_file << "num_led_strips_per_arduino[" << i << "] = " << num_light_strips << ";\n";
+    header_file << "NUM_LED_STRIPS_PER_ARDUINO[" << i << "] = " << num_light_strips << ";\n";
   }
   header_file << endl;
 
+  header_file << "static const uint8_t ICSC_DE_PINS[" << number_of_arduinos_ << "];\n";
+  for (int i = 0; i < number_of_arduinos_; ++i)
+  {
+    header_file << "ICSC_DE_PINS[" << i << "] = " << icsc_de_pins_[i] << ";\n";
+  }
 
-
-  header_file << "#endif // _DEC_STRUCTURE_H" << endl;
+  header_file << "\n#endif // _DEC_STRUCTURE_H" << endl;
   header_file.close();
 
   return true;

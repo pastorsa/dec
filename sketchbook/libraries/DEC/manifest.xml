@@ -10,9 +10,10 @@
   <url>http://ros.org/wiki/DEC</url>
   
   <depend package="roscpp"/>
+  <depend package="ICSC"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec"/>
+    <cpp cflags="-I${prefix}" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec"/>
   </export>
 
 </package>

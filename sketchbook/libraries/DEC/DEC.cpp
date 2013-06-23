@@ -1,6 +1,9 @@
-#include <Arduino.h>
-#include <DEC.h>
-#include <ICSC.h>
+#include "DEC.h"
+
+#ifndef ARDUINO
+#include <string.h>
+using namespace std;
+#endif
 
 // Constructor of the class
 DECInterface::DECInterface()
@@ -88,6 +91,9 @@ void DECInterface::parseSetupData(char* data)
   token_ = data[byte_count];
   byte_count++;
 
+  setup_data_[token_]->icsc_de_pin = data[byte_count];
+  byte_count++;
+
   setup_data_[token_]->num_led_strips = data[byte_count];
   byte_count++;
   for (uint8_t i = 0; i < setup_data_[token_]->num_led_strips; ++i)
@@ -121,6 +127,9 @@ boolean DECInterface::generateSetupData(uint8_t token)
 
   uint8_t byte_count = 0;
   data_[byte_count] = token;
+  byte_count++;
+
+  data_[byte_count] = setup_data_[token_]->icsc_de_pin;
   byte_count++;
 
   data_[byte_count] = setup_data_[token]->num_led_strips;

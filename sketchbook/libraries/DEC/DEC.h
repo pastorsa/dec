@@ -2,16 +2,21 @@
 #define _DEC_H
 
 // File generated from dec_visualization/config/structure.yaml
-#include "dec_config.h"
-// #include <Arduino.h>
+#ifndef ARDUINO
+#include <stdlib.h>
+#include <stdint.h>
+typedef bool boolean;
+#else
+#include <Arduino.h>
+#endif
+
+#include "DEC_config.h"
+#include "ICSC_config.h"
 
 // Fixed constants
 static const uint8_t DEC_CONTROLLER_ID = 255;
 static const uint8_t DEC_LAPTOP_ID = 254;
 // Note station id 0xFD == 253 is used for broadcasting
-
-// TODO: play with this
-#define DEC_BAUD_RATE 115200
 
 /* Remember:
  * uint8_t     = [0..255]
@@ -85,6 +90,7 @@ public:
    */
   typedef struct
   {
+    uint8_t icsc_de_pin;
     uint8_t num_led_strips;
     led_strip_setup_t led_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
     uint8_t num_sensors;

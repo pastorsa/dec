@@ -1,13 +1,11 @@
 #include <ICSC.h>
+#include <DEC.h>
 
 const uint8_t my_station_id = 2;
 const uint8_t remote_station_id = 50;
+const uint8_t ICSC_DE_PIN = 7;
 
-boolean flag = false;
-
-const uint8_t DE_PIN = 7;
-const uint8_t RE_PIN = 8;
-
+boolean msg_received = false;
 
 // Local variables for debugging
 const int led_pin = 13;         // the number of the LED pin
@@ -26,40 +24,46 @@ void blink()
   digitalWrite(led_pin, led_state);
 }
 
+void pressed(unsigned char src, char command, unsigned char len, char *data)
+{
+  msg_received = true;
+  digitalWrite(13, HIGH);
+}
+
+void released(unsigned char src, char command, unsigned char len, char *data)
+{
+  msg_received = true;
+  digitalWrite(13, LOW);
+}
 
 void setup()
 {
-  ICSC.begin(my_station_id, 115200, DE_PIN);
+  ICSC.begin(my_station_id, DEC_BAUD_RATE, ICSC_DE_PIN);
+  ICSC.registerCommand('P', &pressed);
+  ICSC.registerCommand('R', &released);
 
   // LED
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
 
   // enable the RS-485 bus
-  pinMode(DE_PIN, OUTPUT); // DE
-  pinMode(RE_PIN, OUTPUT); // NOT_RE
+  pinMode(7, OUTPUT); // DE
+  pinMode(8, OUTPUT); // NOT_RE
 
-  digitalWrite(DE_PIN, HIGH);  // DE
-  digitalWrite(RE_PIN, LOW);   // NOT_RE  
+  digitalWrite(7, LOW);  // DE
+  digitalWrite(8, LOW);   // NOT_RE
 }
 
 void loop()
 {
-  if ((millis() - ts) >= interval)
-  {
-    ts = millis();
-    if (flag)
-    {
-      // ICSC.send(ICSC_BROADCAST, 'P', 0, NULL);
-      ICSC.send(remote_station_id, 'P', 0, NULL);      
-    } 
-    else
-    {
-      // ICSC.send(ICSC_BROADCAST, 'R', 0, NULL);
-      ICSC.send(remote_station_id, 'R', 0, NULL);      
-      blink();
-    }
-    flag = !flag;
-  }
   ICSC.process();
+  // static unsigned long ts = millis();
+  // if (!msg_received && millis() - ts >= 100)
+  // {
+  //   ts = millis();
+  //   blink();
+  // }
 }
+
+
+
