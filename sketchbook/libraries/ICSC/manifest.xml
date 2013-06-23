@@ -1,18 +1,18 @@
 <package>
-  <description brief="DEC">
+  <description brief="ICSC">
 
-     DEC
+     ICSC
 
   </description>
   <author>Peter</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/DEC</url>
-  
+  <url>http://ros.org/wiki/ICSC</url>
+
   <depend package="roscpp"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec"/>
+    <cpp cflags="-I${prefix}/include"/>
   </export>
 
 </package>
