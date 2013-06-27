@@ -26,7 +26,7 @@ namespace dec_visualization
 
 DECData::DECData() : interaction_mode_(0), number_of_arduinos_(0),
     max_number_of_light_strips_per_arduino_(0), max_number_of_leds_per_light_strip_(0),
-    max_number_of_sensors_per_arduino_(0), initialized_(false)
+    max_number_of_sensors_per_arduino_(0), /*controller_icsc_de_pin_(-1),*/ initialized_(false)
 {
 };
 
@@ -44,7 +44,7 @@ bool DECData::init(ros::NodeHandle node_handle)
                  "Maximum number of light strips specified >%i< is invalid.", max_number_of_light_strips_per_arduino_);
   ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_leds_per_light_strip", max_number_of_leds_per_light_strip_));
   ROS_ASSERT_MSG(max_number_of_leds_per_light_strip_ > 0 && max_number_of_leds_per_light_strip_ <= 255,
-                 "Maximum number of leds per light strip specified >%i< is invalid.", max_number_of_leds_per_light_strip_);
+                 "Maximum number of LEDs per light strip specified >%i< is invalid.", max_number_of_leds_per_light_strip_);
 
   ROS_VERIFY(dec_utilities::read(node_handle, "interaction_mode", interaction_mode_));
 
@@ -70,23 +70,14 @@ bool DECData::init(ros::NodeHandle node_handle)
   ROS_VERIFY(read(node_handle, "light_beams", light_beams_));
   ROS_VERIFY(read(node_handle, "sensors", sensors_));
 
-  ROS_VERIFY(read(node_handle, "light_beam_connections", light_beam_connections_, light_beam_index_counter_,
-                  arduino_to_light_beam_map_, light_beams_.size()));
-  ROS_VERIFY(read(node_handle, "light_node_connections", light_node_connections_, light_node_index_counter_,
-                  arduino_to_light_node_map_, light_nodes_.size()));
-  ROS_ASSERT(arduino_to_light_beam_map_.size() == arduino_to_light_node_map_.size() &&
-             (int)arduino_to_light_beam_map_.size() == number_of_arduinos_);
+  ROS_VERIFY(read(node_handle, "light_beam_connections", light_beam_connections_, light_beam_index_counter_, arduino_to_light_beam_map_, light_beams_.size()));
+  ROS_VERIFY(read(node_handle, "light_node_connections", light_node_connections_, light_node_index_counter_, arduino_to_light_node_map_, light_nodes_.size()));
+  ROS_VERIFY(read(node_handle, "sensor_connections", sensor_connections_, sensor_index_counter_, arduino_to_sensor_map_, sensors_.size()));
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
     ROS_ASSERT_MSG(static_cast<int>(arduino_to_light_beam_map_[i].size()) + static_cast<int>(arduino_to_light_node_map_[i].size())
-               < max_number_of_light_strips_per_arduino_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
-               (int)arduino_to_light_beam_map_[i].size(), (int)arduino_to_light_node_map_[i].size(),
-               max_number_of_light_strips_per_arduino_);
-  }
-
-  ROS_VERIFY(read(node_handle, "sensor_connections", sensor_connections_, sensor_index_counter_, arduino_to_sensor_map_, sensors_.size()));
-  for (unsigned int i = 0; i < arduino_to_light_beam_map_.size(); ++i)
-  {
+               <= max_number_of_light_strips_per_arduino_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
+               (int)arduino_to_light_beam_map_[i].size(), (int)arduino_to_light_node_map_[i].size(), max_number_of_light_strips_per_arduino_);
     ROS_ASSERT(static_cast<int>(arduino_to_sensor_map_[i].size()) < max_number_of_sensors_per_arduino_);
   }
 
@@ -99,15 +90,24 @@ bool DECData::init(ros::NodeHandle node_handle)
                  "Number of LEDs for each light node is incorrect >%i<. It should equal the number of light nodes >%i<.",
                  (int)num_leds_of_each_light_node_.size(), (int)light_nodes_.size());
 
-  ROS_VERIFY(dec_utilities::read(node_handle, "icsc_de_pins", icsc_de_pins_));
-  ROS_ASSERT_MSG((int)icsc_de_pins_.size() ==  number_of_arduinos_,
-                 "Number of DE pins for the RS-485 interface >%i< must be equal to the number of arduinos >%i<.",
-                 (int)icsc_de_pins_.size(), number_of_arduinos_);
-  for (unsigned int i = 0; i < icsc_de_pins_.size(); ++i)
+  //  ROS_VERIFY(dec_utilities::read(node_handle, "node_icsc_de_pins", node_icsc_de_pins_));
+  //  ROS_ASSERT_MSG((int)node_icsc_de_pins_.size() ==  number_of_arduinos_,
+  //                 "Number of DE pins for the RS-485 interface >%i< must be equal to the number of arduinos >%i<.",
+  //                 (int)node_icsc_de_pins_.size(), number_of_arduinos_);
+  //  for (unsigned int i = 0; i < node_icsc_de_pins_.size(); ++i)
+  //  {
+  //    ROS_ASSERT_MSG(node_icsc_de_pins_[i] >= 0 && node_icsc_de_pins_[i] <= 255,
+  //                   "DE pin specified for arduino >%i< is invalid >%i<. Check node_icsc_de_pins parameter.", (int)i, node_icsc_de_pins_[i]);
+  //  }
+  //  ROS_VERIFY(dec_utilities::read(node_handle, "controller_icsc_de_pin", controller_icsc_de_pin_));
+  //  ROS_ASSERT_MSG(controller_icsc_de_pin_ >= 0 && controller_icsc_de_pin_ <= 255,
+  //                 "DE pin specified for the controller arduino is invalid >%i<. Check controller_icsc_de_pin parameter.", controller_icsc_de_pin_);
+
+  ROS_VERIFY(dec_utilities::read(node_handle, "io_pin_ordering", io_pin_ordering_));
+  for (unsigned int i = 0; i < io_pin_ordering_.size(); ++i)
   {
-    ROS_ASSERT_MSG(icsc_de_pins_[i] >= 0 && icsc_de_pins_[i] <= 255,
-                   "DE pin specified for arduino >%i< is invalid >%i<. Check icsc_de_pins parameter.",
-                   (int)i, icsc_de_pins_[i]);
+    ROS_ASSERT_MSG(io_pin_ordering_[i] >= 0 && io_pin_ordering_[i] <= 255,
+                   "IO pin specified for pin >%i< is invalid >%i<. Check io_pin_ordering parameter.", (int)i, io_pin_ordering_[i]);
   }
 
   const int NUM_ENTRIES_PER_ARDUINO =
@@ -116,6 +116,7 @@ bool DECData::init(ros::NodeHandle node_handle)
       + 4 * max_number_of_light_strips_per_arduino_; // for RGBA
 
   data_ = Eigen::MatrixXi::Zero(number_of_arduinos_, NUM_ENTRIES_PER_ARDUINO);
+  ROS_INFO("Created >%i< by >%i< data matrix.", (int)data_.rows(), (int)data_.cols());
 
   // Lastly, generate the configuration file
   bool generate_configuration_file = false;
@@ -132,7 +133,7 @@ bool DECData::init(ros::NodeHandle node_handle)
   {
     std::string path = ros::package::getPath("DEC");
     dec_utilities::appendTrailingSlash(path);
-    generateStructureFile(path + "../../dec_controller/dec_structure.h");
+    generateStructureFile(path + "DEC_structure.h");
   }
 
   return (initialized_ = true);
@@ -346,25 +347,134 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
   header_file << "// This configuration file is generated from dec_visualization/config/structure.yaml.\n";
   header_file << "// Please do not edit.\n";
   header_file << "// Instead edit dec_visualization/config/structure.yaml and regenerate this file.\n\n";
-
-  header_file << "#ifndef _DEC_STRUCTURE_H" << endl;
-  header_file << "#define _DEC_STRUCTURE_H" << endl;
+  header_file << "#ifndef _DEC_STRUCTURE_H\n#define _DEC_STRUCTURE_H\n";
   header_file << endl;
 
-  header_file << "static const uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_arduinos_ << "];\n";
+  //  header_file << "static const uint8_t CONTROLLER_ICSC_DE_PIN = " << controller_icsc_de_pin_ << ";\n";
+  //  header_file << "static const uint8_t NODE_ICSC_DE_PINS[" << number_of_arduinos_ << "] = {";
+  //  for (int i = 0; i < number_of_arduinos_; ++i)
+  //  {
+  //    header_file << node_icsc_de_pins_[i];
+  //    if (i + 1 < number_of_arduinos_)
+  //      header_file << ", ";
+  //  }
+  //  header_file << "};" << endl;
+  header_file << "static const uint8_t IO_PIN_ORDERING[" << io_pin_ordering_.size() << "] = {";
+  for (unsigned int i = 0; i < io_pin_ordering_.size(); ++i)
+  {
+    header_file << io_pin_ordering_[i];
+    if (i + 1 < io_pin_ordering_.size())
+      header_file << ", ";
+  }
+  header_file << "};" << endl << endl;
+
+  header_file << "static const uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
     int num_light_strips = 0;
     num_light_strips += (int)arduino_to_light_beam_map_[i].size();
     num_light_strips += (int)arduino_to_light_node_map_[i].size();
-    header_file << "NUM_LED_STRIPS_PER_ARDUINO[" << i << "] = " << num_light_strips << ";\n";
+    header_file << num_light_strips;
+    if (i + 1 < number_of_arduinos_)
+      header_file << ", ";
   }
-  header_file << endl;
+  header_file << "};" << endl;
 
-  header_file << "static const uint8_t ICSC_DE_PINS[" << number_of_arduinos_ << "];\n";
+  unsigned int num_leds_for_each_light = num_leds_of_each_light_beam_.size() + num_leds_of_each_light_node_.size();
+  header_file << "static const uint8_t NUM_LEDS_OF_EACH_LIGHT[" << num_leds_for_each_light << "] = {";
+  for (unsigned int i = 0; i < num_leds_for_each_light; ++i)
+  {
+    if (i < num_leds_of_each_light_beam_.size())
+    {
+      header_file << num_leds_of_each_light_beam_[i];
+      if (!num_leds_of_each_light_node_.empty())
+        header_file << ", ";
+    }
+    else
+    {
+      header_file << num_leds_of_each_light_node_[i - num_leds_of_each_light_beam_.size()];
+      if (i + 1 < num_leds_of_each_light_beam_.size() + num_leds_of_each_light_node_.size())
+        header_file << ", ";
+
+    }
+  }
+  header_file << "};" << endl;
+  header_file << "static const uint8_t NUM_SENSORS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
-    header_file << "ICSC_DE_PINS[" << i << "] = " << icsc_de_pins_[i] << ";\n";
+    header_file << arduino_to_sensor_map_[i].size();
+    if (i + 1 < number_of_arduinos_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl << endl;
+
+  std::vector<std::string> things;
+  things.push_back("LIGHT_BEAM");
+  things.push_back("LIGHT_NODE");
+  things.push_back("SENSOR");
+  std::vector<std::vector<int> > connections;
+  connections.push_back(light_beam_connections_);
+  connections.push_back(light_node_connections_);
+  connections.push_back(sensor_connections_);
+  std::vector<std::vector<int> > counters;
+  counters.push_back(light_beam_index_counter_);
+  counters.push_back(light_node_index_counter_);
+  counters.push_back(sensor_index_counter_);
+  std::vector<std::vector<std::vector<int> > > arduino_to_thing_maps;
+  arduino_to_thing_maps.push_back(arduino_to_light_beam_map_);
+  arduino_to_thing_maps.push_back(arduino_to_light_node_map_);
+  arduino_to_thing_maps.push_back(arduino_to_sensor_map_);
+
+  for (unsigned int i = 0; i < things.size(); ++i)
+  {
+    header_file << "static const uint8_t " << things[i] << "_CONNECTIONS[" << connections[i].size() << "] = {";
+    for (unsigned int j = 0; j < connections[i].size(); ++j)
+    {
+      header_file << connections[i][j];
+      if (j + 1 < connections[i].size())
+        header_file << ", ";
+    }
+    header_file << "};" << endl;
+  }
+
+  for (unsigned int i = 0; i < things.size(); ++i)
+  {
+    header_file << "static const uint8_t " << things[i] << "_INDEX_COUNTER[" << counters[i].size() << "] = {";
+    for (unsigned int j = 0; j < counters[i].size(); ++j)
+    {
+      header_file << counters[i][j];
+      if (j + 1 < counters[i].size())
+        header_file << ", ";
+    }
+    header_file << "};" << endl;
+  }
+
+  for (unsigned int i = 0; i < things.size(); ++i)
+  {
+    header_file << "// A value of 255 is assigned to invalidate the entry.\n";
+    const std::string NAME = "ARDUINO_TO_" + things[i] + "_MAP";
+    header_file << "static const uint8_t " << NAME << "[" << number_of_arduinos_ << "][" << arduino_to_thing_maps[i].size() << "] = {";
+    for (int j = 0; j < number_of_arduinos_; ++j)
+    {
+      header_file << "{";
+      for (int k = 0; k < number_of_arduinos_; ++k)
+      {
+        if (k < (int)arduino_to_thing_maps[i][j].size())
+        {
+          header_file << arduino_to_thing_maps[i][j][k];
+        }
+        else
+        {
+          header_file << "255";
+        }
+        if (k + 1 < number_of_arduinos_)
+          header_file << ", ";
+      }
+      header_file << "}";
+      if (j + 1 < number_of_arduinos_)
+        header_file << ", ";
+    }
+    header_file << "};" << endl;
   }
 
   header_file << "\n#endif // _DEC_STRUCTURE_H" << endl;

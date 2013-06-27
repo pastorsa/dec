@@ -1,8 +1,7 @@
-#include <DEC.h>
 #include <ICSC.h>
 
-const uint8_t DEC_NODE_ID = 1;
-const uint8_t ICSC_DE_PIN = 7;
+const uint8_t NODE_ID = 1;
+const uint8_t CONTROLLER_ID = 0;
 
 boolean msg_received = false;
 
@@ -10,7 +9,7 @@ boolean msg_received = false;
 const int led_pin = 13;         // the number of the LED pin
 int led_state = LOW;             // ledState used to set the LED
 long previous_millis = 0;        // will store last time LED was updated
-unsigned long interval = 1000;   // interval at which to blink (milliseconds)
+unsigned long interval = 500;   // interval at which to blink (milliseconds)
 static unsigned long ts = millis();
 void blink()
 {
@@ -25,7 +24,7 @@ void blink()
 
 void setup()
 {
-  ICSC.begin(DEC_NODE_ID, DEC_BAUD_RATE, ICSC_DE_PIN);
+  ICSC.begin(NODE_ID, 115200, 7);
   ICSC.registerCommand('P', &pressed);
   ICSC.registerCommand('R', &released);
 
@@ -44,6 +43,12 @@ void setup()
 void loop()
 {
   ICSC.process();
+  // static unsigned long ts = millis();
+  // if (!msg_received && millis() - ts >= 100)
+  // {
+  //   ts = millis();
+  //   blink();
+  // }
 }
 
 void pressed(unsigned char src, char command, unsigned char len, char *data)

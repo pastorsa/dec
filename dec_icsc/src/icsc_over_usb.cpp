@@ -305,13 +305,13 @@ void InterChipSerialCommunication::process()
   usleep(20);
 }
 
-void InterChipSerialCommunication::register_command(char command, callback_function function)
+void InterChipSerialCommunication::registerCommand(char command, callback_function function)
 {
   for (int i = 0; i < MAX_COMMANDS; i++)
   {
     if (commands_[i].commandCode == 0)
     {
-      printf("Registering callback >%i< to command >%c<.\n", i, command);
+      printf("Registering callback >%i< to command >%u<.\n", i, command);
       commands_[i].commandCode = command;
       commands_[i].callback = function;
       return;
@@ -319,7 +319,7 @@ void InterChipSerialCommunication::register_command(char command, callback_funct
   }
 }
 
-void InterChipSerialCommunication::unregister_command(char command)
+void InterChipSerialCommunication::unregisterCommand(char command)
 {
   for (int i = 0; i < MAX_COMMANDS; i++)
   {

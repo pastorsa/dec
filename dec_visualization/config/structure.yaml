@@ -289,17 +289,26 @@ sensors:
 # nodes: [0, 1] constructs a light strip from node 0 to node 1
 light_beams:
   - nodes: [0, 1]
-#  - nodes: [3, 7]
-#  - nodes: [4, 5]
-#  - nodes: [5, 6]
+  - nodes: [3, 7]
+  - nodes: [4, 5]
+  - nodes: [5, 6]
 #  - nodes: [6, 7]
 
 # Which nodes have light strips wrapped around
 # [0, 2, 5] corresponds to light nodes at node 0, 2, and 5
 light_nodes: [8, 9, 11, 15, 16, 17, 21, 22, 23, 29, 30, 31, 33, 34, 35, 40, 41, 42, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 65, 66, 67, 68, 72, 73, 75, 76, 77, 78, 79, 80, 84, 85, 86, 87, 88, 92]
 
-num_leds_of_each_light_beam: [10]
+num_leds_of_each_light_beam: [1, 2, 3, 4]
 num_leds_of_each_light_node: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+# The pin ordering describes the order of pins at which "first" the light beams led strips
+# are connected then "second" the light node led strips are connected and "third" the 
+# sensors are connected.
+# For example if a arduino has 3 light beams, 2 light nodes, and 5 sensors attached then
+# the light node pins are the first three numbers in io_pin_ordering, the light beam pins are the 
+# next 2 numbers, and the sensor pins are the next 5 numbers.
+# Obviously, the numbers are limited to the amount of io pins on the arduino
+io_pin_ordering: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 
 # This list contains the arduino id to which this 
 # light node is hooked up
@@ -307,10 +316,10 @@ num_leds_of_each_light_node: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 # light node 0 is hooked up with arduino 2
 # light node 1 is hooked up with arduino 1
 # light node 2 is hooked up with arduino 2
-# Note: Each node light must be hooked up to exactly
+# Note: Each light node must be hooked up to exactly
 # one arduino. Thus, number of light_node_connections
 # must equal the number of light_nodes specified.
-light_node_connections: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+light_node_connections: [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10]
 # This list contains the arduino id to which this 
 # light beam is hooked up
 # [2, 1, 2] means
@@ -320,7 +329,7 @@ light_node_connections: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 # Note: Each beam light must be hooked up to exactly
 # one arduino. Thus, number of light_beam_connections
 # must equal the number of light_beams specified.
-light_beam_connections: [0]
+light_beam_connections: [0, 1, 2, 1]
 # This list contains the arduino id to which this 
 # sensor is hooked up
 # [2, 1, 2] means

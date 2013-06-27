@@ -10,10 +10,9 @@
 
 #include <dec_icsc/icsc_over_usb.h>
 
-using namespace std;
+const unsigned char DEC_CONTROLLER_ID = 254;
 
-unsigned char remote_station_id = 2;
-const unsigned char my_station_id = 50;
+using namespace std;
 
 class TestICSCReceiveLED
 {
@@ -33,7 +32,7 @@ bool TestICSCReceiveLED::setup()
 {
   std::string device_name = "/dev/ttyUSB0";
   ROS_INFO("Trying to open device >%s<.", device_name.c_str());
-  if(!icsc_.begin(my_station_id, B115200, const_cast<char*>(device_name.c_str())))
+  if(!icsc_.begin(DEC_CONTROLLER_ID, const_cast<char*>(device_name.c_str())))
   {
     ROS_INFO("Problems when setting up device.");
     return false;
@@ -45,13 +44,13 @@ bool TestICSCReceiveLED::setup()
 
 void receive(unsigned char source, char command, unsigned char length, char *data)
 {
-  ROS_WARN("Received >%i< bytes from >%u< from >%c<.", (int)length, source, command);
+  ROS_WARN("Received >%i< bytes from >%u< of type >%c<.", (int)length, source, command);
 }
 
 void TestICSCReceiveLED::run()
 {
-  icsc_.register_command('P', &receive);
-  icsc_.register_command('R', &receive);
+  icsc_.registerCommand('P', &receive);
+  icsc_.registerCommand('R', &receive);
   while (ros::ok())
   {
     icsc_.process();

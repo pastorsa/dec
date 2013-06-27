@@ -144,7 +144,7 @@ class _ICSC {
     public:
         _ICSC();
         ~_ICSC();
-        // void begin(unsigned char station, unsigned long baud=9600);
+        // void begin(unsigned char station, unsigned long baud);
         void begin(unsigned char station, unsigned long baud, int dePin);
         void begin(unsigned char station, unsigned long baud, HardwareSerial *sdev);
         void begin(unsigned char station, unsigned long baud, HardwareSerial *sdev, int dePin);

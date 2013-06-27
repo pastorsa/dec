@@ -52,19 +52,46 @@ public:
 
   /*! Initialize the communication
    * @param station the id of this station
-   * @param baud baudrate. For example B115200
    * @param device name of the device. For example /dev/ttyUSB0
    * @return True on success, otherwise False
    */
-  bool begin(unsigned char station, unsigned int baud, char *device);
+  bool begin(unsigned char station, char *device)
+  {
+    return begin(station, DEC_BAUD_RATE, device);
+  }
+
+  /*! Close the device
+   */
   void stop();
 
+  /*!
+   * @param station The id of the station that should receive the message or ICSC_BROADCAST for broadcast message
+   * @param command The message type/id
+   * @param len Number of bytes being send
+   * @param data The payload
+   * @return The number of bytes send (should be equal to len to indicate success)
+   */
   unsigned char send(unsigned char station, unsigned char command, unsigned char len, char *data);
+
+  /*! This function needs to be called to process callbacks
+   * Required for receiving nodes
+   */
   void process();
-  void register_command(char command, callback_function function);
-  void unregister_command(char command);
+
+  /*! Register a callback for a particular message
+   * @param command The ID of the message
+   * @param function The callback function
+   */
+  void registerCommand(char command, callback_function function);
+
+  /*! Unregister a particular callback function for a particula message
+   * @param command
+   */
+  void unregisterCommand(char command);
 
 private:
+
+  bool begin(unsigned char station, unsigned int baud, char *device);
 
   // Structure to store command code / function pairs
   typedef struct

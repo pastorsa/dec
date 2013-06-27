@@ -1,7 +1,7 @@
 #include <ICSC.h>
 
-const uint8_t my_station_id = 2;
-const uint8_t remote_station_id = 50;
+const uint8_t NODE_ID = 0;
+const uint8_t CONTROLLER_ID = 255;
 
 boolean flag = false;
 
@@ -29,7 +29,7 @@ void blink()
 
 void setup()
 {
-  ICSC.begin(my_station_id, 115200, DE_PIN);
+  ICSC.begin(NODE_ID, 115200, DE_PIN);
 
   // LED
   pinMode(13, OUTPUT);
@@ -51,12 +51,12 @@ void loop()
     if (flag)
     {
       // ICSC.send(ICSC_BROADCAST, 'P', 0, NULL);
-      ICSC.send(remote_station_id, 'P', 0, NULL);      
+      ICSC.send(CONTROLLER_ID, 'P', 0, NULL);      
     } 
     else
     {
       // ICSC.send(ICSC_BROADCAST, 'R', 0, NULL);
-      ICSC.send(remote_station_id, 'R', 0, NULL);      
+      ICSC.send(CONTROLLER_ID, 'R', 0, NULL);      
       blink();
     }
     flag = !flag;

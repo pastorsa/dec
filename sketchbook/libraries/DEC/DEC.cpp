@@ -1,5 +1,7 @@
 #include "DEC.h"
 
+#include <stdio.h>
+
 #ifndef ARDUINO
 #include <string.h>
 using namespace std;
@@ -9,11 +11,11 @@ using namespace std;
 DECInterface::DECInterface()
 {
   // Allocate memory (do this separately to have things aligned in memory
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
     setup_data_[i] = (setup_data_t *)malloc(sizeof(setup_data_t));
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
     sensor_data_[i] = (sensor_data_t *)malloc(sizeof(sensor_data_t));
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
     light_data_[i] = (light_data_t *)malloc(sizeof(light_data_t));
 
   // The controller is the boss
@@ -31,11 +33,11 @@ DECInterface::DECInterface()
 DECInterface::~DECInterface()
 {
   // Free memory
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
     free(setup_data_[i]);
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
     free(sensor_data_[i]);
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
     free(light_data_[i]);
   free(data_);
 }
@@ -43,7 +45,7 @@ DECInterface::~DECInterface()
 void DECInterface::reset()
 {
   // DEC_SETUP_DATA
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
   {
     setup_data_[i]->num_led_strips = 0;
     for (uint8_t j = 0; j < DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE; ++j)
@@ -54,12 +56,12 @@ void DECInterface::reset()
     setup_data_[i]->num_sensors = 0;
     for (uint8_t j = 0; j < DEC_MAX_NUMBER_OF_SENSORS_PER_NODE; ++j)
     {
-      setup_data_[i]->led_strips[j].pin = 0;
+      setup_data_[i]->sensors[j].pin = 0;
     }
   }
 
   // DEC_SENSOR_DATA
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
   {
     sensor_data_[i]->level = 0;
     for (uint8_t j = 0; j < DEC_MAX_NUMBER_OF_SENSORS_PER_NODE; ++j)
@@ -68,8 +70,9 @@ void DECInterface::reset()
     }
   }
 
+  /*
   // DEC_LIGHT_DATA
-  for(uint8_t i = 0; i < DEC_NUM_NODES; ++i)
+  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
   {
     for (uint8_t j = 0; j < DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE; ++j)
     {
@@ -77,6 +80,31 @@ void DECInterface::reset()
       {
         light_data_[i]->led_strips[j].colors[k] = 0;
       }
+    }
+  }
+  */
+}
+
+void DECInterface::loadSetupData()
+{
+  uint8_t num_leds_index = 0;
+  for (uint8_t node_id = 0; node_id < DEC_NUMBER_OF_ARDUINOS; ++node_id)
+  {
+    dec_interface.setup_data_[node_id]->num_led_strips = NUM_LED_STRIPS_PER_ARDUINO[node_id];
+    uint8_t io_pin_index = 0;
+    for (uint8_t i = 0; i < dec_interface.setup_data_[node_id]->num_led_strips; ++i)
+    {
+      dec_interface.setup_data_[node_id]->led_strips[i].num_leds = NUM_LEDS_OF_EACH_LIGHT[num_leds_index];
+      num_leds_index++;
+      dec_interface.setup_data_[node_id]->led_strips[i].pin = IO_PIN_ORDERING[io_pin_index];
+      io_pin_index++;
+    }
+
+    dec_interface.setup_data_[node_id]->num_sensors = NUM_SENSORS_PER_ARDUINO[node_id];
+    for (uint8_t i = 0; i < dec_interface.setup_data_[node_id]->num_sensors; ++i)
+    {
+      dec_interface.setup_data_[node_id]->sensors[i].pin = IO_PIN_ORDERING[io_pin_index];
+      io_pin_index++;
     }
   }
 }
@@ -89,9 +117,6 @@ void DECInterface::parseSetupData(char* data)
 {
   uint8_t byte_count = 0;
   token_ = data[byte_count];
-  byte_count++;
-
-  setup_data_[token_]->icsc_de_pin = data[byte_count];
   byte_count++;
 
   setup_data_[token_]->num_led_strips = data[byte_count];
@@ -127,9 +152,6 @@ boolean DECInterface::generateSetupData(uint8_t token)
 
   uint8_t byte_count = 0;
   data_[byte_count] = token;
-  byte_count++;
-
-  data_[byte_count] = setup_data_[token_]->icsc_de_pin;
   byte_count++;
 
   data_[byte_count] = setup_data_[token]->num_led_strips;

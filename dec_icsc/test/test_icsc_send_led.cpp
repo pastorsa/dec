@@ -12,8 +12,7 @@
 
 using namespace std;
 
-unsigned char remote_station_id = 2;
-const unsigned char my_station_id = 50;
+const unsigned char DEC_CONTROLLER_ID = 254;
 
 class TestICSCSendLED
 {
@@ -33,7 +32,7 @@ bool TestICSCSendLED::setup()
 {
   std::string device_name = "/dev/ttyUSB0";
   ROS_INFO("Trying to open device >%s<.", device_name.c_str());
-  if(!icsc_.begin(my_station_id, B115200, const_cast<char*>(device_name.c_str())))
+  if(!icsc_.begin(DEC_CONTROLLER_ID, const_cast<char*>(device_name.c_str())))
   {
     ROS_INFO("Problems when setting up device.");
     return false;

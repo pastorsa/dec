@@ -104,7 +104,8 @@ protected:
   std::vector<std::pair<int, int> > sensors_;
   std::vector<std::pair<int, int> > light_beams_;
 
-  /*! Number of LEDs for each light beam and node
+  /*! Number of LEDs for each light beam and light node.
+   * The size corresponds to the number of light beams and light nodes in the structure.
    */
   std::vector<int> num_leds_of_each_light_beam_;
   std::vector<int> num_leds_of_each_light_node_;
@@ -112,22 +113,26 @@ protected:
   /*! Which light_beam/light_node/sensor is connected to which arduino
    * The size of each vector is equal to the size of
    * light_beams/light_nodes/sensors. The stored number is the
-   * id of the arduino to which this thing is connected
+   * id of the arduino to which this thing is connected.
    */
   std::vector<int> light_beam_connections_;
   std::vector<int> light_node_connections_;
   std::vector<int> sensor_connections_;
 
-  /*!
+  /*! These vectors are of size number_of_arduinos
+   * Each entry (index by the arduino id) contains the index
+   * into arduino_to_*_map_ (see below) to obtain the "local" index of this
+   * thing at this arduino.
    */
   std::vector<int> light_beam_index_counter_;
   std::vector<int> light_node_index_counter_;
   std::vector<int> sensor_index_counter_;
 
   /*! Number of light beams/light nodes/sensor for each arduino
-   * The size of these maps is equal to the number of arduinos in the network
+   * The size of these vectors is equal to the number of arduinos in the network
    * each entry contains a list of indices into light beams/light nodes/sensors
-   * to which this arduino is connected
+   * to which this arduino is connected. Obviously, it can be empty, meaning that
+   * this arduino does not have a light beams/light nodes/sensors attached.
    */
   std::vector<std::vector<int> > arduino_to_light_beam_map_;
   std::vector<std::vector<int> > arduino_to_light_node_map_;
@@ -136,7 +141,18 @@ protected:
   /*! This vector contains the pin settings of the DE pin of the RS-485 interace
    * of each arduino. Thus, the size of this vector must be the same as number_of_arduino
    */
-  std::vector<int> icsc_de_pins_;
+  // std::vector<int> node_icsc_de_pins_;
+  // int controller_icsc_de_pin_;
+
+  /*! The pin ordering describes the order of pins at which "first" the light beams led strips
+   * are connected then "second" the light node led strips are connected and "third" the
+   * sensors are connected.
+   * For example if a arduino has 3 light beams, 2 light nodes, and 5 sensors attached then
+   * the light node pins are the first three numbers in io_pin_ordering, the light beam pins are the
+   * next 2 numbers, and the sensor pins are the next 5 numbers.
+   * Obviously, the numbers are limited to the amount of io pins on the arduino
+   */
+  std::vector<int> io_pin_ordering_;
 
 private:
   bool initialized_;

@@ -11,10 +11,11 @@ typedef bool boolean;
 #endif
 
 #include "DEC_config.h"
+#include "DEC_structure.h"
 #include "ICSC_config.h"
 
 // Fixed constants
-static const uint8_t DEC_CONTROLLER_ID = 255;
+static const uint8_t DEC_CONTROLLER_ID = 50;
 static const uint8_t DEC_LAPTOP_ID = 254;
 // Note station id 0xFD == 253 is used for broadcasting
 
@@ -64,7 +65,7 @@ Byte 3:
 // Message contains sensor information
 #define DEC_SENSOR_DATA 0x02
 // Message contains sensor information
-#define DEC_LIGHT_DATA 0x02
+#define DEC_LIGHT_DATA 0x03
 
 class DECInterface
 {
@@ -100,7 +101,11 @@ public:
   /*! Data type to which the "data" gets parsed and which gets generated
    * by the functions below based on the
    */
-  setup_data_t* setup_data_[DEC_NUM_NODES];
+  setup_data_t* setup_data_[DEC_NUMBER_OF_ARDUINOS];
+
+  /*!
+   */
+  void loadSetupData();
 
   /*! Parse the received data into the this->setup_data_ structure.
    * The index into this->setup_data_ is obtained from the first byte in
@@ -133,7 +138,7 @@ public:
   /*! Data type to which the data gets parsed and which gets generated
    * by the functions below.
    */
-  sensor_data_t* sensor_data_[DEC_NUM_NODES];
+  sensor_data_t* sensor_data_[DEC_NUMBER_OF_ARDUINOS];
 
   /*! Parse the received "data" into the the sensor_data_ structure.
    * @param source  : ID of the node that send this message used at
@@ -171,7 +176,7 @@ public:
   /*! Data type to which the "data" gets parsed and which gets generated
    * by the functions below.
    */
-  light_data_t* light_data_[DEC_NUM_NODES];
+  light_data_t* light_data_[DEC_NUMBER_OF_ARDUINOS];
 
   /*! Parse the received data into the the light_data_ structure.
    * @param source  : ID of the node that send this message used at

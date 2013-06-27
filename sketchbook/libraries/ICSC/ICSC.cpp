@@ -73,7 +73,7 @@ _ICSC::~_ICSC()
 // and initialize my variables.
 // void _ICSC::begin(unsigned char station, unsigned long baud)
 // {
-//    begin(station, baud, &Serial, -1);
+//   begin(station, baud, &Serial, -1);
 // }
 
 void _ICSC::begin(unsigned char station, unsigned long baud, int dePin)

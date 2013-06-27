@@ -65,7 +65,6 @@ bool DECProcessor::init(ros::NodeHandle node_handle)
     {
       const int INDEX = arduino_to_light_node_map_[i][j];
       const int ENTRY = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (arduino_to_light_beam_map_[i].size() * 4) + (j * 4);
-      ROS_WARN("%i %i : %i", (int)i, (int)j, (int)arduino_to_light_beam_map_[i].size());
       data_(i, ENTRY + RED_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.r * COLOR_RESOLUTION);
       data_(i, ENTRY + GREEN_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.g * COLOR_RESOLUTION);
       data_(i, ENTRY + BLUE_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.b * COLOR_RESOLUTION);
@@ -161,7 +160,7 @@ bool DECProcessor::setLightMarkers()
   for (unsigned int i = 0; i < light_node_connections_.size(); ++i)
   {
     const int ARDUINO_INDEX = light_node_connections_[i];
-    const int ENTRY_INDEX = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (light_beam_connections_.size() * 4) + (light_node_index_counter_[i] * 4);
+    const int ENTRY_INDEX = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (arduino_to_light_beam_map_[ARDUINO_INDEX].size() * 4) + (light_node_index_counter_[i] * 4);
     light_node_markers_.markers[i].color.r = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + RED_OFFSET)) / COLOR_RESOLUTION;
     light_node_markers_.markers[i].color.g = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + GREEN_OFFSET)) / COLOR_RESOLUTION;
     light_node_markers_.markers[i].color.b = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + BLUE_OFFSET)) / COLOR_RESOLUTION;
