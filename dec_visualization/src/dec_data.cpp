@@ -327,7 +327,9 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   header_file << "#ifndef _DEC_CONFIG_H" << endl;
   header_file << "#define _DEC_CONFIG_H\n" << endl;
 
-  header_file << "static const uint8_t DEC_NUMBER_OF_ARDUINOS  = " << number_of_arduinos_ << ";\n";
+  header_file << "// Number of arduinos in the structure.\n";
+  header_file << "static const uint8_t DEC_NUMBER_OF_ARDUINOS = " << number_of_arduinos_ << ";\n\n";
+  header_file << "// Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)\n";
   header_file << "static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = " << max_number_of_sensors_per_arduino_ << ";\n";
   header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = " << max_number_of_light_strips_per_arduino_ << ";\n";
   header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = " << max_number_of_leds_per_light_strip_ << ";\n";

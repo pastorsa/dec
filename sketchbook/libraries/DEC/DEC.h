@@ -1,7 +1,12 @@
+/*! This file implements the communication protocol for the dec structure
+ *
+ *  Created on: Jun 22, 2013
+ *      Author: pastor
+ */
+
 #ifndef _DEC_H
 #define _DEC_H
 
-// File generated from dec_visualization/config/structure.yaml
 #ifndef ARDUINO
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,6 +15,7 @@ typedef bool boolean;
 #include <Arduino.h>
 #endif
 
+// File generated from dec_visualization/config/structure.yaml
 #include "DEC_config.h"
 #include "DEC_structure.h"
 #include "ICSC_config.h"
@@ -20,7 +26,7 @@ static const uint8_t DEC_LAPTOP_ID = 254;
 // Note station id 0xFD == 253 is used for broadcasting
 
 /* Remember:
- * uint8_t     = [0..255]
+ * uint8_t     = [0..255]light_data_
  * uint16_t    = [0..65535]
  * uint32_t    = [0..4billion]
  *
@@ -103,7 +109,7 @@ public:
    */
   setup_data_t* setup_data_[DEC_NUMBER_OF_ARDUINOS];
 
-  /*!
+  /*! Sets setup_data_t_ from the generated header files.
    */
   void loadSetupData();
 

@@ -18,6 +18,5 @@
     <rosparam command="load" file="$(find dec_visualization)/config/config.yaml" />
     <rosparam command="load" file="$(find dec_visualization)/config/structure.yaml" />
     <rosparam command="load" file="$(find dec_visualization)/config/simulation.yaml" />
-    <rosparam command="load" file="$(find dec_visualization)/config/communication.yaml" />
   </node>
 </launch>

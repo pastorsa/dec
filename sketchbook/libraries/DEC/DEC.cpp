@@ -1,3 +1,9 @@
+/*! This file implements the communication protocol for the dec structure
+ *
+ *  Created on: Jun 22, 2013
+ *      Author: pastor
+ */
+
 #include "DEC.h"
 
 #include <stdio.h>
@@ -12,17 +18,17 @@ DECInterface::DECInterface()
 {
   // Allocate memory (do this separately to have things aligned in memory
   for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    setup_data_[i] = (setup_data_t *)malloc(sizeof(setup_data_t));
+    setup_data_[i] = (setup_data_t*)malloc(sizeof(setup_data_t));
   for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    sensor_data_[i] = (sensor_data_t *)malloc(sizeof(sensor_data_t));
+    sensor_data_[i] = (sensor_data_t*)malloc(sizeof(sensor_data_t));
   for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    light_data_[i] = (light_data_t *)malloc(sizeof(light_data_t));
+    light_data_[i] = (light_data_t*)malloc(sizeof(light_data_t));
 
   // The controller is the boss
   token_ = DEC_CONTROLLER_ID;
 
   // Local member variables used for sending/receiving messages
-  data_ = (char *)malloc(sizeof(char) * MAX_MESSAGE);
+  data_ = (char*)malloc(MAX_MESSAGE * sizeof(char));
   length_ = 0;
 
   // Zero out everything
@@ -70,7 +76,6 @@ void DECInterface::reset()
     }
   }
 
-  /*
   // DEC_LIGHT_DATA
   for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
   {
@@ -82,7 +87,6 @@ void DECInterface::reset()
       }
     }
   }
-  */
 }
 
 void DECInterface::loadSetupData()

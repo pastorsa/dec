@@ -20,5 +20,9 @@ max_number_of_light_strips_per_arduino: 8
 # Maximum number of leds that can be controlled by each arduino
 max_number_of_leds_per_light_strip: 24
 
+# Whether or not the header files should be created
 generate_configuration_file: true
 generate_structure_file: true
+
+# The rs-485 serial interface device name
+rs485_device_name: /dev/ttyUSB0  

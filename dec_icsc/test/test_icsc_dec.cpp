@@ -102,7 +102,7 @@ void TestICSCDEC::run()
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "TestICSCReceiveLED");
+  ros::init(argc, argv, "TestICSCDEC");
   ros::NodeHandle node_handle;
 
   TestICSCDEC test_icsc_receive_led;
