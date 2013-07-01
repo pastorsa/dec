@@ -17,12 +17,15 @@ using namespace std;
 DECInterface::DECInterface()
 {
   // Allocate memory (do this separately to have things aligned in memory
-  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    setup_data_[i] = (setup_data_t*)malloc(sizeof(setup_data_t));
-  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    sensor_data_[i] = (sensor_data_t*)malloc(sizeof(sensor_data_t));
-  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    light_data_[i] = (light_data_t*)malloc(sizeof(light_data_t));
+  *setup_data_ = (setup_data_t*)malloc(DEC_NUMBER_OF_ARDUINOS * sizeof(setup_data_t));
+  *sensor_data_ = (sensor_data_t*)malloc(DEC_NUMBER_OF_ARDUINOS * sizeof(sensor_data_t));
+  *light_data_ = (light_data_t*)malloc(DEC_NUMBER_OF_ARDUINOS * sizeof(light_data_t));
+  //  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
+  //    setup_data_[i] = (setup_data_t*)malloc(sizeof(setup_data_t));
+  //  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
+  //    sensor_data_[i] = (sensor_data_t*)malloc(sizeof(sensor_data_t));
+  //  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
+  //    light_data_[i] = (light_data_t*)malloc(sizeof(light_data_t));
 
   // The controller is the boss
   token_ = DEC_CONTROLLER_ID;
@@ -39,12 +42,15 @@ DECInterface::DECInterface()
 DECInterface::~DECInterface()
 {
   // Free memory
-  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    free(setup_data_[i]);
-  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    free(sensor_data_[i]);
-  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
-    free(light_data_[i]);
+  free(setup_data_);
+  free(sensor_data_);
+  free(light_data_);
+  //  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
+  //    free(setup_data_[i]);
+  //  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
+  //    free(sensor_data_[i]);
+  //  for(uint8_t i = 0; i < DEC_NUMBER_OF_ARDUINOS; ++i)
+  //    free(light_data_[i]);
   free(data_);
 }
 
