@@ -97,7 +97,7 @@ bool DECSimulation::process()
     }
   }
 
-  ROS_DEBUG_STREAM("data: " << std::endl << data_);
+  ROS_INFO_STREAM("data: " << std::endl << data_);
 
   return DECProcessor::update();
 }

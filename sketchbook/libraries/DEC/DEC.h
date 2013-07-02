@@ -15,7 +15,7 @@ typedef bool boolean;
 #include <Arduino.h>
 #endif
 
-// File generated from dec_visualization/config/structure.yaml and dec_visualization/config/config.yaml
+// File generated from dec_visualization/config/config.yaml
 #include "DEC_config.h"
 #include "ICSC_config.h"
 

@@ -300,7 +300,7 @@ void DECProcessor::setupBeamMarkers(ros::NodeHandle& node_handle,
     tf::Vector3 p1, p2;
     convert(node_positions[beams[i].first], p1);
     convert(node_positions[beams[i].second], p2);
-    tf::Vector3 center = (p2 + p1) / 2.0f;
+    tf::Vector3 center = (p1 + p2) / 2.0f;
     convert(center, marker.pose.position);
 
     tf::Vector3 p12 = p2 - p1;

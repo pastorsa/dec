@@ -343,6 +343,57 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   return true;
 }
 
+std::vector<std::vector<int> > DECData::getArduinoToSensorsDistances(const int& arduino_id) const
+{
+  ROS_ASSERT(arduino_id >= 0 && arduino_id < number_of_arduinos_);
+
+  std::vector<std::vector<double> > arduino_to_sensor_distances;
+  for (int i = 0; i < number_of_arduinos_; ++i)
+  {
+    std::vector<double> distances;
+    for (unsigned int j = 0; j < arduino_to_sensor_map_[i].size(); ++j)
+    {
+      tf::Vector3 point_1, point_2;
+      convert(node_positions_[sensors_[j].first], point_1);
+      convert(node_positions_[sensors_[j].second], point_2);
+      // tf::Vector3 sensor_position = (point_1 + point_2) / static_cast<double>(2.0);
+
+      double distance = fabs(tf::Vector3(point_1 - point_2).length());
+      distances.push_back(distance);
+    }
+    arduino_to_sensor_distances.push_back(distances);
+  }
+
+  // compute maximum and scale accordingly
+  double max = -1.0;
+  for (unsigned int i = 0; i < arduino_to_sensor_distances.size(); ++i)
+  {
+    for (unsigned int j = 0; j < arduino_to_sensor_distances[i].size(); ++j)
+    {
+      if (arduino_to_sensor_distances[i][j] > max)
+      {
+        max = arduino_to_sensor_distances[i][j];
+      }
+    }
+  }
+  ROS_INFO("Maximum distance is >%.2f< meters.", max);
+  ROS_ASSERT(max > 0.0);
+  const double RATIO = static_cast<double>(1.0)/max;
+
+  std::vector<std::vector<int> > arduino_to_sensor_metric;
+  for (unsigned int i = 0; i < arduino_to_sensor_distances.size(); ++i)
+  {
+    std::vector<int> metric;
+    for (unsigned int j = 0; j < arduino_to_sensor_distances[i].size(); ++j)
+    {
+      metric.push_back(static_cast<int>(arduino_to_sensor_distances[i][j] * RATIO));
+    }
+    arduino_to_sensor_metric.push_back(metric);
+  }
+
+  return arduino_to_sensor_metric;
+}
+
 bool DECData::generateStructureFile(const std::string& abs_file_name,
                                     const std::string& progmem_prefix,
                                     const std::string& unit_prefix)

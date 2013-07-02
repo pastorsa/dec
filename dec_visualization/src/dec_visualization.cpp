@@ -47,15 +47,15 @@ bool DECVisualization::initialize(ros::NodeHandle node_handle)
   }
   ROS_ASSERT(dec_processor_->initialize(node_handle));
 
-  Eigen::DenseIndex size = (Eigen::DenseIndex)dec_processor_->light_nodes_.size();
-  graph_ = Eigen::MatrixXf::Zero(size, size);
+  // Eigen::DenseIndex size = (Eigen::DenseIndex)dec_processor_->light_nodes_.size();
+  // graph_ = Eigen::MatrixXf::Zero(size, size);
 
   return true;
 }
 
 void DECVisualization::run()
 {
-  setGraphDistances();
+  // setGraphDistances();
 
   ROS_INFO_COND(simulation_mode_, "Starting simulation mode.");
   ROS_INFO_COND(!simulation_mode_, "Starting real mode.");
@@ -68,28 +68,28 @@ void DECVisualization::run()
   }
 }
 
-bool DECVisualization::setGraphDistances()
-{
-  Eigen::DenseIndex size = (Eigen::DenseIndex)dec_processor_->light_nodes_.size();
-  graph_.setZero(size,size);
-
-  for (unsigned int i = 0; i < dec_processor_->light_nodes_.size(); ++i)
-  {
-    for (unsigned int j = 0; j < i; ++j)
-    {
-      tf::Vector3 point_i, point_j;
-      convert(dec_processor_->light_node_positions_[i], point_i);
-      convert(dec_processor_->light_node_positions_[j], point_j);
-
-      double distance = fabs(tf::Vector3(point_i - point_j).length());
-      graph_(i,j) = distance;
-      graph_(j,i) = distance;
-    }
-  }
-  // ROS_INFO_STREAM(graph_);
-
-  return true;
-}
+// bool DECVisualization::setGraphDistances()
+// {
+//  Eigen::DenseIndex size = (Eigen::DenseIndex)dec_processor_->light_nodes_.size();
+//  graph_.setZero(size,size);
+//
+//  for (unsigned int i = 0; i < dec_processor_->light_nodes_.size(); ++i)
+//  {
+//    for (unsigned int j = 0; j < i; ++j)
+//    {
+//      tf::Vector3 point_i, point_j;
+//      convert(dec_processor_->light_node_positions_[i], point_i);
+//      convert(dec_processor_->light_node_positions_[j], point_j);
+//
+//      double distance = fabs(tf::Vector3(point_i - point_j).length());
+//      graph_(i,j) = distance;
+//      graph_(j,i) = distance;
+//    }
+//  }
+//  // ROS_INFO_STREAM(graph_);
+//
+//  return true;
+// }
 
 } // namespace
 

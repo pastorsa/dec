@@ -179,6 +179,12 @@ private:
                            const int node_index);
 
   /*!
+   * @param arduino_id
+   * @return distance of
+   */
+  std::vector<std::vector<int> > getArduinoToSensorsDistances(const int& arduino_id) const;
+
+  /*!
    */
   bool generateConfigurationFile(const std::string& abs_file_name);
   bool generateStructureFile(const std::string& abs_file_name,

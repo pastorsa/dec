@@ -37,8 +37,8 @@ private:
 
   boost::shared_ptr<DECProcessor> dec_processor_;
 
-  bool setGraphDistances();
-  Eigen::MatrixXf graph_;
+  // bool setGraphDistances();
+  // Eigen::MatrixXf graph_;
 
 };
 

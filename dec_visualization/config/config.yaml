@@ -13,12 +13,12 @@ number_of_arduinos: 20
 # controller_icsc_de_pin: 7
 # Maximum number of sensors that can be hooked
 # up with each arduino
-max_number_of_sensors_per_arduino: 6
+max_number_of_sensors_per_arduino: 8
 # Maximum number of lights that can be hooked
 # up with each arduino
-max_number_of_light_strips_per_arduino: 6
+max_number_of_light_strips_per_arduino: 10
 # Maximum number of leds that can be controlled by each arduino
-max_number_of_leds_per_light_strip: 50
+max_number_of_leds_per_light_strip: 100
 
 # Whether or not the header files should be created
 generate_configuration_file: true
