@@ -78,7 +78,9 @@ bool DECData::init(ros::NodeHandle node_handle)
     ROS_ASSERT_MSG(static_cast<int>(arduino_to_light_beam_map_[i].size()) + static_cast<int>(arduino_to_light_node_map_[i].size())
                <= max_number_of_light_strips_per_arduino_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
                (int)arduino_to_light_beam_map_[i].size(), (int)arduino_to_light_node_map_[i].size(), max_number_of_light_strips_per_arduino_);
-    ROS_ASSERT(static_cast<int>(arduino_to_sensor_map_[i].size()) < max_number_of_sensors_per_arduino_);
+    ROS_ASSERT_MSG(static_cast<int>(arduino_to_sensor_map_[i].size()) <= max_number_of_sensors_per_arduino_,
+                   "Number of sensors per arduino >%i< exceeds the limit >%i< of allowed sensors per arduino.",
+                   (int)arduino_to_sensor_map_[i].size(), max_number_of_sensors_per_arduino_);
   }
 
   ROS_VERIFY(dec_utilities::read(node_handle, "num_leds_of_each_light_beam", num_leds_of_each_light_beam_));

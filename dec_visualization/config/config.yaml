@@ -6,19 +6,19 @@ interaction_mode: 1
 
 # Number of arduinos in the structure
 # Note: due to RS485 limitations we are limited to at most 30 (actually 32).
-number_of_arduinos: 20
+number_of_arduinos: 1
 # DE pin at each arduino to which the RS 485 interface is hooked up
 # Thus, this array must have size >number_of_arduinos<. 
 # node_icsc_de_pins: [7, 7, 8, 8, 8]
 # controller_icsc_de_pin: 7
 # Maximum number of sensors that can be hooked
 # up with each arduino
-max_number_of_sensors_per_arduino: 5
+max_number_of_sensors_per_arduino: 1
 # Maximum number of lights that can be hooked
 # up with each arduino
-max_number_of_light_strips_per_arduino: 8
+max_number_of_light_strips_per_arduino: 2
 # Maximum number of leds that can be controlled by each arduino
-max_number_of_leds_per_light_strip: 24
+max_number_of_leds_per_light_strip: 1
 
 # Whether or not the header files should be created
 generate_configuration_file: true

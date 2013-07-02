@@ -16,7 +16,7 @@ DECInterface dec_interface;
 const int led_pin = 13;         // the number of the LED pin
 int led_state = LOW;             // ledState used to set the LED
 long previous_millis = 0;        // will store last time LED was updated
-unsigned long interval = 500;   // interval at which to blink (milliseconds)
+unsigned long interval = 100;   // interval at which to blink (milliseconds)
 static unsigned long ts = millis();
 void blink()
 {
@@ -31,7 +31,7 @@ void blink()
   }
 }
 
-
+/*
 // This function is called whenever a broadcast was send
 void receive(unsigned char source, char command, unsigned char length, char *data)
 {
@@ -85,12 +85,13 @@ void receive(unsigned char source, char command, unsigned char length, char *dat
   //    }
   //  }
 }
+*/
 
 void setup()
 {
   ICSC.begin(DEC_NODE_ID, DEC_BAUD_RATE, ICSC_DE_PIN);
-  ICSC.registerCommand(DEC_SETUP_DATA, &receive);
-  ICSC.registerCommand(DEC_SENSOR_DATA, &receive);
+ // ICSC.registerCommand(DEC_SETUP_DATA, &receive);
+ // ICSC.registerCommand(DEC_SENSOR_DATA, &receive);
   // ICSC.registerCommand(DEC_LIGHT_DATA, &receive);
 
   // LED
@@ -108,11 +109,14 @@ void setup()
 void loop()
 {
   ICSC.process();
+  
+  dec_interface.loadSetupData();
+  
   static unsigned long ts = millis();
   if (/*!msg_received &&*/ millis() - ts >= 100)
   {
     ts = millis();
-    // blink();
+    blink();
   }
   if (msg_received)
   {

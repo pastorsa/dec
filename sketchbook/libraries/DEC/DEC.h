@@ -15,7 +15,7 @@ typedef bool boolean;
 #include <Arduino.h>
 #endif
 
-// File generated from dec_visualization/config/structure.yaml
+// File generated from dec_visualization/config/structure.yaml and dec_visualization/config/config.yaml
 #include "DEC_config.h"
 #include "DEC_structure.h"
 #include "ICSC_config.h"
@@ -45,24 +45,8 @@ Byte 0 is always the id of the arduino with the NEXT token.
 if the token matches with DEC_NODE_ID or DEC_CONTROLLER_ID
 then we can send a broadcast
 
-Different types have different message formats
-If command is DEC_SETUP_DATA
-Byte 1:
-Byte 2:
-Byte 3:
-...
-
-If command is DEC_SENSOR_DATA
-Byte 1:
-Byte 2:
-Byte 3:
-...
-
-If command is DEC_LIGHT_DATA
-Byte 1:
-Byte 2:
-Byte 3:
-...
+The message types can be DEC_SETUP_DATA, DEC_SENSOR_DATA, and DEC_LIGHT_DATA
+The format corresponds to the structs setup_data_t, sensor_data_t, and light_data_t.
 */
 
 // Message types:
@@ -70,7 +54,7 @@ Byte 3:
 #define DEC_SETUP_DATA 0x01
 // Message contains sensor information
 #define DEC_SENSOR_DATA 0x02
-// Message contains sensor information
+// Message contains light information
 #define DEC_LIGHT_DATA 0x03
 
 class DECInterface
@@ -107,7 +91,7 @@ public:
   /*! Data type to which the "data" gets parsed and which gets generated
    * by the functions below based on the
    */
-  setup_data_t* setup_data_[DEC_NUMBER_OF_ARDUINOS];
+  setup_data_t setup_data_[DEC_NUMBER_OF_ARDUINOS];
 
   /*! Sets setup_data_t_ from the generated header files.
    */
@@ -144,7 +128,7 @@ public:
   /*! Data type to which the data gets parsed and which gets generated
    * by the functions below.
    */
-  sensor_data_t* sensor_data_[DEC_NUMBER_OF_ARDUINOS];
+  sensor_data_t sensor_data_[DEC_NUMBER_OF_ARDUINOS];
 
   /*! Parse the received "data" into the the sensor_data_ structure.
    * @param source  : ID of the node that send this message used at
@@ -182,7 +166,7 @@ public:
   /*! Data type to which the "data" gets parsed and which gets generated
    * by the functions below.
    */
-  light_data_t* light_data_[DEC_NUMBER_OF_ARDUINOS];
+  light_data_t light_data_[DEC_NUMBER_OF_ARDUINOS];
 
   /*! Parse the received data into the the light_data_ structure.
    * @param source  : ID of the node that send this message used at

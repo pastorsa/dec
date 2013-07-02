@@ -13,7 +13,7 @@
 
 using namespace std;
 
-const unsigned char DEC_NODE_ID = 1;
+const unsigned char DEC_NODE_ID = 0;
 
 /*! Communication interface used to generate/parse messages
  */
@@ -97,6 +97,9 @@ void TestICSCDEC::run()
   while (ros::ok())
   {
     icsc.process();
+
+    ROS_INFO("ok");
+    ros::Duration(1.0).sleep();
   }
 }
 
