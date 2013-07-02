@@ -181,7 +181,9 @@ private:
   /*!
    */
   bool generateConfigurationFile(const std::string& abs_file_name);
-  bool generateStructureFile(const std::string& abs_file_name);
+  bool generateStructureFile(const std::string& abs_file_name,
+                             const std::string& progmem_prefix,
+                             const std::string& unit_prefix);
 };
 
 }

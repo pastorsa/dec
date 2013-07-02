@@ -17,16 +17,15 @@ typedef bool boolean;
 
 // File generated from dec_visualization/config/structure.yaml and dec_visualization/config/config.yaml
 #include "DEC_config.h"
-#include "DEC_structure.h"
 #include "ICSC_config.h"
 
 // Fixed constants
-static const uint8_t DEC_CONTROLLER_ID = 50;
-static const uint8_t DEC_LAPTOP_ID = 254;
+#define DEC_CONTROLLER_ID (uint8_t(50))
+#define DEC_LAPTOP_ID (uint8_t(254))
 // Note station id 0xFD == 253 is used for broadcasting
 
 /* Remember:
- * uint8_t     = [0..255]light_data_
+ * uint8_t     = [0..255]
  * uint16_t    = [0..65535]
  * uint32_t    = [0..4billion]
  *
@@ -55,7 +54,7 @@ The format corresponds to the structs setup_data_t, sensor_data_t, and light_dat
 // Message contains sensor information
 #define DEC_SENSOR_DATA 0x02
 // Message contains light information
-#define DEC_LIGHT_DATA 0x03
+// #define DEC_LIGHT_DATA 0x03
 
 class DECInterface
 {
@@ -91,11 +90,7 @@ public:
   /*! Data type to which the "data" gets parsed and which gets generated
    * by the functions below based on the
    */
-  setup_data_t setup_data_[DEC_NUMBER_OF_ARDUINOS];
-
-  /*! Sets setup_data_t_ from the generated header files.
-   */
-  void loadSetupData();
+  setup_data_t setup_data_;
 
   /*! Parse the received data into the this->setup_data_ structure.
    * The index into this->setup_data_ is obtained from the first byte in
@@ -121,7 +116,7 @@ public:
    */
   typedef struct
   {
-    uint64_t level;
+    uint32_t level;
     uint16_t sensors[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE];
   } sensor_data_t;
 
@@ -148,41 +143,40 @@ public:
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_SENSOR_DATA <<<<<<<<<<<<<<<<<<<<<<<<< */
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
-  /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
-  /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DEC_LIGHT_DATA >>>>>>>>>>>>>>>>>>>>>>>>>> */
-
-  /*! Light data being broadcasted by the controller and received by each node
-   */
-  typedef struct
-  {
-    uint32_t colors[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
-  } led_data_t;
-
-  typedef struct
-  {
-    led_data_t led_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
-  } light_data_t;
-
-  /*! Data type to which the "data" gets parsed and which gets generated
-   * by the functions below.
-   */
-  light_data_t light_data_[DEC_NUMBER_OF_ARDUINOS];
-
-  /*! Parse the received data into the the light_data_ structure.
-   * @param source  : ID of the node that send this message used at
-   *                  index into this->light_data_
-   * @param data    : Received data being parsed into this->light_data_
-   */
-   void parseLightData(uint8_t source, char* data);
-
-   /*! Prepares the data_ and length_ member variables from the light_data_ structure.
-    * Fill desired values into sensor_data_ at index "token" before calling this function
-    * @param token   : Token of the node that is receiving the light data
-    *                  Note: this is also the "index" into the light_data_ that
-    *                  is being used to generate/fill the "data" message
-    */
-   void generateLightData(uint8_t token);
-
+//  /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+//  /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DEC_LIGHT_DATA >>>>>>>>>>>>>>>>>>>>>>>>>> */
+//
+//  /*! Light data being broadcasted by the controller and received by each node
+//   */
+//  typedef struct
+//  {
+//    uint32_t colors[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
+//  } led_data_t;
+//
+//  typedef struct
+//  {
+//    led_data_t led_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+//  } light_data_t;
+//
+//  /*! Data type to which the "data" gets parsed and which gets generated
+//   * by the functions below.
+//   */
+//  light_data_t light_data_[DEC_NUMBER_OF_ARDUINOS];
+//
+//  /*! Parse the received data into the the light_data_ structure.
+//   * @param source  : ID of the node that send this message used at
+//   *                  index into this->light_data_
+//   * @param data    : Received data being parsed into this->light_data_
+//   */
+//   void parseLightData(uint8_t source, char* data);
+//
+//   /*! Prepares the data_ and length_ member variables from the light_data_ structure.
+//    * Fill desired values into sensor_data_ at index "token" before calling this function
+//    * @param token   : Token of the node that is receiving the light data
+//    *                  Note: this is also the "index" into the light_data_ that
+//    *                  is being used to generate/fill the "data" message
+//    */
+//   void generateLightData(uint8_t token);
 
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_LIGHT_DATA <<<<<<<<<<<<<<<<<<<<<<<<<< */
   /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
@@ -214,7 +208,7 @@ public:
    * Size of data_ is MAX_MESSAGE (see ICSC.h)
    * char* is equivalent to int8_t* (it is signed)
    */
-  char* data_;
+  char data_[MAX_MESSAGE];
   uint8_t length_;
 
 private:

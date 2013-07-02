@@ -8,12 +8,15 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dec_launch</url>
+
   <depend package="dec_command_line"/>
   <depend package="dec_msgs"/>
   <depend package="dec_object_models"/>
   <depend package="dec_utilities"/>
   <depend package="dec_visualization"/>
   <depend package="dec_world_state"/>
+
+  <depend package="dec_icsc"/>
 
 </package>
 

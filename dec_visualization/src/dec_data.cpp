@@ -135,7 +135,8 @@ bool DECData::init(ros::NodeHandle node_handle)
   {
     std::string path = ros::package::getPath("DEC");
     dec_utilities::appendTrailingSlash(path);
-    generateStructureFile(path + "DEC_structure.h");
+    // generateStructureFile(path + "DEC_structure_arduino.h", "PROGMEM ", "prog_");
+    generateStructureFile(path + "DEC_structure.h", "", "");
   }
 
   return (initialized_ = true);
@@ -330,11 +331,11 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   header_file << "#define _DEC_CONFIG_H\n" << endl;
 
   header_file << "// Number of arduinos in the structure.\n";
-  header_file << "static const uint8_t DEC_NUMBER_OF_ARDUINOS = " << number_of_arduinos_ << ";\n\n";
+  header_file << "#define DEC_NUMBER_OF_ARDUINOS (uint8_t(" << number_of_arduinos_ << "))\n\n";
   header_file << "// Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)\n";
-  header_file << "static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = " << max_number_of_sensors_per_arduino_ << ";\n";
-  header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = " << max_number_of_light_strips_per_arduino_ << ";\n";
-  header_file << "static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = " << max_number_of_leds_per_light_strip_ << ";\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t(" << max_number_of_sensors_per_arduino_ << "))\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t(" << max_number_of_light_strips_per_arduino_ << "))\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP (uint8_t(" << max_number_of_leds_per_light_strip_ << "))\n";
 
   header_file << "\n#endif // _DEC_CONFIG_H" << endl;
   header_file.close();
@@ -342,7 +343,9 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   return true;
 }
 
-bool DECData::generateStructureFile(const std::string& abs_file_name)
+bool DECData::generateStructureFile(const std::string& abs_file_name,
+                                    const std::string& progmem_prefix,
+                                    const std::string& unit_prefix)
 {
   std::ofstream header_file;
   header_file.open(abs_file_name.c_str(), std::ios::out);
@@ -351,19 +354,12 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
   header_file << "// This configuration file is generated from dec_visualization/config/structure.yaml.\n";
   header_file << "// Please do not edit.\n";
   header_file << "// Instead edit dec_visualization/config/structure.yaml and regenerate this file.\n\n";
-  header_file << "#ifndef _DEC_STRUCTURE_H\n#define _DEC_STRUCTURE_H\n";
-  header_file << endl;
+  header_file << "#ifndef _DEC_STRUCTURE_H\n#define _DEC_STRUCTURE_H\n\n";
 
-  //  header_file << "static const uint8_t CONTROLLER_ICSC_DE_PIN = " << controller_icsc_de_pin_ << ";\n";
-  //  header_file << "static const uint8_t NODE_ICSC_DE_PINS[" << number_of_arduinos_ << "] = {";
-  //  for (int i = 0; i < number_of_arduinos_; ++i)
-  //  {
-  //    header_file << node_icsc_de_pins_[i];
-  //    if (i + 1 < number_of_arduinos_)
-  //      header_file << ", ";
-  //  }
-  //  header_file << "};" << endl;
-  header_file << "static const uint8_t IO_PIN_ORDERING[" << io_pin_ordering_.size() << "] = {";
+  if (!progmem_prefix.empty())
+    header_file << "#include <avr/pgmspace.h>\n\n";
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t IO_PIN_ORDERING[" << io_pin_ordering_.size() << "] = {";
   for (unsigned int i = 0; i < io_pin_ordering_.size(); ++i)
   {
     header_file << io_pin_ordering_[i];
@@ -372,7 +368,7 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
   }
   header_file << "};" << endl << endl;
 
-  header_file << "static const uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
     int num_light_strips = 0;
@@ -385,7 +381,7 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
   header_file << "};" << endl;
 
   unsigned int num_leds_for_each_light = num_leds_of_each_light_beam_.size() + num_leds_of_each_light_node_.size();
-  header_file << "static const uint8_t NUM_LEDS_OF_EACH_LIGHT[" << num_leds_for_each_light << "] = {";
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LEDS_OF_EACH_LIGHT[" << num_leds_for_each_light << "] = {";
   for (unsigned int i = 0; i < num_leds_for_each_light; ++i)
   {
     if (i < num_leds_of_each_light_beam_.size())
@@ -403,7 +399,7 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
     }
   }
   header_file << "};" << endl;
-  header_file << "static const uint8_t NUM_SENSORS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_SENSORS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
   for (int i = 0; i < number_of_arduinos_; ++i)
   {
     header_file << arduino_to_sensor_map_[i].size();
@@ -431,7 +427,7 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
 
   for (unsigned int i = 0; i < things.size(); ++i)
   {
-    header_file << "static const uint8_t " << things[i] << "_CONNECTIONS[" << connections[i].size() << "] = {";
+    header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t " << things[i] << "_CONNECTIONS[" << connections[i].size() << "] = {";
     for (unsigned int j = 0; j < connections[i].size(); ++j)
     {
       header_file << connections[i][j];
@@ -443,7 +439,7 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
 
   for (unsigned int i = 0; i < things.size(); ++i)
   {
-    header_file << "static const uint8_t " << things[i] << "_INDEX_COUNTER[" << counters[i].size() << "] = {";
+    header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t " << things[i] << "_INDEX_COUNTER[" << counters[i].size() << "] = {";
     for (unsigned int j = 0; j < counters[i].size(); ++j)
     {
       header_file << counters[i][j];
@@ -457,7 +453,7 @@ bool DECData::generateStructureFile(const std::string& abs_file_name)
   {
     header_file << "// A value of 255 is assigned to invalidate the entry.\n";
     const std::string NAME = "ARDUINO_TO_" + things[i] + "_MAP";
-    header_file << "static const uint8_t " << NAME << "[" << number_of_arduinos_ << "][" << arduino_to_thing_maps[i].size() << "] = {";
+    header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t " << NAME << "[" << number_of_arduinos_ << "][" << arduino_to_thing_maps[i].size() << "] = {";
     for (int j = 0; j < number_of_arduinos_; ++j)
     {
       header_file << "{";

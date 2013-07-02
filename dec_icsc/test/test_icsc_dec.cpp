@@ -11,6 +11,8 @@
 #include "DEC.h"
 #include <dec_icsc/icsc_over_usb.h>
 
+#include "DEC_structure.h"
+
 using namespace std;
 
 const unsigned char DEC_NODE_ID = 0;
@@ -29,6 +31,11 @@ class TestICSCDEC
 public:
   TestICSCDEC() {};
   virtual ~TestICSCDEC() {};
+
+  /*! Sets dec_interface.setup_data from the generated header files.
+   * @param node_id The arduino id for which the setup data needs to be set
+   */
+  void loadSetupData(const int& node_id);
 
   bool setup();
   void run();
@@ -54,19 +61,44 @@ void receive(unsigned char source, char command, unsigned char length, char *dat
       icsc.send(ICSC_BROADCAST, DEC_SENSOR_DATA, dec_interface.length_, dec_interface.data_);
     }
   }
-  else if (command == DEC_LIGHT_DATA)
-  {
-    // parse data into local memory
-    dec_interface.parseLightData(source, data);
-
-    // check whether it's my turn to broadcast my data
-    if (dec_interface.token_ == DEC_CONTROLLER_ID)
-    {
-      // not implemented yet
-    }
-  }
+  //  else if (command == DEC_LIGHT_DATA)
+  //  {
+  //    // parse data into local memory
+  //    dec_interface.parseLightData(source, data);
+  //
+  //    // check whether it's my turn to broadcast my data
+  //    if (dec_interface.token_ == DEC_CONTROLLER_ID)
+  //    {
+  //      // not implemented yet
+  //    }
+  //  }
   msg_received = true;
 }
+
+/*! Sets setup_data_t_ from the generated header files.
+ * @param node_id which setup data need to be loaded ?
+ */
+void TestICSCDEC::loadSetupData(const int& node_id)
+{
+  uint8_t num_leds_index = 0;
+  dec_interface.setup_data_.num_led_strips = NUM_LED_STRIPS_PER_ARDUINO[node_id];
+  uint8_t io_pin_index = 0;
+  for (uint8_t i = 0; i < dec_interface.setup_data_.num_led_strips; ++i)
+  {
+    dec_interface.setup_data_.led_strips[i].num_leds = NUM_LEDS_OF_EACH_LIGHT[num_leds_index];
+    num_leds_index++;
+    dec_interface.setup_data_.led_strips[i].pin = IO_PIN_ORDERING[io_pin_index];
+    io_pin_index++;
+  }
+
+  dec_interface.setup_data_.num_sensors = NUM_SENSORS_PER_ARDUINO[node_id];
+  for (uint8_t i = 0; i < dec_interface.setup_data_.num_sensors; ++i)
+  {
+    dec_interface.setup_data_.sensors[i].pin = IO_PIN_ORDERING[io_pin_index];
+    io_pin_index++;
+  }
+}
+
 
 bool TestICSCDEC::setup()
 {
@@ -81,9 +113,9 @@ bool TestICSCDEC::setup()
 
   icsc.registerCommand(DEC_SETUP_DATA, &receive);
   icsc.registerCommand(DEC_SENSOR_DATA, &receive);
-  icsc.registerCommand(DEC_LIGHT_DATA, &receive);
+  // icsc.registerCommand(DEC_LIGHT_DATA, &receive);
 
-  dec_interface.loadSetupData();
+  loadSetupData(DEC_NODE_ID);
   if(dec_interface.generateSetupData(DEC_NODE_ID)) // token = 0
   {
     ROS_WARN("Sending setup broadcast of size >%u<.", dec_interface.length_);

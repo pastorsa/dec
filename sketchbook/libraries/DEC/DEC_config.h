@@ -6,11 +6,11 @@
 #define _DEC_CONFIG_H
 
 // Number of arduinos in the structure.
-static const uint8_t DEC_NUMBER_OF_ARDUINOS = 1;
+#define DEC_NUMBER_OF_ARDUINOS (uint8_t(20))
 
 // Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)
-static const uint8_t DEC_MAX_NUMBER_OF_SENSORS_PER_NODE = 1;
-static const uint8_t DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE = 2;
-static const uint8_t DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = 1;
+#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t(6))
+#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t(6))
+#define DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP (uint8_t(50))
 
 #endif // _DEC_CONFIG_H
