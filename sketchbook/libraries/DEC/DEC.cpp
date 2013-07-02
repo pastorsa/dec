@@ -109,33 +109,57 @@ void DECInterface::reset()
   */
 }
 
+// void DECInterface::loadSetupData()
+// {
+//   uint8_t num_leds_index = 0;
+//   for (uint8_t node_id = 0; node_id < DEC_NUMBER_OF_ARDUINOS; ++node_id)
+//   {
+// //    printf("\n\nnode_id = %i\n", node_id);
+// //    printf("NUM_LED_STRIPS_PER_ARDUINO[node_id] = %i\n", NUM_LED_STRIPS_PER_ARDUINO[node_id]);
+// //
+// //    printf("dec_interface.setup_data_[node_id].num_led_strips = %i\n", dec_interface.setup_data_[node_id].num_led_strips);
+//     dec_interface.setup_data_[node_id].num_led_strips = NUM_LED_STRIPS_PER_ARDUINO[node_id];
+// //    printf("dec_interface.setup_data_[node_id].num_led_strips = %i\n", dec_interface.setup_data_[node_id].num_led_strips);
+//     uint8_t io_pin_index = 0;
+//     for (uint8_t i = 0; i < dec_interface.setup_data_[node_id].num_led_strips; ++i)
+//     {
+// //      printf("NUM_LEDS_OF_EACH_LIGHT[num_leds_index] = %i\n", NUM_LEDS_OF_EACH_LIGHT[num_leds_index]);
+
+//       dec_interface.setup_data_[node_id].led_strips[i].num_leds = NUM_LEDS_OF_EACH_LIGHT[num_leds_index];
+// //      printf("dec_interface.setup_data_[node_id].led_strips[i].num_leds = %i\n", dec_interface.setup_data_[node_id].led_strips[i].num_leds);
+//       num_leds_index++;
+//       dec_interface.setup_data_[node_id].led_strips[i].pin = IO_PIN_ORDERING[io_pin_index];
+//       io_pin_index++;
+//     }
+
+//     dec_interface.setup_data_[node_id].num_sensors = NUM_SENSORS_PER_ARDUINO[node_id];
+//     for (uint8_t i = 0; i < dec_interface.setup_data_[node_id].num_sensors; ++i)
+//     {
+//       dec_interface.setup_data_[node_id].sensors[i].pin = IO_PIN_ORDERING[io_pin_index];
+//       io_pin_index++;
+//     }
+//   }
+// }
+
 void DECInterface::loadSetupData()
 {
   uint8_t num_leds_index = 0;
   for (uint8_t node_id = 0; node_id < DEC_NUMBER_OF_ARDUINOS; ++node_id)
   {
-//    printf("\n\nnode_id = %i\n", node_id);
-//    printf("NUM_LED_STRIPS_PER_ARDUINO[node_id] = %i\n", NUM_LED_STRIPS_PER_ARDUINO[node_id]);
-//
-//    printf("dec_interface.setup_data_[node_id].num_led_strips = %i\n", dec_interface.setup_data_[node_id].num_led_strips);
-    dec_interface.setup_data_[node_id].num_led_strips = NUM_LED_STRIPS_PER_ARDUINO[node_id];
-//    printf("dec_interface.setup_data_[node_id].num_led_strips = %i\n", dec_interface.setup_data_[node_id].num_led_strips);
+    setup_data_[node_id].num_led_strips = NUM_LED_STRIPS_PER_ARDUINO[node_id];
     uint8_t io_pin_index = 0;
-    for (uint8_t i = 0; i < dec_interface.setup_data_[node_id].num_led_strips; ++i)
+    for (uint8_t i = 0; i < setup_data_[node_id].num_led_strips; ++i)
     {
-//      printf("NUM_LEDS_OF_EACH_LIGHT[num_leds_index] = %i\n", NUM_LEDS_OF_EACH_LIGHT[num_leds_index]);
-
-      dec_interface.setup_data_[node_id].led_strips[i].num_leds = NUM_LEDS_OF_EACH_LIGHT[num_leds_index];
-//      printf("dec_interface.setup_data_[node_id].led_strips[i].num_leds = %i\n", dec_interface.setup_data_[node_id].led_strips[i].num_leds);
+      setup_data_[node_id].led_strips[i].num_leds = NUM_LEDS_OF_EACH_LIGHT[num_leds_index];
       num_leds_index++;
-      dec_interface.setup_data_[node_id].led_strips[i].pin = IO_PIN_ORDERING[io_pin_index];
+      setup_data_[node_id].led_strips[i].pin = IO_PIN_ORDERING[io_pin_index];
       io_pin_index++;
     }
 
-    dec_interface.setup_data_[node_id].num_sensors = NUM_SENSORS_PER_ARDUINO[node_id];
-    for (uint8_t i = 0; i < dec_interface.setup_data_[node_id].num_sensors; ++i)
+    setup_data_[node_id].num_sensors = NUM_SENSORS_PER_ARDUINO[node_id];
+    for (uint8_t i = 0; i < setup_data_[node_id].num_sensors; ++i)
     {
-      dec_interface.setup_data_[node_id].sensors[i].pin = IO_PIN_ORDERING[io_pin_index];
+      setup_data_[node_id].sensors[i].pin = IO_PIN_ORDERING[io_pin_index];
       io_pin_index++;
     }
   }

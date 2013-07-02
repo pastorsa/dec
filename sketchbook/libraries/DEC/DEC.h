@@ -224,6 +224,6 @@ private:
 };
 
 // Global object for interacting with the class
-extern DECInterface dec_interface;
+// extern DECInterface dec_interface;
 
 #endif // _DEC_H
