@@ -2,7 +2,7 @@
 #include <DEC.h>
 
 // Fixed constants need to be adjusted for each arduino eventually
-const uint8_t DEC_NODE_ID = 0;
+const uint8_t DEC_NODE_ID = 1;
 const uint8_t ICSC_DE_PIN = 7;
 
 // Local variables
@@ -10,13 +10,13 @@ boolean msg_received = false;
 
 /*! Communication interface used to generate/parse messages
  */
-DECInterface dec_interface;
+// static DECInterface dec_interface;
 
 // Local variables for debugging
 const int led_pin = 13;         // the number of the LED pin
 int led_state = LOW;             // ledState used to set the LED
 long previous_millis = 0;        // will store last time LED was updated
-unsigned long interval = 100;   // interval at which to blink (milliseconds)
+unsigned long interval = 500;   // interval at which to blink (milliseconds)
 static unsigned long ts = millis();
 void blink()
 {
@@ -31,7 +31,7 @@ void blink()
   }
 }
 
-
+/*
 // This function is called whenever a broadcast was send
 void receive(unsigned char source, char command, unsigned char length, char *data)
 {
@@ -46,6 +46,11 @@ void receive(unsigned char source, char command, unsigned char length, char *dat
       // setup the node
       // Adafruit_NeoPixel test(13);
 
+      // acknowledge
+      dec_interface.generateSetupData(DEC_NODE_ID);
+      // send back for now
+      dec_interface.setTokenToController();
+      ICSC.broadcast(command, dec_interface.length_, dec_interface.data_);
     }
   }
   else if (command == DEC_SENSOR_DATA)
@@ -64,18 +69,6 @@ void receive(unsigned char source, char command, unsigned char length, char *dat
       ICSC.broadcast(command, dec_interface.length_, dec_interface.data_);
     }
   }
-
-  // if (dec_interface.token_ == DEC_NODE_ID) 
-  // {
-    delay(500);
-    // acknowledge
-    dec_interface.generateSensorData(DEC_NODE_ID);
-    // send back for now
-    dec_interface.setTokenToController();
-    ICSC.broadcast(DEC_SENSOR_DATA, dec_interface.length_, dec_interface.data_);
-  // }
-
-  
   //  else if (command == DEC_LIGHT_DATA)
   //  {
   //    // parse data into local memory
@@ -92,6 +85,7 @@ void receive(unsigned char source, char command, unsigned char length, char *dat
   //    }
   //  }
 }
+*/
 
 void setup()
 {
@@ -114,25 +108,22 @@ void setup()
 
 void loop()
 {
-  ICSC.process();
-  
-  // dec_interface.loadSetupData();
-  
+  // ICSC.process();
   static unsigned long ts = millis();
-  if (/*!msg_received &&*/ millis() - ts >= 200)
+  if (/*!msg_received &&*/ millis() - ts >= 100)
   {
     ts = millis();
-    // blink();
-  }
-  if (msg_received)
-  {
-    msg_received = false;
-    if (led_state == LOW)
-      led_state = HIGH;
-    else
-      led_state = LOW;
-    digitalWrite(led_pin, led_state);
-  }
+      blink();
+      }
+//  if (msg_received)
+//  {
+//    msg_received = false;
+//    if (led_state == LOW)
+//      led_state = HIGH;
+//    else
+//      led_state = LOW;
+//    digitalWrite(led_pin, led_state);
+//  }
 }
 
 

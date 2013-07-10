@@ -157,7 +157,7 @@ boolean DECInterface::generateSetupData(uint8_t token)
   if (setup_data_.num_sensors > DEC_MAX_NUMBER_OF_SENSORS_PER_NODE)
     return false;
 
-  uint8_t byte_count = 0;
+  uint16_t byte_count = 0;
   data_[byte_count] = token;
   byte_count++;
 
@@ -203,7 +203,7 @@ void DECInterface::parseSensorData(uint8_t source, char* data)
 // Generate this->data_ message from this->sensor_data_ at index >token< to be send to nodes
 void DECInterface::generateSensorData(uint8_t token)
 {
-  uint8_t byte_count = 0;
+  uint16_t byte_count = 0;
   data_[byte_count] = token;
   byte_count++;
 
@@ -215,7 +215,7 @@ void DECInterface::generateSensorData(uint8_t token)
 
 void DECInterface::generateRequest(uint8_t token)
 {
-  uint8_t byte_count = 0;
+  uint16_t byte_count = 0;
   data_[byte_count] = token;
   byte_count++;
   length_ = byte_count;

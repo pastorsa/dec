@@ -39,6 +39,7 @@ void setup()
   pinMode(DE_PIN, OUTPUT); // DE
   pinMode(RE_PIN, OUTPUT); // NOT_RE
 
+  digitalWrite(DE_PIN, LOW);  // DE
   digitalWrite(DE_PIN, HIGH);  // DE
   digitalWrite(RE_PIN, LOW);   // NOT_RE  
 }

@@ -1,0 +1,15 @@
+<package>
+  <description brief="dec_udp">
+
+     dec_udp
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_udp</url>
+  <depend package="roscpp"/>
+
+</package>
+
+

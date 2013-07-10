@@ -17,7 +17,7 @@ typedef bool boolean;
 
 // File generated from dec_visualization/config/config.yaml
 #include "DEC_config.h"
-#include "ICSC_config.h"
+// #include "ICSC_config.h"
 
 // Fixed constants
 #define DEC_CONTROLLER_ID (uint8_t(50))
@@ -208,8 +208,8 @@ public:
    * Size of data_ is MAX_MESSAGE (see ICSC.h)
    * char* is equivalent to int8_t* (it is signed)
    */
-  char data_[MAX_MESSAGE];
-  uint8_t length_;
+  char data_[1500];
+  uint16_t length_;
 
 private:
 

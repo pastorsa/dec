@@ -48,7 +48,20 @@ private:
 void receive(unsigned char source, char command, unsigned char length, char *data)
 {
   ROS_INFO("Received >%i< bytes from >%u< from >%c<.", (int)length, source, command);
-  if (command == DEC_SENSOR_DATA)
+  if (command == DEC_SETUP_DATA)
+  {
+    // parse data into local memory
+    dec_interface.parseSetupData(data);
+
+    // check whether it's for me
+    if (dec_interface.token_ == DEC_CONTROLLER_ID)
+    {
+      // continue the sensor data loop
+      dec_interface.generateRequest(DEC_NODE_ID); // token = 0
+      icsc.send(ICSC_BROADCAST, DEC_SENSOR_DATA, dec_interface.length_, dec_interface.data_);
+    }
+  }
+  else if (command == DEC_SENSOR_DATA)
   {
     // parse data into local memory
     dec_interface.parseSensorData(source, data);
@@ -60,6 +73,10 @@ void receive(unsigned char source, char command, unsigned char length, char *dat
       dec_interface.generateRequest(DEC_NODE_ID); // token = 0
       icsc.send(ICSC_BROADCAST, DEC_SENSOR_DATA, dec_interface.length_, dec_interface.data_);
     }
+  }
+  else
+  {
+    ROS_ERROR("Invalid message.");
   }
   //  else if (command == DEC_LIGHT_DATA)
   //  {
@@ -130,8 +147,8 @@ void TestICSCDEC::run()
   {
     icsc.process();
 
-    ROS_INFO("ok");
-    ros::Duration(1.0).sleep();
+//    ROS_INFO("ok");
+//    ros::Duration(1.0).sleep();
   }
 }
 
