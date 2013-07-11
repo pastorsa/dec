@@ -27,7 +27,7 @@
 
 using namespace std;
 
-const int ECHOMAX = 255; // Longest string to echo
+const int ECHOMAX = 1400; // Longest string to echo
 
 int main(int argc, char *argv[])
 {
@@ -52,10 +52,11 @@ int main(int argc, char *argv[])
     UDPSocket sock(1501);
     cout << "Created socket on port " << sock.getLocalPort() << endl;
     int respStringLen = 0; // Length of received response
-    unsigned int num_packages = 1000;
+    unsigned int num_packages = 100;
 
     cout << "start..." << endl;
     clock_t begin = clock();
+		int counter = 0;
     for (unsigned int i = 0; i < num_packages; ++i)
     {
       // Send the string to the server
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
       char echoBuffer[ECHOMAX + 1]; // Buffer for echoed string + \0
 
       respStringLen = sock.recv(echoBuffer, ECHOMAX);
+			counter++;
 
       echoBuffer[respStringLen] = '\0'; // Terminate the string!
       // cout << "Received " << respStringLen << " bytes : " << echoBuffer << endl; // Print the echoed arg
@@ -74,7 +76,7 @@ int main(int argc, char *argv[])
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 
     cout << "Transmitting " << num_packages << " of size " << respStringLen << " took " << elapsed_secs << " seconds." << endl;
-
+		cout << "Received " << counter << " packages." << endl;
     // Destructor closes the socket
 
   }

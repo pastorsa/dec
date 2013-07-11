@@ -1,0 +1,15 @@
+<package>
+  <description brief="dec_teensy">
+
+     dec_teensy
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_teensy</url>
+  <depend package="roscpp"/>
+
+</package>
+
+

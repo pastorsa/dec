@@ -20,3 +20,13 @@ control/wamControl/btclient/examples/ex7-serial/ex7.map
 .svn
 _gtest_from_src
 Debug
+
+*.elf
+*.hex
+*.lss
+*.o
+*.lst
+*.eep
+*.sym
+.dep
+*.map

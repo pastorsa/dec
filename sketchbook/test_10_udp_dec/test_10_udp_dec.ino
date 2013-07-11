@@ -51,10 +51,12 @@ void handleMessage(uint16_t port, uint8_t ip[4], const char *data, uint16_t len)
 
 void setup()
 {
-  Serial.begin(57600);
-  Serial.print("Node >");
-  Serial.print(DEC_NODE_ID);
-  Serial.println("< setup:");
+  Serial.begin(9600);
+//  Serial.print("Node >");
+//  Serial.print(DEC_NODE_ID);
+//  Serial.println("< setup:");
+
+  Serial.println("ready");
 
   if (ether.begin(sizeof Ethernet::buffer, mymac) == 0)
   {

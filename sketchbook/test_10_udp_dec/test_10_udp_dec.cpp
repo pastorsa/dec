@@ -63,25 +63,30 @@ void handleMessage(uint16_t port, uint8_t ip[4], const char *data, uint16_t len)
 
 void setup()
 {
-  Serial.begin(57600);
+  Serial.begin(9600);
   Serial.print("Node >");
   Serial.print(DEC_NODE_ID);
   Serial.println("< setup:");
+
+  Serial.println("fuck 1");
 
   if (ether.begin(buffer_size, mymac) == 0)
   {
     Serial.println( "Failed to access Ethernet controller");
   }
+  Serial.println("fuck 2");
+
   if(!ether.staticSetup(myip, gwip))
   {
     Serial.println( "Failed to setup Ethernet controller");
   }
 
-  //ether.printIp("IP:  ", ether.myip);
-  //ether.printIp("GW:  ", ether.gwip);
-  //Serial.print("Listening on UDP port ");
-  //Serial.print(LOCAL_PORT);
-  //Serial.println(".");
+  Serial.println("fuck 3");
+  ether.printIp("IP:  ", ether.myip);
+  ether.printIp("GW:  ", ether.gwip);
+  Serial.print("Listening on UDP port ");
+  Serial.print(LOCAL_PORT);
+  Serial.println(".");
   ether.udpServerListenOnPort(&handleMessage, LOCAL_PORT);
 }
 
