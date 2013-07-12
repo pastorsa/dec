@@ -8,7 +8,15 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dec_teensy</url>
+
   <depend package="roscpp"/>
+
+<!--
+  <export>
+    <cpp cflags="-I${prefix}"/>
+  </export>
+-->
+
 
 </package>
 

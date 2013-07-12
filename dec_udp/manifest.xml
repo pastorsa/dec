@@ -8,7 +8,9 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dec_udp</url>
+
   <depend package="roscpp"/>
+  <depend package="dec_communication"/>
 
 </package>
 

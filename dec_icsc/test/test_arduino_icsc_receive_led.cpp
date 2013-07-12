@@ -1,1 +1,0 @@
-../../sketchbook/libraries/ICSC/examples/RemoteLEDReceiver/RemoteLEDReceiver.ino

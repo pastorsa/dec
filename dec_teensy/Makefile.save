@@ -37,7 +37,7 @@ TARGET = main
 HEXFILE = TeenC
 
 # List C source files here.
-SRC =	src/$(TARGET).c src/spi.c src/dec_communication.c src/enc28j60.c src/ustack.c usb_debug/print.c usb_debug/usb_debug.c
+SRC =	src/$(TARGET).c src/spi.c src/enc28j60.c src/ustack.c usb_debug/print.c usb_debug/usb_debug.c
 
 # MCU name, you MUST set this to match the board you are using.
 MCU = atmega32u4        
@@ -66,7 +66,7 @@ OPT = s
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = include/dec_teensy include ../dec_communication/include
+EXTRAINCDIRS = include/dec_teensy ../dec_communication/include
 
 # Compiler flag to set the C Standard level.
 #     c89   = "ANSI" C
@@ -129,11 +129,13 @@ SCANF_LIB =
 
 MATH_LIB = -lm
 
+DEC_COMMUNICATION_LIB = -ldec_communication
+
 # List any extra directories to look for libraries here.
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRALIBDIRS = 
+EXTRALIBDIRS = ../dec_communication/lib
 
 #---------------- External Memory Options ----------------
 # 64 KB of external RAM, starting after internal RAM (ATmega128!),
@@ -154,8 +156,7 @@ LDFLAGS += -Wl,--relax
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += $(EXTMEMOPTS)
 LDFLAGS += $(patsubst %,-L%,$(EXTRALIBDIRS))
-LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
-
+LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB) $(DEC_COMMUNICATION_LIB)
 #LDFLAGS += -T linker_script.x
 
 #---------------- Programming Options (teensy-loader-cli) ----------------

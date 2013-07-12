@@ -1,1 +1,0 @@
-../../sketchbook/test_6_icsc_dec/test_6_icsc_dec.cpp

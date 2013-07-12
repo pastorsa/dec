@@ -21,20 +21,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_executable(test_udp_echo
-  src/PracticalSocket.cpp
-  src/UDPEchoClient.cpp
-)
-
+set(CMAKE_C_FLAGS "-std=gnu99") 
 rosbuild_add_library(${PROJECT_NAME}
-  src/PracticalSocket.cpp
-  src/dec_interface.cpp  
+  src/dec_communication.c
 )
-
-rosbuild_add_executable(test_udp_dec
-  test/test_udp_dec.cpp
-)
-target_link_libraries(test_udp_dec ${PROJECT_NAME})
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

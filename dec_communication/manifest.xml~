@@ -1,0 +1,20 @@
+<package>
+  <description brief="dec_communication">
+
+     dec_communication
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_communication</url>
+
+  <depend package="roscpp"/>
+
+  <export>
+    <cpp cflags="-I${prefix}" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec_communication"/>
+  </export>
+
+</package>
+
+

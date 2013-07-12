@@ -16,23 +16,14 @@
         along with TeenC.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _MAIN_h
-#define _MAIN_h
+#ifndef _ADDRESS_h
+#define _ADDRESS_h
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/pgmspace.h>
-#include <stdlib.h>
+// NOTE: Change both, NODE_ID and NODE_ID_HEX !!
+#define NODE_ID 1
+#define NODE_ID_HEX 0x01
 
-#define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
-#define ADC_Prescaler (_BV(ADPS2) | _BV(ADPS1))
-#define ADC_Mux 0
-
-#define TLed PORTD ^= _BV(6)
-
-signed char SameStrPM(uint8_t *is,char *is2,signed char l);
-uint8_t FindStr(uint8_t *p,uint16_t pl,char *s,uint8_t l);
-
-uint16_t ADC_Read(uint8_t ch);
+static const uint8_t IPAddr[4] = {10,0,0,NODE_ID};
+static uint8_t MACAddr[6] = {0x0,0x0,0x0,0x0,0x0,NODE_ID_HEX};
 
 #endif

@@ -181,6 +181,6 @@ void TCP_Send(uint8_t *b,uint8_t hl,TCP_Data *tcp_s,uint8_t m);
 uint8_t BuffWrite(uint8_t *b,char *s);
 uint8_t BuffWritePM(uint8_t *b,char *s);
 
-static const uint8_t IPAddr[4] = {10,0,0,2};
-static uint8_t MACAddr[6] = {0x0,0x11,0x22,0x33,0x44,0x55};
+// static const uint8_t IPAddr[4] = {10,0,0,2};
+// static uint8_t MACAddr[6] = {0x0,0x11,0x22,0x33,0x44,0x55};
 #endif

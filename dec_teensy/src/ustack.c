@@ -19,6 +19,7 @@
 #include "common.h"
 #include "enc28j60.h"
 #include "ustack.h"
+#include "address.h"
 
 /* Return Length of Written Data */
 uint8_t BuffWrite(uint8_t *b,char *s) {

@@ -125,18 +125,18 @@ bool DECData::init(ros::NodeHandle node_handle)
   ROS_VERIFY(dec_utilities::read(node_handle, "generate_configuration_file", generate_configuration_file));
   if (generate_configuration_file)
   {
-    std::string path = ros::package::getPath("DEC");
+    std::string path = ros::package::getPath("dec_communication");
     dec_utilities::appendTrailingSlash(path);
-    generateConfigurationFile(path + "DEC_config.h");
+    generateConfigurationFile(path + "include/dec_communication/DEC_config.h");
   }
   bool generate_structure_file = false;
   ROS_VERIFY(dec_utilities::read(node_handle, "generate_structure_file", generate_structure_file));
   if (generate_structure_file)
   {
-    std::string path = ros::package::getPath("DEC");
+    std::string path = ros::package::getPath("dec_communication");
     dec_utilities::appendTrailingSlash(path);
     // generateStructureFile(path + "DEC_structure_arduino.h", "PROGMEM ", "prog_");
-    generateStructureFile(path + "DEC_structure.h", "", "");
+    generateStructureFile(path + "include/dec_communication/DEC_structure.h");
   }
 
   return (initialized_ = true);
@@ -331,11 +331,11 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   header_file << "#define _DEC_CONFIG_H\n" << endl;
 
   header_file << "// Number of arduinos in the structure.\n";
-  header_file << "#define DEC_NUMBER_OF_ARDUINOS (uint8_t(" << number_of_arduinos_ << "))\n\n";
+  header_file << "#define DEC_NUMBER_OF_ARDUINOS (uint8_t)" << number_of_arduinos_ << "\n\n";
   header_file << "// Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)\n";
-  header_file << "#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t(" << max_number_of_sensors_per_arduino_ << "))\n";
-  header_file << "#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t(" << max_number_of_light_strips_per_arduino_ << "))\n";
-  header_file << "#define DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP (uint8_t(" << max_number_of_leds_per_light_strip_ << "))\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t)" << max_number_of_sensors_per_arduino_ << "\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t)" << max_number_of_light_strips_per_arduino_ << "\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP (uint8_t)" << max_number_of_leds_per_light_strip_ << "\n";
 
   header_file << "\n#endif // _DEC_CONFIG_H" << endl;
   header_file.close();
@@ -395,8 +395,8 @@ std::vector<std::vector<int> > DECData::getArduinoToSensorsDistances(const int& 
 }
 
 bool DECData::generateStructureFile(const std::string& abs_file_name,
-                                    const std::string& progmem_prefix,
-                                    const std::string& unit_prefix)
+                                    const std::string progmem_prefix,
+                                    const std::string unit_prefix)
 {
   std::ofstream header_file;
   header_file.open(abs_file_name.c_str(), std::ios::out);

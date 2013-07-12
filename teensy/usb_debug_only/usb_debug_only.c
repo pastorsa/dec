@@ -1,17 +1,17 @@
-/* USB Mouse Plus Debug Channel Example for Teensy USB Development Board
- * http://www.pjrc.com/teensy/usb_mouse.html
- * Copyright (c) 2009 PJRC.COM, LLC
- *
+/* USB Debug Channel Example for Teensy USB Development Board
+ * http://www.pjrc.com/teensy/
+ * Copyright (c) 2008 PJRC.COM, LLC
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,14 +21,11 @@
  * THE SOFTWARE.
  */
 
-/* Version 1.0:   Initial Release
- * Version 1.1:   Add support for Teensy 2.0
- * Version 1.1.1: Fix Transmit Data for
- *				  recent Linux Kernels. l.530 - by RedoX -
- */
+// Version 1.0: Initial Release
+// Version 1.1: Add support for Teensy 2.0
 
 #define USB_SERIAL_PRIVATE_INCLUDE
-#include "usb_debug.h"
+#include "usb_debug_only.h"
 
 /**************************************************************************
  *
@@ -36,37 +33,28 @@
  *
  **************************************************************************/
 
-/* You can change these to give your code its own name. */
+// You can change these to give your code its own name.  On Windows,
+// these are only used before an INF file (driver install) is loaded.
+#define STR_MANUFACTURER	L"Your Name"
+#define STR_PRODUCT		L"Your USB Device"
 
-// Teensy 2.0
-// #define STR_MANUFACTURER	L"Teensy2"
-// #define STR_PRODUCT		L"Debug"
 
-// Teensy 2.0 ++ 
-#define STR_MANUFACTURER	L"Teensy2++"
-#define STR_PRODUCT		L"Debug"
-
-/* Mac OS-X and Linux automatically load the correct drivers.  On
- * Windows, even though the driver is supplied by Microsoft, an
- * INF file is needed to load the driver.  These numbers need to
- * match the INF file.
- */
-
-// Teensy 2.0
-// #define VENDOR_ID		0x16C0
-// #define PRODUCT_ID		0x047F
-
-// Teensy 2.0 ++ 
+// Mac OS-X and Linux automatically load the correct drivers.  On
+// Windows, even though the driver is supplied by Microsoft, an
+// INF file is needed to load the driver.  These numbers need to
+// match the INF file.
 #define VENDOR_ID		0x16C0
-#define PRODUCT_ID		0x0478
+#define PRODUCT_ID		0x0479
 
-/* USB devices are supposed to implment a halt feature, which is
- * rarely (if ever) used.  If you comment this line out, the halt
- * code will be removed, saving 102 bytes of space (gcc 4.3.0).
- * This is not strictly USB compliant, but works with all major
- * operating systems.
- */
+
+// USB devices are supposed to implment a halt feature, which is
+// rarely (if ever) used.  If you comment this line out, the halt
+// code will be removed, saving 102 bytes of space (gcc 4.3.0).
+// This is not strictly USB compliant, but works with all major
+// operating systems.
 #define SUPPORT_ENDPOINT_HALT
+
+
 
 /**************************************************************************
  *
@@ -74,9 +62,12 @@
  *
  **************************************************************************/
 
-#define ENDPOINT0_SIZE		32
+// you might want to change the buffer size, up to 64 bytes.
+// The host reserves your bandwidth because this is an interrupt
+// endpoint, so it won't be available to other interrupt or isync
+// endpoints in other devices on the bus.
 
-#define DEBUG_INTERFACE		0
+#define ENDPOINT0_SIZE		32
 #define DEBUG_TX_ENDPOINT	3
 #define DEBUG_TX_SIZE		32
 #define DEBUG_TX_BUFFER		EP_DOUBLE_BUFFER
@@ -88,20 +79,21 @@ static const uint8_t PROGMEM endpoint_config_table[] = {
 	0
 };
 
+
 /**************************************************************************
  *
  *  Descriptor Data
  *
  **************************************************************************/
 
-/* Descriptors are the data that your computer reads when it auto-detects
- * this USB device (called "enumeration" in USB lingo).  The most commonly
- * changed items are editable at the top of this file.  Changing things
- * in here should only be done by those who've read chapter 9 of the USB
- * spec and relevant portions of any USB class specifications!
- */
+// Descriptors are the data that your computer reads when it auto-detects
+// this USB device (called "enumeration" in USB lingo).  The most commonly
+// changed items are editable at the top of this file.  Changing things
+// in here should only be done by those who've read chapter 9 of the USB
+// spec and relevant portions of any USB class specifications!
 
-static const uint8_t PROGMEM device_descriptor[] = {
+
+static uint8_t PROGMEM device_descriptor[] = {
 	18,					// bLength
 	1,					// bDescriptorType
 	0x00, 0x02,				// bcdUSB
@@ -118,7 +110,7 @@ static const uint8_t PROGMEM device_descriptor[] = {
 	1					// bNumConfigurations
 };
 
-static const uint8_t PROGMEM debug_hid_report_desc[] = {
+static uint8_t PROGMEM hid_report_descriptor[] = {
 	0x06, 0x31, 0xFF,			// Usage Page 0xFF31 (vendor defined)
 	0x09, 0x74,				// Usage 0x74
 	0xA1, 0x53,				// Collection 0x53
@@ -131,9 +123,9 @@ static const uint8_t PROGMEM debug_hid_report_desc[] = {
 	0xC0					// end collection
 };
 
-#define CONFIG1_DESC_SIZE        (9+9+9+7)
-#define DEBUG_HID_DESC_OFFSET    (9+9)
-static const uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
+#define CONFIG1_DESC_SIZE (9+9+9+7)
+#define HID_DESC2_OFFSET  (9+9)
+static uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
 	// configuration descriptor, USB spec 9.6.3, page 264-266, Table 9-10
 	9, 					// bLength;
 	2,					// bDescriptorType;
@@ -147,7 +139,7 @@ static const uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
 	// interface descriptor, USB spec 9.6.5, page 267-269, Table 9-12
 	9,					// bLength
 	4,					// bDescriptorType
-	DEBUG_INTERFACE,			// bInterfaceNumber
+	0,					// bInterfaceNumber
 	0,					// bAlternateSetting
 	1,					// bNumEndpoints
 	0x03,					// bInterfaceClass (0x03 = HID)
@@ -161,7 +153,7 @@ static const uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
 	0,					// bCountryCode
 	1,					// bNumDescriptors
 	0x22,					// bDescriptorType
-	sizeof(debug_hid_report_desc),		// wDescriptorLength
+	sizeof(hid_report_descriptor),		// wDescriptorLength
 	0,
 	// endpoint descriptor, USB spec 9.6.6, page 269-271, Table 9-13
 	7,					// bLength
@@ -172,35 +164,33 @@ static const uint8_t PROGMEM config1_descriptor[CONFIG1_DESC_SIZE] = {
 	1					// bInterval
 };
 
-/* If you're desperate for a little extra code memory, these strings
- * can be completely removed if iManufacturer, iProduct, iSerialNumber
- * in the device desciptor are changed to zeros.
- */
+// If you're desperate for a little extra code memory, these strings
+// can be completely removed if iManufacturer, iProduct, iSerialNumber
+// in the device desciptor are changed to zeros.
 struct usb_string_descriptor_struct {
 	uint8_t bLength;
 	uint8_t bDescriptorType;
 	int16_t wString[];
 };
-static const struct usb_string_descriptor_struct PROGMEM string0 = {
+static struct usb_string_descriptor_struct PROGMEM string0 = {
 	4,
 	3,
 	{0x0409}
 };
-static const struct usb_string_descriptor_struct PROGMEM string1 = {
+static struct usb_string_descriptor_struct PROGMEM string1 = {
 	sizeof(STR_MANUFACTURER),
 	3,
 	STR_MANUFACTURER
 };
-static const struct usb_string_descriptor_struct PROGMEM string2 = {
+static struct usb_string_descriptor_struct PROGMEM string2 = {
 	sizeof(STR_PRODUCT),
 	3,
 	STR_PRODUCT
 };
 
-/* This table defines which descriptor data is sent for each specific
- * request from the host (in wValue and wIndex).
- */
-static const struct descriptor_list_struct {
+// This table defines which descriptor data is sent for each specific
+// request from the host (in wValue and wIndex).
+static struct descriptor_list_struct {
 	uint16_t	wValue;
 	uint16_t	wIndex;
 	const uint8_t	*addr;
@@ -208,13 +198,14 @@ static const struct descriptor_list_struct {
 } PROGMEM descriptor_list[] = {
 	{0x0100, 0x0000, device_descriptor, sizeof(device_descriptor)},
 	{0x0200, 0x0000, config1_descriptor, sizeof(config1_descriptor)},
-	{0x2200, DEBUG_INTERFACE, debug_hid_report_desc, sizeof(debug_hid_report_desc)},
-	{0x2100, DEBUG_INTERFACE, config1_descriptor+DEBUG_HID_DESC_OFFSET, 9},
+	{0x2200, 0x0000, hid_report_descriptor, sizeof(hid_report_descriptor)},
+	{0x2100, 0x0000, config1_descriptor+HID_DESC2_OFFSET, 9},
 	{0x0300, 0x0000, (const uint8_t *)&string0, 4},
 	{0x0301, 0x0409, (const uint8_t *)&string1, sizeof(STR_MANUFACTURER)},
 	{0x0302, 0x0409, (const uint8_t *)&string2, sizeof(STR_PRODUCT)}
 };
 #define NUM_DESC_LIST (sizeof(descriptor_list)/sizeof(struct descriptor_list_struct))
+
 
 /**************************************************************************
  *
@@ -222,15 +213,13 @@ static const struct descriptor_list_struct {
  *
  **************************************************************************/
 
-/* zero when we are not configured, non-zero when enumerated */
+// zero when we are not configured, non-zero when enumerated
 static volatile uint8_t usb_configuration=0;
 
-/* the time remaining before we transmit any partially full
- * packet, or send a zero length packet.
- */
+// the time remaining before we transmit any partially full
+// packet, or send a zero length packet.
 static volatile uint8_t debug_flush_timer=0;
 
-static char proto=1;
 
 /**************************************************************************
  *
@@ -238,44 +227,43 @@ static char proto=1;
  *
  **************************************************************************/
 
-/* initialize USB */
+
+// initialize USB
 void usb_init(void)
 {
 	HW_CONFIG();
-	USB_FREEZE();				/* enable USB */
-	PLL_CONFIG();				/* config PLL */
-        while (!(PLLCSR & (1<<PLOCK))) ;	/* wait for PLL lock */
-        USB_CONFIG();				/* start USB clock */
-        UDCON = 0;				/* enable attach resistor */
+	USB_FREEZE();				// enable USB
+	PLL_CONFIG();				// config PLL
+        while (!(PLLCSR & (1<<PLOCK))) ;	// wait for PLL lock
+        USB_CONFIG();				// start USB clock
+        UDCON = 0;				// enable attach resistor
 	usb_configuration = 0;
         UDIEN = (1<<EORSTE)|(1<<SOFE);
 	sei();
 }
 
-/* return 0 if the USB is not configured, or the configuration
- * number selected by the HOST
- */
+// return 0 if the USB is not configured, or the configuration
+// number selected by the HOST
 uint8_t usb_configured(void)
 {
 	return usb_configuration;
 }
 
-/* transmit a character.  0 returned on success, -1 on error */
+// transmit a character.  0 returned on success, -1 on error
 int8_t usb_debug_putchar(uint8_t c)
 {
 	static uint8_t previous_timeout=0;
 	uint8_t timeout, intr_state;
 
-	/* if we're not online (enumerated and configured), error */
+	// if we're not online (enumerated and configured), error
 	if (!usb_configuration) return -1;
-	/* interrupts are disabled so these functions can be
-	 * used from the main program or interrupt context,
-	 * even both in the same program!
-	 */
+	// interrupts are disabled so these functions can be
+	// used from the main program or interrupt context,
+	// even both in the same program!
 	intr_state = SREG;
 	cli();
 	UENUM = DEBUG_TX_ENDPOINT;
-	/* if we gave up due to timeout before, don't wait again */
+	// if we gave up due to timeout before, don't wait again
 	if (previous_timeout) {
 		if (!(UEINTX & (1<<RWAL))) {
 			SREG = intr_state;
@@ -283,27 +271,27 @@ int8_t usb_debug_putchar(uint8_t c)
 		}
 		previous_timeout = 0;
 	}
-	/* wait for the FIFO to be ready to accept data */
+	// wait for the FIFO to be ready to accept data
 	timeout = UDFNUML + 4;
 	while (1) {
-		/* are we ready to transmit? */
+		// are we ready to transmit?
 		if (UEINTX & (1<<RWAL)) break;
 		SREG = intr_state;
-		/* have we waited too long? */
+		// have we waited too long?
 		if (UDFNUML == timeout) {
 			previous_timeout = 1;
 			return -1;
 		}
-		/* has the USB gone offline? */
+		// has the USB gone offline?
 		if (!usb_configuration) return -1;
-		/* get ready to try checking again */
+		// get ready to try checking again
 		intr_state = SREG;
 		cli();
 		UENUM = DEBUG_TX_ENDPOINT;
 	}
-	/* actually write the byte into the FIFO */
+	// actually write the byte into the FIFO
 	UEDATX = c;
-	/* if this completed a packet, transmit it now */
+	// if this completed a packet, transmit it now!
 	if (!(UEINTX & (1<<RWAL))) {
 		UEINTX = 0x3A;
 		debug_flush_timer = 0;
@@ -314,7 +302,8 @@ int8_t usb_debug_putchar(uint8_t c)
 	return 0;
 }
 
-/* immediately transmit any buffered output. */
+
+// immediately transmit any buffered output.
 void usb_debug_flush_output(void)
 {
 	uint8_t intr_state;
@@ -332,15 +321,19 @@ void usb_debug_flush_output(void)
 	SREG = intr_state;
 }
 
+
+
 /**************************************************************************
  *
  *  Private Functions - not intended for general user consumption....
  *
  **************************************************************************/
 
-/* USB Device Interrupt - handle all device-level events
- * the transmit buffer flushing is triggered by the start of frame
- */
+
+
+// USB Device Interrupt - handle all device-level events
+// the transmit buffer flushing is triggered by the start of frame
+//
 ISR(USB_GEN_vect)
 {
 	uint8_t intbits, t;
@@ -355,45 +348,53 @@ ISR(USB_GEN_vect)
 		UEIENX = (1<<RXSTPE);
 		usb_configuration = 0;
         }
-	if ((intbits & (1<<SOFI)) && usb_configuration) {
-		t = debug_flush_timer;
-		if (t) {
-			debug_flush_timer = -- t;
-			if (!t) {
-				UENUM = DEBUG_TX_ENDPOINT;
-				while ((UEINTX & (1<<RWAL))) {
-					UEDATX = 0;
+	if (intbits & (1<<SOFI)) {
+		if (usb_configuration) {
+			t = debug_flush_timer;
+			if (t) {
+				debug_flush_timer = -- t;
+				if (!t) {
+					UENUM = DEBUG_TX_ENDPOINT;
+					while ((UEINTX & (1<<RWAL))) {
+						UEDATX = 0;
+					}
+					UEINTX = 0x3A;
 				}
-				UEINTX = 0x3A;
 			}
 		}
 	}
 }
 
 
-
-/* Misc functions to wait for ready and send/receive packets */
-static inline void usb_wait_in_ready(void) {
+// Misc functions to wait for ready and send/receive packets
+static inline void usb_wait_in_ready(void)
+{
 	while (!(UEINTX & (1<<TXINI))) ;
 }
-static inline void usb_send_in(void) {
+static inline void usb_send_in(void)
+{
 	UEINTX = ~(1<<TXINI);
 }
-static inline void usb_wait_receive_out(void) {
+static inline void usb_wait_receive_out(void)
+{
 	while (!(UEINTX & (1<<RXOUTI))) ;
 }
-static inline void usb_ack_out(void) {
+static inline void usb_ack_out(void)
+{
 	UEINTX = ~(1<<RXOUTI);
 }
 
-/* USB Endpoint Interrupt - endpoint 0 is handled here.  The
- * other endpoints are manipulated by the user-callable
- * functions, and the start-of-frame interrupt.
- */
-ISR(USB_COM_vect) {
+
+
+// USB Endpoint Interrupt - endpoint 0 is handled here.  The
+// other endpoints are manipulated by the user-callable
+// functions, and the start-of-frame interrupt.
+//
+ISR(USB_COM_vect)
+{
         uint8_t intbits;
 	const uint8_t *list;
-	const uint8_t *cfg;
+        const uint8_t *cfg;
 	uint8_t i, n, len, en;
 	uint8_t bmRequestType;
 	uint8_t bRequest;
@@ -404,8 +405,8 @@ ISR(USB_COM_vect) {
 	const uint8_t *desc_addr;
 	uint8_t	desc_length;
 
-	UENUM = 0;
-	intbits = UEINTX;
+        UENUM = 0;
+        intbits = UEINTX;
         if (intbits & (1<<RXSTPI)) {
                 bmRequestType = UEDATX;
                 bRequest = UEDATX;
@@ -443,12 +444,12 @@ ISR(USB_COM_vect) {
 			len = (wLength < 256) ? wLength : 255;
 			if (len > desc_length) len = desc_length;
 			do {
-				/* wait for host ready for IN packet */
+				// wait for host ready for IN packet
 				do {
 					i = UEINTX;
 				} while (!(i & ((1<<TXINI)|(1<<RXOUTI))));
-				if (i & (1<<RXOUTI)) return;	/* abort */
-				/* send IN packet */
+				if (i & (1<<RXOUTI)) return;	// abort
+				// send IN packet
 				n = len < ENDPOINT0_SIZE ? len : ENDPOINT0_SIZE;
 				for (i = n; i; i--) {
 					UEDATX = pgm_read_byte(desc_addr++);
@@ -522,15 +523,15 @@ ISR(USB_COM_vect) {
 		}
 		#endif
 		if (bRequest == HID_GET_REPORT && bmRequestType == 0xA1) {
-			if (wIndex == DEBUG_INTERFACE) {
+			if (wIndex == 0) {
 				len = wLength;
 				do {
-					/* wait for host ready for IN packet */
+					// wait for host ready for IN packet
 					do {
 						i = UEINTX;
 					} while (!(i & ((1<<TXINI)|(1<<RXOUTI))));
-					if (i & (1<<RXOUTI)) return;	/* abort */
-					/* send IN packet */
+					if (i & (1<<RXOUTI)) return;	// abort
+					// send IN packet
 					n = len < ENDPOINT0_SIZE ? len : ENDPOINT0_SIZE;
 					for (i = n; i; i--) {
 						UEDATX = 0;
@@ -538,13 +539,11 @@ ISR(USB_COM_vect) {
 					len -= n;
 					usb_send_in();
 				} while (len || n == ENDPOINT0_SIZE);
-			} else
-				proto = 0;  /* We _HAVE_ to change a static var
-							 * even if it's unused after...
-							 * I don't know why... dirty hack
-							 */
-			return;
+				return;
+			}
 		}
-	}
-	UECONX = (1<<STALLRQ) | (1<<EPEN);	/* stall */
+        }
+	UECONX = (1<<STALLRQ) | (1<<EPEN);	// stall
 }
+
+

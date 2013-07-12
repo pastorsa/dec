@@ -16,24 +16,65 @@
  along with TeenC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// ENC28J60 related includes
 #include "common.h"
 #include "main.h"
 #include "spi.h"
 #include "enc28j60.h"
 #include "ustack.h"
 
+#include "address.h"
+
+// DEC includes
+#include <dec_communication/dec_communication.h>
+
+
+void handleMessage(uint8_t* buffer_ptr, uint16_t* length)
+{
+  dbg_s(" Got Message of size ");
+  dbg_n(*length);
+  dbg_s(" : ");
+  for (uint16_t i = 0; i < *length; ++i)
+    dbg_c(buffer_ptr[i]);
+  dbg_s("\n");
+
+
+  // parseSetupData()
+
+//  loadSetupData(0);
+//
+//  if(generateSetupData(NODE_ID, buffer_ptr, length))
+//  {
+//    dbg_s(" Sending Message of size ");
+//    dbg_n(*length);
+//    dbg_s(" : ");
+//
+//    for (uint16_t i = 0; i < *length; ++i)
+//      dbg_n(buffer_ptr[i]);
+//    dbg_s("\n");
+//  }
+
+//  for (uint16_t i = 0; i < length; ++i)
+//    buffer_ptr[i] = i;
+}
+
 int main(void)
 {
-  uint16_t PLen, DLen;
-  uint8_t RxB[BFSize ], *Ptr, IPHLen, k;
-  char Str[4];
-  TCP_Data Tcp;
+  uint16_t packet_length, data_length;
+  uint8_t *buffer_ptr;
+  uint8_t ip_header_length;
+  uint8_t aux_init;
+
+  // init
+  // reset(&_setup_data, _sensor_data, _light_data);
+  // dec_init();
 
   CPU_PRESCALE(0); /* Run at 16 MHz */
-  DDRD = _BV(DDD6); /* Teensy Onboad Led Enable */
+  DDRD = _BV(DDD6); /* Teensy onboard Led Enable */
   /* ADC */
   DDRF = ~_BV(DDF0); /* F0 as Input */
-  //PORTF = _BV(PORTF0);														 /* Enable Pullup */
+  //PORTF = _BV(PORTF0);
+  /* Enable Pullup */
   DIDR0 = _BV(ADC0D); /* Disable Digital Pin */
 
   dbg_init
@@ -43,8 +84,8 @@ int main(void)
   {
     ENC_Init(MACAddr); /* ENC28J60 Init */
     _delay_ms(500);
-    k = ENC_RevID;
-  } while (!k);
+    aux_init = ENC_RevID;
+  } while (!aux_init);
 
   ENC_LEDInit; /* ENC Leds Init */
   while (1)
@@ -57,191 +98,200 @@ int main(void)
       if (ENC_hasRxd)
       {
         // return Packet Size
-        PLen = ENC_PckRx(RxB, BFSize);
-        if (PLen > 0)
+        packet_length = ENC_PckRx(_rx_buffer, BUFFER_SIZE);
+        if (packet_length > 0)
         {
-          /*dbg_s("\nGot Packet:\n");
-           for(i=0;i<l;i++) {
-           dbg_n(RxB[i]); dbg_c(' ');
-           } */
+//          dbg_s("\nGot Packet:\n");
+//          for (uint16_t i = 0; i < BUFFER_SIZE; ++i)
+//          {
+//            dbg_n(_rx_buffer[i]);dbg_c(' ');
+//          }
           // Return 1 if packet was ARP, and was handeld
-          if (!ifARP_Reply(RxB, PLen))
+          if (!ifARP_Reply(_rx_buffer, packet_length))
           {
             // Return IPHLen if valid IP Packet, else 0
-            IPHLen = IP_Check(RxB, PLen);
-            if (IPHLen > 0)
+            ip_header_length = IP_Check(_rx_buffer, packet_length);
+            if (ip_header_length > 0)
             {
-              dbg_s("\nIP - ");
+              // dbg_s("\nIP - ");
               // Return Protocol
-              DLen = IP_gProtocol(RxB);
-              if (DLen == IP_pICMP)
+              data_length = IP_gProtocol(_rx_buffer);
+              if (data_length == IP_pICMP)
               {
-                dbg_s("ICMP");
-                ICMP_Reply(RxB, IPHLen, PLen);
+                dbg_s("ICMP\n");
+                ICMP_Reply(_rx_buffer, ip_header_length, packet_length);
               }
-              else if (DLen == IP_pUDP)
+              else if (data_length == IP_pUDP)
               {
-                dbg_s("UDP");
+                dbg_s("UDP\n");
                 // Return Data Len
-                DLen = UDP_Recv(RxB, IPHLen, PLen);
-                if (DLen > 0)
+                data_length = UDP_Recv(_rx_buffer, ip_header_length, packet_length);
+                if (data_length > 0)
                 {
-                  //dbg_s(" on Port ");
-                  //dbg_n(RxB[IP_Start+j+UDP_DestPort_H]);
-                  //dbg_n(RxB[IP_Start+j+UDP_DestPort_L]);
-                  //dbg_s(" Got Message: ");
-                  //dbg_c(' ');
-                  //dbg_n(i);
-                  //for(l=0;l<i;l++)
-                  //dbg_c(RxB[IP_Start+j+UDP_HeaderLen+l]);
-                  Ptr = RxB + IP_Start + IPHLen + UDP_HeaderLen;
-                  if (SameStrPM(Ptr, PSTR("Ts:sT"), 5))
-                    DLen = BuffWritePM(Ptr, PSTR("Not Auth"));
-                  else
-                  {
-                    if (!SameStrPM(Ptr + 6, PSTR("TLed"), 4))
-                      TLed;
-                    DLen = BuffWritePM(Ptr, PSTR("Granted"));
-                  }
-                  DLen += BuffWritePM(Ptr + DLen, PSTR("\n>> "));
-                  //for(l=0;l<i-1;l++)
-                  //RxB[IP_Start+j+UDP_HeaderLen+l]='0';
-                  UDP_Send(RxB, IPHLen, DLen, ModeReply);
-                  //UDP_Send(RxB,j,i,ModeSend);
+
+//                  dbg_s("\n on Port ");
+//                  dbg_n(_rx_buffer[IP_Start+IPHLen+UDP_DestPort_H]);
+//                  dbg_n(_rx_buffer[IP_Start+IPHLen+UDP_DestPort_L]);
+
+                  //                  dbg_s(" on Port ");
+                  //                  dbg_n(_rx_buffer[IP_Start+j+UDP_DestPort_H]);
+                  //                  dbg_n(_rx_buffer[IP_Start+j+UDP_DestPort_L]);
+                  //                  dbg_s(" Got Message: ");
+//                  dbg_c(' ');
+//                  dbg_n(i);
+//                  for(l=0;l<i;l++)
+//                  dbg_c(_rx_buffer[IP_Start+j+UDP_HeaderLen+l]);
+                  buffer_ptr = _rx_buffer + IP_Start + ip_header_length + UDP_HeaderLen;
+
+                  handleMessage(buffer_ptr, &data_length);
+
+//                  if (SameStrPM(buffer_ptr, PSTR("Ts:sT"), 5))
+//                    data_length = BuffWritePM(buffer_ptr, PSTR("Not Auth"));
+//                  else
+//                  {
+//                    if (!SameStrPM(buffer_ptr + 6, PSTR("TLed"), 4))
+//                      TLed;
+//                    data_length = BuffWritePM(buffer_ptr, PSTR("Granted"));
+//                  }
+//                  data_length += BuffWritePM(buffer_ptr + data_length, PSTR("\n>> "));
+//                  //for(l=0;l<i-1;l++)
+//                  //_rx_buffer[IP_Start+j+UDP_HeaderLen+l]='0';
+                  UDP_Send(_rx_buffer, ip_header_length, data_length, ModeReply);
+                  //UDP_Send(_rx_buffer,j,i,ModeSend);
                 }
-              }
-              else
-              {
-                dbg_s("TCP");
-                // Return 1 if accepted
-                if (TCP_Recv(RxB, IPHLen, PLen, &Tcp))
-                {
-                  /*dbg_s(" on Port ");
-                   dbg_n(RxB[IP_Start+j+TCP_DestPort_H]);
-                   dbg_n(RxB[IP_Start+j+TCP_DestPort_L]);
-                   dbg_s(" Packet Ok: Flags: ");
-                   dbg_n16(Tcp.Flags);
-                   dbg_s(" - HLen: ");
-                   dbg_n16(Tcp.HLen);
-                   dbg_s(" - DLen: ");
-                   dbg_n16(Tcp.DLen);
-                   if(Tcp.DLen > 0) {
-                   dbg_s(" - Message: ");
-                   dbg_c('\n');
-                   for(i=0;i<Tcp.DLen;i++)
-                   dbg_c(RxB[IP_Start+IPHLen+Tcp.HLen+i]);
-                   } */
-                  if (Tcp.Flags == TCP_fSYN)
-                  {
-                    //dbg_s(" - Got SYN, do SYN_ACK");
-                    Tcp.Ss = 1;
-                    Tcp.As = 0;
-                    Tcp.Flags = TCP_fSYN | TCP_fACK;
-                    TCP_Send(RxB, IPHLen, &Tcp, ModeReply);
-                    k = 0;
-                  }
-                  else if (Tcp.Flags == TCP_fACK)
-                  {
-                    //dbg_s(" - Got Ack");
-                    if (k == 1)
-                    {
-                      Tcp.As = 0;
-                      Tcp.Ss = 0;
-                      Tcp.DLen = 0;
-                      Tcp.Flags = TCP_fACK | TCP_fFIN;
-                      TCP_Send(RxB, IPHLen, &Tcp, ModeReply);
-                      k = 2;
-                    }
-                  }
-                  else if (Tcp.Flags == (TCP_fACK | TCP_fPSH))
-                  {
-                    //dbg_s(" - Got Push-Ack, do Ack");
-                    Tcp.Ss = Tcp.DLen;
-                    Tcp.As = 0;
-                    Tcp.Flags = TCP_fACK;
-                    DLen = Tcp.DLen;
-                    Tcp.DLen = 0;
-                    TCP_Send(RxB, IPHLen, &Tcp, ModeReply);
-                    Ptr = RxB + IP_Start + IPHLen + Tcp.HLen;
-                    if (Get16B(Ptr-Tcp.HLen+TCP_SrcPort_H) == 0x50)
-                    {
-                      if (!SameStrPM(Ptr, PSTR("GET /"), 4))
-                      {
-                        Tcp.Ss = 1;
-                        // Return 0xFF if str found
-                        // If Non auth, deny access
-                        if (FindStr(Ptr, 0x200, PSTR("dGVzdDp0ZXN0"), 12) != 0xFF)
-                          Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 401 NoAuth\r\n"
-                                                           "WWW-Authenticate: Basic realm=\"TeenSee\"\r\n"
-                                                           "Content-Type: text/html\r\n\r\n"
-                                                           "<html>\n\t<head><title>TeenC</title></head>"
-                                                           "<body><h1>Auth Required</h1></body></html>"));
-                        else
-                        { // Else, allow access
-                          // If page is not root: / -> 404
-                          if (*(Ptr + 5) != ' ' && *(Ptr + 5) != '?')
-                            Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 404 Not Found\r\n"
-                                                             "Content-Type: text/html\r\n\r\n"
-                                                             "<html><head><title>TeenC</title></head>"
-                                                             "<body>"
-                                                             "<h1>404 - I think you're lost...</h1>"
-                                                             "</body></html>"));
-                          else
-                          {
-                            if (*(Ptr + 6) == 'L' && *(Ptr + 7) == 'T')
-                            {
-                              TLed;
-                              Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 303 Ok\r\n"
-                                                               "Location: /\r\n\r\n"));
-                            }
-                            else
-                            {
-                              Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 200 Ok\r\n"
-                                                               "Content-Type: text/html\r\n\r\n"
-                                                               "<html><head><title>TeenC</title></head>"
-                                                               "<body><h1>It works!</h1><p>Led is O"));
-                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, (PORTD & _BV(6) ? PSTR("n") : PSTR("ff")));
-                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, PSTR(" - <a href=\"?LT\">Toggle</a>"
-                                                                           "<br />ADC Pin Value: "));
-                              Tcp.DLen += BuffWrite(Ptr + Tcp.DLen, itoa(ADC_Read(ADC_Mux), Str, 10));
-                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, PSTR("</p></body></html>"));
-                            }
-                          }
-                        }
-                        /* Send Back Data */
-                        TCP_Send(RxB, IPHLen, &Tcp, ModeSingleSend);
-                        k = 2;
-                      }
-                    }
-                    else
-                    {
-                      if (!SameStrPM(Ptr, PSTR("TL"), 2))
-                        TLed;
-                      Tcp.DLen = BuffWritePM(Ptr, PSTR(">> "));
-                      /* Send Back Data */
-                      TCP_Send(RxB, IPHLen, &Tcp, ModeSend);
-                      k = 0;
-                    }
-                  }
-                  else if (Tcp.Flags == (TCP_fACK | TCP_fFIN))
-                  {
-                    //dbg_s("End\n");
-                    Tcp.As = 0;
-                    Tcp.DLen = 0;
-                    if (k != 2)
-                    {
-                      Tcp.Ss = 0;
-                      Tcp.Flags = TCP_fACK | TCP_fFIN;
-                    }
-                    else
-                    {
-                      Tcp.Ss = 1;
-                      Tcp.Flags = TCP_fACK;
-                    }
-                    TCP_Send(RxB, IPHLen, &Tcp, ModeReply);
-                    k = 2;
-                  } //else  dbg_s("Unknown Flag "); // Flags
-                } // TCP Packet Accepted
+//              }
+//              else
+//              {
+//                dbg_s("TCP");
+//                // Return 1 if accepted
+//                if (TCP_Recv(_rx_buffer, IPHLen, PLen, &Tcp))
+//                {
+//                  /*dbg_s(" on Port ");
+//                   dbg_n(_rx_buffer[IP_Start+j+TCP_DestPort_H]);
+//                   dbg_n(_rx_buffer[IP_Start+j+TCP_DestPort_L]);
+//                   dbg_s(" Packet Ok: Flags: ");
+//                   dbg_n16(Tcp.Flags);
+//                   dbg_s(" - HLen: ");
+//                   dbg_n16(Tcp.HLen);
+//                   dbg_s(" - DLen: ");
+//                   dbg_n16(Tcp.DLen);
+//                   if(Tcp.DLen > 0) {
+//                   dbg_s(" - Message: ");
+//                   dbg_c('\n');
+//                   for(i=0;i<Tcp.DLen;i++)
+//                   dbg_c(_rx_buffer[IP_Start+IPHLen+Tcp.HLen+i]);
+//                   } */
+//                  if (Tcp.Flags == TCP_fSYN)
+//                  {
+//                    //dbg_s(" - Got SYN, do SYN_ACK");
+//                    Tcp.Ss = 1;
+//                    Tcp.As = 0;
+//                    Tcp.Flags = TCP_fSYN | TCP_fACK;
+//                    TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
+//                    k = 0;
+//                  }
+//                  else if (Tcp.Flags == TCP_fACK)
+//                  {
+//                    //dbg_s(" - Got Ack");
+//                    if (k == 1)
+//                    {
+//                      Tcp.As = 0;
+//                      Tcp.Ss = 0;
+//                      Tcp.DLen = 0;
+//                      Tcp.Flags = TCP_fACK | TCP_fFIN;
+//                      TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
+//                      k = 2;
+//                    }
+//                  }
+//                  else if (Tcp.Flags == (TCP_fACK | TCP_fPSH))
+//                  {
+//                    //dbg_s(" - Got Push-Ack, do Ack");
+//                    Tcp.Ss = Tcp.DLen;
+//                    Tcp.As = 0;
+//                    Tcp.Flags = TCP_fACK;
+//                    DLen = Tcp.DLen;
+//                    Tcp.DLen = 0;
+//                    TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
+//                    Ptr = _rx_buffer + IP_Start + IPHLen + Tcp.HLen;
+//                    if (Get16B(Ptr-Tcp.HLen+TCP_SrcPort_H) == 0x50)
+//                    {
+//                      if (!SameStrPM(Ptr, PSTR("GET /"), 4))
+//                      {
+//                        Tcp.Ss = 1;
+//                        // Return 0xFF if str found
+//                        // If Non auth, deny access
+//                        if (FindStr(Ptr, 0x200, PSTR("dGVzdDp0ZXN0"), 12) != 0xFF)
+//                          Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 401 NoAuth\r\n"
+//                                                           "WWW-Authenticate: Basic realm=\"TeenSee\"\r\n"
+//                                                           "Content-Type: text/html\r\n\r\n"
+//                                                           "<html>\n\t<head><title>TeenC</title></head>"
+//                                                           "<body><h1>Auth Required</h1></body></html>"));
+//                        else
+//                        { // Else, allow access
+//                          // If page is not root: / -> 404
+//                          if (*(Ptr + 5) != ' ' && *(Ptr + 5) != '?')
+//                            Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 404 Not Found\r\n"
+//                                                             "Content-Type: text/html\r\n\r\n"
+//                                                             "<html><head><title>TeenC</title></head>"
+//                                                             "<body>"
+//                                                             "<h1>404 - I think you're lost...</h1>"
+//                                                             "</body></html>"));
+//                          else
+//                          {
+//                            if (*(Ptr + 6) == 'L' && *(Ptr + 7) == 'T')
+//                            {
+//                              TLed;
+//                              Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 303 Ok\r\n"
+//                                                               "Location: /\r\n\r\n"));
+//                            }
+//                            else
+//                            {
+//                              Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 200 Ok\r\n"
+//                                                               "Content-Type: text/html\r\n\r\n"
+//                                                               "<html><head><title>TeenC</title></head>"
+//                                                               "<body><h1>It works!</h1><p>Led is O"));
+//                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, (PORTD & _BV(6) ? PSTR("n") : PSTR("ff")));
+//                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, PSTR(" - <a href=\"?LT\">Toggle</a>"
+//                                                                           "<br />ADC Pin Value: "));
+//                              Tcp.DLen += BuffWrite(Ptr + Tcp.DLen, itoa(ADC_Read(ADC_Mux), Str, 10));
+//                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, PSTR("</p></body></html>"));
+//                            }
+//                          }
+//                        }
+//                        /* Send Back Data */
+//                        TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeSingleSend);
+//                        k = 2;
+//                      }
+//                    }
+//                    else
+//                    {
+//                      if (!SameStrPM(Ptr, PSTR("TL"), 2))
+//                        TLed;
+//                      Tcp.DLen = BuffWritePM(Ptr, PSTR(">> "));
+//                      /* Send Back Data */
+//                      TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeSend);
+//                      k = 0;
+//                    }
+//                  }
+//                  else if (Tcp.Flags == (TCP_fACK | TCP_fFIN))
+//                  {
+//                    //dbg_s("End\n");
+//                    Tcp.As = 0;
+//                    Tcp.DLen = 0;
+//                    if (k != 2)
+//                    {
+//                      Tcp.Ss = 0;
+//                      Tcp.Flags = TCP_fACK | TCP_fFIN;
+//                    }
+//                    else
+//                    {
+//                      Tcp.Ss = 1;
+//                      Tcp.Flags = TCP_fACK;
+//                    }
+//                    TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
+//                    k = 2;
+//                  } //else  dbg_s("Unknown Flag "); // Flags
+//                } // TCP Packet Accepted
               } // IP Packet Type
             } //else dbg_s("\nUnhandeld IP Packet.");
           } //else dbg_s("\nARP");					// IP or ARP
