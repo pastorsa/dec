@@ -27,7 +27,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 rosbuild_add_executable(dec_visualization 
   src/dec_visualization.cpp
-  src/dec_communication.cpp
+#  src/dec_communication.cpp
   src/dec_simulation.cpp
   src/dec_data.cpp
   src/dec_processor.cpp

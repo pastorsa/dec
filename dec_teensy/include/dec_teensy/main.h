@@ -19,20 +19,10 @@
 #ifndef _MAIN_h
 #define _MAIN_h
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/pgmspace.h>
-#include <stdlib.h>
-
-#define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
-#define ADC_Prescaler (_BV(ADPS2) | _BV(ADPS1))
-#define ADC_Mux 0
-
-#define TLed PORTD ^= _BV(6)
 
 signed char SameStrPM(uint8_t *is,char *is2,signed char l);
-uint8_t FindStr(uint8_t *p,uint16_t pl,char *s,uint8_t l);
+// uint8_t FindStr(uint8_t *p,uint16_t pl,char *s,uint8_t l);
 
-uint16_t ADC_Read(uint8_t ch);
+// uint16_t ADC_Read(uint8_t ch);
 
 #endif

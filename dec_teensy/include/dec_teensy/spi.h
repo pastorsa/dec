@@ -47,4 +47,5 @@ unsigned char SPI_Recv(void);
 
 void SPI_Tx(unsigned char b);
 unsigned char SPI_Rx(void);
+
 #endif

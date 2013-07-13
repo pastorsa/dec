@@ -5,8 +5,8 @@
  *      Author: pastor
  */
 
-#ifndef DEC_COMMUNICATION_H_
-#define DEC_COMMUNICATION_H_
+#ifndef DEC_VISUALIZATION_COMMUNICATION_H_
+#define DEC_VISUALIZATION_COMMUNICATION_H_
 
 #include <Eigen/Eigen>
 #include <boost/shared_ptr.hpp>
@@ -42,5 +42,4 @@ private:
 
 }
 
-
-#endif /* DEC_COMMUNICATION_H_ */
+#endif /* DEC_VISUALIZATION_COMMUNICATION_H_ */

@@ -11,6 +11,8 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+// #include <dec_udp/dec_interface.h>
+
 #include <dec_visualization/dec_data.h>
 
 namespace dec_visualization
@@ -84,8 +86,12 @@ private:
   void publish();
   bool setLightMarkers();
 
+  // void sendLightData();
+
   void setupMode();
   void localMode();
+
+  // dec_udp::DecInterface dec_interface_;
 
 };
 

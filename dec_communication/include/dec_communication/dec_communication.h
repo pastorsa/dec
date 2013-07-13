@@ -10,12 +10,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include <dec_communication/DEC_config.h>
-#include <dec_communication/DEC_structure.h>
+// generated files
+// #include <dec_communication/DEC_config.h>
+// #include <dec_communication/DEC_structure.h>
+#include "DEC_config.h"
+#include "DEC_structure.h"
 
 // Fixed constants
 #define DEC_CONTROLLER_ID 50
-// Note station id 0xFD == 253 is used for broadcasting
 
 /* Remember:
  * uint8_t     = [0..255]
@@ -33,23 +35,20 @@
 
 /*
 Message Definition
-Byte 0 is always the id of the arduino with the NEXT token.
-if the token matches with DEC_NODE_ID or DEC_CONTROLLER_ID
-then we can send a broadcast
-
-The message types can be DEC_SETUP_DATA, DEC_SENSOR_DATA, and DEC_LIGHT_DATA
+Byte 0 is the message type. The message types can be DEC_SETUP_DATA, DEC_SENSOR_DATA, and DEC_LIGHT_DATA
 The format corresponds to the structs setup_data_t, sensor_data_t, and light_data_t.
 */
 
 // Message types:
 // Message is broadcasted for setup
-#define DEC_SETUP_DATA 0x01
+#define DEC_SETUP_DATA (uint8_t)1
 // Message contains sensor information
-#define DEC_SENSOR_DATA 0x02
+#define DEC_SENSOR_DATA (uint8_t)2
 // Message contains light information
-// #define DEC_LIGHT_DATA 0x03
+#define DEC_LIGHT_DATA (uint8_t)3
 
-#define BUFFER_SIZE (uint16_t)900
+// update this
+#define BUFFER_SIZE (uint16_t)1600
 
 /*check if the compiler is of C++*/
 #ifdef __cplusplus
@@ -60,9 +59,10 @@ extern "C" {
 
 /*!
  */
-uint8_t _token;
-uint16_t _length;
+uint16_t _rx_buffer_length;
 uint8_t _rx_buffer[BUFFER_SIZE];
+
+uint8_t _light_buffer[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE + (uint8_t)1];
 
 /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
 /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>> DEC_SETUP_DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
@@ -72,15 +72,17 @@ typedef struct
 } sensor_setup_t;
 typedef struct
 {
-  uint16_t num_leds;
+  uint8_t num_leds;
   uint8_t pin;
 } led_strip_setup_t;
 /*! Setup data.
  */
 typedef struct
 {
-  uint8_t num_led_strips;
-  led_strip_setup_t led_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  uint8_t num_led_nodes;
+  led_strip_setup_t led_nodes[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  uint8_t num_led_beams;
+  led_strip_setup_t led_beams[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
   uint8_t num_sensors;
   sensor_setup_t sensors[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE];
 } setup_data_t;
@@ -90,21 +92,16 @@ typedef struct
  */
 setup_data_t _setup_data;
 
-/*! Parse the received data into the this->setup_data_ structure.
- * The index into this->setup_data_ is obtained from the first byte in
- * the received this->data_;
- * @param data : Received data being parsed into this->setup_data_
+/*! Parse the received data into the _setup_data structure.
+ * @param data : Received data being parsed
  */
 void parseSetupData(uint8_t* data);
 
-/*! Prepares the data_ and length_ member variables from the setup_data_ structure.
- * Fill desired values into setup_data_ at index "token" before calling this function
- * @param token   : Token of the arduino that is receiving the setup data
- *                  Note: this is also the "index" into the setup_data_ that
- *                  is being used to generate/fill the "data" message
- * @return 1 on success, otherwise 0 (due to wrong input)
+/*! Prepares the provided buffer and _length member variables from the _setup_data structure.
+ * Fill desired values into _setup_data before calling this function
+ * @param buffer
  */
-uint8_t generateSetupData(uint8_t token, uint8_t* buffer, uint16_t* length);
+void generateSetupData(uint8_t* buffer);
 /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_SETUP_DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
@@ -114,28 +111,25 @@ uint8_t generateSetupData(uint8_t token, uint8_t* buffer, uint16_t* length);
  */
 typedef struct
 {
-  uint8_t sensors[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE];
+  uint8_t sensor_value[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE];
 } sensor_data_t;
 
 /*! Data type to which the data gets parsed and which gets generated
  * by the functions below.
  */
-sensor_data_t _sensor_data[DEC_NUMBER_OF_ARDUINOS];
+sensor_data_t _sensor_data;
 
-/*! Parse the received "data" into the the sensor_data_ structure.
- * @param source  : ID of the node that send this message used at
- *                  index into this->sensor_data_
- * @param data    : Received data being parsed into this->sensor_data_
+/*! Parse the received data into the the _sensor_data structure.
+ * @param buffer  : Received data being parsed
  */
-void parseSensorData(uint8_t source, char* data);
+void parseSensorData(uint8_t* buffer);
 
-/*! Prepares the data_ and length_ member variables from the sensor_data_ structure.
- * Fill desired values into sensor_data_ at index "token" before calling this function
- * @param token   : Token of the node that is receiving the sensor data
- *                  Note: this is also the "index" into the sensor_data_ that
- *                  is being used to generate/fill the "data" message
+/*! Prepares the provided buffer and _length member variables from the _sensor_data structure.
+ * Fill desired values into _sensor_data before calling this function
+ * @param buffer
+ * @param sensor_data
  */
-void generateSensorData(uint8_t token, uint8_t* buffer, uint16_t* length);
+void generateSensorData(uint8_t* buffer, const sensor_data_t* sensor_data);
 
 /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_SENSOR_DATA <<<<<<<<<<<<<<<<<<<<<<<<< */
 /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
@@ -147,70 +141,78 @@ void generateSensorData(uint8_t token, uint8_t* buffer, uint16_t* length);
  */
 typedef struct
 {
-  uint32_t colors[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
-} led_data_t;
+  uint8_t red;
+  uint8_t green;
+  uint8_t blue;
+  uint8_t brightness;
+} led_node_data_t;
 
 typedef struct
 {
-  led_data_t led_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  uint8_t red[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
+  uint8_t green[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
+  uint8_t blue[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
+  uint8_t brightness[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
+} led_beam_data_t;
+
+typedef struct
+{
+  led_node_data_t led_nodes[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  led_beam_data_t led_beams[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
 } light_data_t;
 
 /*! Data type to which the "data" gets parsed and which gets generated
  * by the functions below.
  */
-light_data_t _light_data[DEC_NUMBER_OF_ARDUINOS];
+light_data_t _light_data;
 
-/*! Parse the received data into the the light_data_ structure.
- * @param source  : ID of the node that send this message used at
- *                  index into this->light_data_
- * @param data    : Received data being parsed into this->light_data_
+/*! Parse the received data into the the _light_data structure.
+ * @param buffer  : Received data being parsed
  */
-void parseLightData(uint8_t source, char* data);
+void parseLightData(uint8_t* buffer);
 
- /*! Prepares the data_ and length_ member variables from the light_data_ structure.
-  * Fill desired values into sensor_data_ at index "token" before calling this function
-  * @param token   : Token of the node that is receiving the light data
-  *                  Note: this is also the "index" into the light_data_ that
-  *                  is being used to generate/fill the "data" message
-  */
-void generateLightData(uint8_t token);
+/*! Prepares provided buffer and _length member variables from the _light_data structure.
+ * Fill desired values into _light_data before calling this function
+ * @param buffer
+ * @param light_data
+ */
+void generateLightData(uint8_t* buffer, const light_data_t* light_data);
 
 /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_LIGHT_DATA <<<<<<<<<<<<<<<<<<<<<<<<<< */
 /*! <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
-
-/*! Prepares an empty message to be send out by the master
-* @param token : Token of the >next< node
-*/
-void generateRequest(uint8_t token, uint8_t* buffer, uint16_t* length);
 
 /*!
  * @param node_id
  */
 void loadSetupData(const uint8_t node_id);
 
-/*! Update token in this->data_
-* @param token : Token for the next station
-*/
-void setToken(uint8_t token, uint8_t* buffer);
-/*! Update token in this->data_ to be DEC_CONTROLLER_ID
-*/
-void setTokenToController(uint8_t* buffer);
-
 /*!
+ * @param buffer
+ * @return 1 if buffer contains setup data
  */
-// void dec_init(void);
-
+uint8_t isSetupData(uint8_t* buffer);
 /*!
- * @param setup_data
- * @param sensor_data
- * @param light_data
+ * @param buffer
+ * @return 1 if buffer contains sensor data
  */
-void reset(setup_data_t* setup_data, sensor_data_t* sensor_data, light_data_t* light_data);
+uint8_t isSensorData(uint8_t* buffer);
+/*!
+ * @param buffer
+ * @return 1 if buffer contains light data
+ */
+uint8_t isLightData(uint8_t* buffer);
+
+/*! Zeros all data
+ */
+void resetData(void);
+
+/*! Prints internal data
+ */
+void printData(void);
 
 /*check if the compiler is of C++ */
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif // _DEC_COMMUNICATION_H

@@ -5,82 +5,101 @@
  *      Author: pastor
  */
 
-#include <ros/ros.h>
-
+#include <stdio.h>
 #include <dec_udp/dec_interface.h>
+
+#include <boost/lexical_cast.hpp>
 
 namespace dec_udp
 {
 
 DecInterface::DecInterface()
- : received_data_length_(0)
 {
   udp_socket_.reset(new UDPSocket(SERVER_IP_ADDRESS, SERVER_PORT));
-  ROS_INFO("Created socket at %s:%i", udp_socket_->getLocalAddress().c_str(), udp_socket_->getLocalPort());
+  // printf("Created socket at %s:%i\n", udp_socket_->getLocalAddress().c_str(), udp_socket_->getLocalPort());
 
   // initialize data
-  reset(&_setup_data, _sensor_data, _light_data);
-
+  resetData();
 }
 
 void DecInterface::print(const setup_data_t& setup_data)
 {
-  ROS_INFO("Setup Data:");
-  ROS_INFO(" Number of LED strips is >%i<", (int)setup_data.num_led_strips);
-  for (uint8_t i = 0; i < setup_data.num_led_strips; ++i)
-    ROS_INFO("  Strip >%i< : #LEDs is >%i< at pin >%i<.", (int)i, (int)setup_data.led_strips[i].num_leds, (int)setup_data.led_strips[i].pin);
-
-  ROS_INFO(" Number of sensors is >%i<", (int)setup_data.num_sensors);
+  printf("Setup Data:\n");
+  printf(" Number of LED nodes is >%u<.\n", _setup_data.num_led_nodes);
+  for (uint8_t i = 0; i < _setup_data.num_led_nodes; ++i)
+    printf("  Node >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_nodes[i].num_leds, _setup_data.led_nodes[i].pin);
+  printf(" Number of LED beams is >%u<.\n", _setup_data.num_led_beams);
+  for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
+    printf("  Beam >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_beams[i].num_leds, _setup_data.led_beams[i].pin);
+  printf(" Number of sensors is >%u<.\n", setup_data.num_sensors);
   for (uint8_t i = 0; i < setup_data.num_sensors; ++i)
-    ROS_INFO("  Sensor >%i< is at pin >%i<.", (int)i, (int)setup_data.sensors[i].pin);
+    printf("  Sensor >%u< is at pin >%u<.\n", i, setup_data.sensors[i].pin);
 }
 
 void DecInterface::print(const sensor_data_t& sensor_data)
 {
-  ROS_INFO("Sensor Data:");
+  printf("Sensor Data:\n");
 }
 
 void DecInterface::print(const light_data_t& light_data)
 {
-  ROS_INFO("Light Data:");
+  printf("Light Data:\n");
 }
 
 bool DecInterface::sendSetupData(const uint8_t node_id)
 {
-
-  ROS_INFO("Loading setup data for node >%i<.", node_id);
+  printf("Loading setup data for node >%i<.\n", node_id);
   loadSetupData(node_id);
-
   print(_setup_data);
 
-  ROS_INFO("Generating setup data for node >%i<.", node_id);
-  if(!generateSetupData(node_id, _rx_buffer, &_length))
+  printf("Generating setup data for node >%i<.\n", node_id);
+  generateSetupData(_rx_buffer);
+  printData();
+
+  const int IP_FROM_NODE = node_id + 1;
+  std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
+
+  printf("Sending >%i< bytes of setup data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
+  if(udp_socket_->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
   {
-    ROS_ERROR("Failed to generate setup data for node >%i<.", node_id);
+    printf("Problems when sending setup data to node id >%i< to >%s:%i<.\n", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
     return false;
   }
 
-  // std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)node_id);
-  std::string foreign_address = BROADCAST_IP_ADDRESS;
+  printf("Waiting to receive setup data answer.\n");
+  _rx_buffer_length = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
 
-  ROS_INFO("Sending >%i< bytes of setup data for node id >%i< to >%s:%i<.", (int)_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-
-  // Send the string to the server
-  if(udp_socket_->sendTo((void*)_rx_buffer, (int)_length, foreign_address, FOREIGN_PORT) != _length)
-  {
-    ROS_ERROR("Problems when sending to node id >%i< to >%s:%i<.", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-    return false;
-  }
-
-  ROS_INFO("Waiting to receive answer.");
-  received_data_length_ = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
-
-  ROS_INFO("Received >%i< bytes.", received_data_length_);
+  printData();
 
   parseSetupData(_rx_buffer);
   print(_setup_data);
 
-  ROS_INFO("Done.");
+  printf("Done with setup.\n");
+  return true;
+}
+
+bool DecInterface::sendLightData(const int node_id, const light_data_t& light_data)
+{
+  loadSetupData(node_id);
+
+  // printf("Generating light data for node >%i<.\n", node_id);
+  generateLightData(_rx_buffer, &light_data);
+  // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
+
+  const int IP_FROM_NODE = node_id + 1;
+  std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
+
+  // printf("Sending >%i< bytes of light data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
+  if(udp_socket_->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
+  {
+    printf("Problems when sending light data to node id >%i< to >%s:%i<.\n", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
+    return false;
+  }
+
+  // printf("Waiting to receive light data answer.\n");
+  _rx_buffer_length = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
+
+  // printf("Done communicating light data.\n");
   return true;
 }
 

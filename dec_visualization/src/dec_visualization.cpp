@@ -16,7 +16,7 @@
 #include <dec_utilities/param_server.h>
 
 #include <dec_visualization/dec_simulation.h>
-#include <dec_visualization/dec_communication.h>
+// #include <dec_visualization/dec_communication.h>
 
 #include <dec_visualization/dec_visualization.h>
 
@@ -37,14 +37,14 @@ bool DECVisualization::initialize(ros::NodeHandle node_handle)
   ROS_INFO("Initializing DEC visualization.");
 
   ROS_VERIFY(dec_utilities::read(node_handle, "simulation_mode", simulation_mode_));
-  if(simulation_mode_)
-  {
+//  if(simulation_mode_)
+//  {
     dec_processor_.reset(new DECSimulation());
-  }
-  else
-  {
-    dec_processor_.reset(new DECCommunication());
-  }
+//  }
+//  else
+//  {
+//    dec_processor_.reset(new DECCommunication());
+//  }
   ROS_ASSERT(dec_processor_->initialize(node_handle));
 
   // Eigen::DenseIndex size = (Eigen::DenseIndex)dec_processor_->light_nodes_.size();

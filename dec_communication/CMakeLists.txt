@@ -21,10 +21,17 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
+include_directories("include/dec_communication")
+
 set(CMAKE_C_FLAGS "-std=gnu99") 
 rosbuild_add_library(${PROJECT_NAME}
   src/dec_communication.c
 )
+
+rosbuild_add_executable(test_dec_communication
+  test/test_dec_communication.c
+)
+target_link_libraries(test_dec_communication ${PROJECT_NAME})
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

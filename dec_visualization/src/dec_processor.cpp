@@ -14,6 +14,8 @@
 
 #include <dec_visualization/dec_processor.h>
 
+#include <dec_udp/dec_interface.h>
+
 using namespace std;
 using namespace conversions;
 
@@ -47,24 +49,24 @@ bool DECProcessor::init(ros::NodeHandle node_handle)
   setupTextMarkers(node_handle_, "light_beam", light_beam_markers_, light_beam_text_markers_);
   setupTextMarkers(node_handle_, "sensor", sensor_markers_, sensor_text_markers_);
 
-  for (unsigned int i = 0; i < arduino_to_light_beam_map_.size(); ++i)
+  for (unsigned int i = 0; i < teensy_to_light_beam_map_.size(); ++i)
   {
-    for (unsigned int j = 0; j < arduino_to_light_beam_map_[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_light_beam_map_[i].size(); ++j)
     {
-      const int INDEX = arduino_to_light_beam_map_[i][j];
-      const int ENTRY = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (j * 4);
+      const int INDEX = teensy_to_light_beam_map_[i][j];
+      const int ENTRY = NUM_ENTRIES_FOR_TEENSY_LEVEL + max_number_of_sensors_per_teensy_ + (j * 4);
       data_(i, ENTRY + RED_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.r * COLOR_RESOLUTION);
       data_(i, ENTRY + GREEN_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.g * COLOR_RESOLUTION);
       data_(i, ENTRY + BLUE_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.b * COLOR_RESOLUTION);
       data_(i, ENTRY + ALPHA_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.a * COLOR_RESOLUTION);
     }
   }
-  for (unsigned int i = 0; i < arduino_to_light_node_map_.size(); ++i)
+  for (unsigned int i = 0; i < teensy_to_light_node_map_.size(); ++i)
   {
-    for (unsigned int j = 0; j < arduino_to_light_node_map_[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_light_node_map_[i].size(); ++j)
     {
-      const int INDEX = arduino_to_light_node_map_[i][j];
-      const int ENTRY = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (arduino_to_light_beam_map_[i].size() * 4) + (j * 4);
+      const int INDEX = teensy_to_light_node_map_[i][j];
+      const int ENTRY = NUM_ENTRIES_FOR_TEENSY_LEVEL + max_number_of_sensors_per_teensy_ + (teensy_to_light_beam_map_[i].size() * 4) + (j * 4);
       data_(i, ENTRY + RED_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.r * COLOR_RESOLUTION);
       data_(i, ENTRY + GREEN_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.g * COLOR_RESOLUTION);
       data_(i, ENTRY + BLUE_OFFSET) = static_cast<int>(light_node_markers_.markers[INDEX].color.b * COLOR_RESOLUTION);
@@ -77,23 +79,32 @@ bool DECProcessor::init(ros::NodeHandle node_handle)
 
 void DECProcessor::setupMode()
 {
-
+  if(enable_communication_)
+  {
+    dec_udp::DecInterface dec_interface;
+    for (int i = 0; i < number_of_teensys_; ++i)
+    {
+      ROS_ASSERT_MSG(dec_interface.sendSetupData(i), "Failed to setup node with id >%i<.", i);
+    }
+  }
 }
 
 void DECProcessor::localMode()
 {
-  for (unsigned int i = 0; i < arduino_to_sensor_map_.size(); ++i)
+  for (unsigned int i = 0; i < teensy_to_sensor_map_.size(); ++i)
   {
     int sensor_value = 0;
-    for (unsigned int j = 0; j < arduino_to_sensor_map_[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_sensor_map_[i].size(); ++j)
     {
-      int value = data_(i, NUM_ENTRIES_FOR_ARDUINO_LEVEL + j);
+      int value = data_(i, NUM_ENTRIES_FOR_TEENSY_LEVEL + j);
       ROS_ASSERT(value >= 0);
       sensor_value += value;
     }
 
     if (sensor_value > SENSOR_RESOLUTION)
+    {
       sensor_value = SENSOR_RESOLUTION;
+    }
 
     // scale sensor value to range 0..1
     double sensor = static_cast<double>(sensor_value) / static_cast<double>(SENSOR_RESOLUTION);
@@ -103,18 +114,18 @@ void DECProcessor::localMode()
     int blue = static_cast<int>(COLOR_RESOLUTION / 2.0);
     int alpha = static_cast<int>(COLOR_RESOLUTION);
 
-    // ROS_INFO("Arduino >%i< has >%i< light beams attached.", i, (int)arduino_to_light_beam_map_[i].size());
-    for (unsigned int j = 0; j < arduino_to_light_beam_map_[i].size(); ++j)
+    // ROS_INFO("Teensy >%i< has >%i< light beams attached.", i, (int)teensy_to_light_beam_map_[i].size());
+    for (unsigned int j = 0; j < teensy_to_light_beam_map_[i].size(); ++j)
     {
-      const int ENTRY = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (j * 4);
+      const int ENTRY = NUM_ENTRIES_FOR_TEENSY_LEVEL + max_number_of_sensors_per_teensy_ + (j * 4);
       data_(i, ENTRY + RED_OFFSET) = red;
       data_(i, ENTRY + GREEN_OFFSET) = green;
       data_(i, ENTRY + BLUE_OFFSET) = blue;
       data_(i, ENTRY + ALPHA_OFFSET) = alpha;
     }
-    for (unsigned int j = 0; j < arduino_to_light_node_map_[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_light_node_map_[i].size(); ++j)
     {
-      const int ENTRY = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (arduino_to_light_beam_map_[i].size() * 4) + (j * 4);
+      const int ENTRY = NUM_ENTRIES_FOR_TEENSY_LEVEL + max_number_of_sensors_per_teensy_ + (teensy_to_light_beam_map_[i].size() * 4) + (j * 4);
       data_(i, ENTRY + RED_OFFSET) = red;
       data_(i, ENTRY + GREEN_OFFSET) = green;
       data_(i, ENTRY + BLUE_OFFSET) = blue;
@@ -130,41 +141,77 @@ bool DECProcessor::update()
   if (interaction_mode_ == (int)eSETUP)
   {
     setupMode();
+    interaction_mode_ = (int)eLOCAL;
   }
   else if (interaction_mode_ == (int)eLOCAL)
   {
     localMode();
+    ROS_ASSERT(setLightMarkers());
+    publish();
   }
   else
   {
     ROS_ERROR("Invalid interaction mode >%i<.", interaction_mode_);
     return false;
   }
-
-  publish();
   return true;
 }
 
 bool DECProcessor::setLightMarkers()
 {
+
+  dec_udp::DecInterface dec_interface;
+  std::vector<light_data_t> light_data(number_of_teensys_);
+
   for (unsigned int i = 0; i < light_beam_connections_.size(); ++i)
   {
-    const int ARDUINO_INDEX = light_beam_connections_[i];
-    const int ENTRY_INDEX = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (light_beam_index_counter_[i] * 4);
-    light_beam_markers_.markers[i].color.r = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + RED_OFFSET)) / COLOR_RESOLUTION;
-    light_beam_markers_.markers[i].color.g = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + GREEN_OFFSET)) / COLOR_RESOLUTION;
-    light_beam_markers_.markers[i].color.b = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + BLUE_OFFSET)) / COLOR_RESOLUTION;
-    light_beam_markers_.markers[i].color.a = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + ALPHA_OFFSET)) / COLOR_RESOLUTION;
+    const int TEENSY_INDEX = light_beam_connections_[i];
+    const int ENTRY_INDEX = NUM_ENTRIES_FOR_TEENSY_LEVEL + max_number_of_sensors_per_teensy_ + (light_beam_index_counter_[i] * 4);
+    light_beam_markers_.markers[i].color.r = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET)) / COLOR_RESOLUTION;
+    light_beam_markers_.markers[i].color.g = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET)) / COLOR_RESOLUTION;
+    light_beam_markers_.markers[i].color.b = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET)) / COLOR_RESOLUTION;
+    light_beam_markers_.markers[i].color.a = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET)) / COLOR_RESOLUTION;
+
+    // also setup communication data
+    for (int j = 0; j < max_number_of_leds_per_light_strip_; ++j)
+    {
+      int index = light_beam_index_counter_[i];
+      light_data[TEENSY_INDEX].led_beams[index].red[j] = data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET);
+      light_data[TEENSY_INDEX].led_beams[index].green[j] = data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET);
+      light_data[TEENSY_INDEX].led_beams[index].blue[j] = data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET);
+      light_data[TEENSY_INDEX].led_beams[index].brightness[j] = data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET);
+    }
   }
 
   for (unsigned int i = 0; i < light_node_connections_.size(); ++i)
   {
-    const int ARDUINO_INDEX = light_node_connections_[i];
-    const int ENTRY_INDEX = NUM_ENTRIES_FOR_ARDUINO_LEVEL + max_number_of_sensors_per_arduino_ + (arduino_to_light_beam_map_[ARDUINO_INDEX].size() * 4) + (light_node_index_counter_[i] * 4);
-    light_node_markers_.markers[i].color.r = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + RED_OFFSET)) / COLOR_RESOLUTION;
-    light_node_markers_.markers[i].color.g = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + GREEN_OFFSET)) / COLOR_RESOLUTION;
-    light_node_markers_.markers[i].color.b = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + BLUE_OFFSET)) / COLOR_RESOLUTION;
-    light_node_markers_.markers[i].color.a = static_cast<double>(data_(ARDUINO_INDEX, ENTRY_INDEX + ALPHA_OFFSET)) / COLOR_RESOLUTION;
+    const int TEENSY_INDEX = light_node_connections_[i];
+    const int ENTRY_INDEX = NUM_ENTRIES_FOR_TEENSY_LEVEL + max_number_of_sensors_per_teensy_ + (teensy_to_light_beam_map_[TEENSY_INDEX].size() * 4) + (light_node_index_counter_[i] * 4);
+    light_node_markers_.markers[i].color.r = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET)) / COLOR_RESOLUTION;
+    light_node_markers_.markers[i].color.g = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET)) / COLOR_RESOLUTION;
+    light_node_markers_.markers[i].color.b = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET)) / COLOR_RESOLUTION;
+    light_node_markers_.markers[i].color.a = static_cast<double>(data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET)) / COLOR_RESOLUTION;
+
+    // also setup communication data
+    int index = light_node_index_counter_[i];
+    light_data[TEENSY_INDEX].led_nodes[index].red = data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET);
+    light_data[TEENSY_INDEX].led_nodes[index].green = data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET);
+    light_data[TEENSY_INDEX].led_nodes[index].blue = data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET);
+    light_data[TEENSY_INDEX].led_nodes[index].brightness = data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET);
+
+    // ROS_DEBUG("Sending light data for teensy >%i< for node >%i< data >%u %u %u %u<.", TEENSY_INDEX, index, light_data[TEENSY_INDEX].led_nodes[index].red,
+    // light_data[TEENSY_INDEX].led_nodes[index].green, light_data[TEENSY_INDEX].led_nodes[index].blue, light_data[TEENSY_INDEX].led_nodes[index].brightness);
+  }
+
+  if(enable_communication_)
+  {
+    for (int n = 0; n < number_of_teensys_; ++n)
+    {
+      if(!dec_interface.sendLightData(n, light_data[n]))
+      {
+        ROS_ERROR("Problems sending light data for micro controller with node id >%i<.", n);
+      }
+    }
   }
 
   return true;
@@ -172,8 +219,6 @@ bool DECProcessor::setLightMarkers()
 
 void DECProcessor::publish()
 {
-  ROS_ASSERT(setLightMarkers());
-
   rviz_pub_.publish(node_markers_);
   rviz_pub_.publish(node_text_markers_);
   rviz_pub_.publish(beam_markers_);

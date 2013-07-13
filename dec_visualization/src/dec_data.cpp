@@ -24,24 +24,55 @@ using namespace conversions;
 namespace dec_visualization
 {
 
-DECData::DECData() : interaction_mode_(0), number_of_arduinos_(0),
-    max_number_of_light_strips_per_arduino_(0), max_number_of_leds_per_light_strip_(0),
-    max_number_of_sensors_per_arduino_(0), /*controller_icsc_de_pin_(-1),*/ initialized_(false)
+DECData::DECData() : interaction_mode_(0), number_of_teensys_(0),
+    max_number_of_light_strips_per_teensy_(0), max_number_of_leds_per_light_strip_(0),
+    max_number_of_sensors_per_teensy_(0), enable_communication_(false), initialized_(false)
 {
 };
 
-
 bool DECData::init(ros::NodeHandle node_handle)
 {
-  ROS_VERIFY(dec_utilities::read(node_handle, "number_of_arduinos", number_of_arduinos_));
-  ROS_ASSERT_MSG(number_of_arduinos_ > 0 && number_of_arduinos_ <= 30,
-                 "Number of arduinos specified >%i< is invalid. It need to be within [1..30].", number_of_arduinos_);
-  ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_sensors_per_arduino", max_number_of_sensors_per_arduino_));
-  ROS_ASSERT_MSG(max_number_of_sensors_per_arduino_ > 0 && max_number_of_sensors_per_arduino_ <= 255,
-                 "Maximum number of sensors specified >%i< is invalid.", max_number_of_sensors_per_arduino_);
-  ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_light_strips_per_arduino", max_number_of_light_strips_per_arduino_));
-  ROS_ASSERT_MSG(max_number_of_light_strips_per_arduino_ > 0 && max_number_of_light_strips_per_arduino_ <= 255,
-                 "Maximum number of light strips specified >%i< is invalid.", max_number_of_light_strips_per_arduino_);
+  ROS_VERIFY(dec_utilities::read(node_handle, "number_of_teensys", number_of_teensys_));
+  ROS_ASSERT_MSG(number_of_teensys_ > 0 && number_of_teensys_ <= 255,
+                 "Number of teensys specified >%i< is invalid. It need to be within [1..255].", number_of_teensys_);
+
+  ROS_VERIFY(dec_utilities::read(node_handle, "sensor_pins", sensor_pins_));
+  for (unsigned int i = 0; i < sensor_pins_.size(); ++i)
+  {
+    const int SENSOR_PINS[29] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 20, 21, 22, 23,
+                                 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}; // Teensy++ 2.0 digital pins that are not PWM capable
+    bool found = false;
+    for (unsigned int j = 0; !found && j < 9; ++j)
+    {
+      if (SENSOR_PINS[j] == sensor_pins_[i])
+      {
+        found = true;
+      }
+    }
+    ROS_ASSERT_MSG(found, "Invalid sensor pin >%i< specified. This pin is not a valid digital pin (excluding PWM pins) on a Teensy++ 2.0 !", sensor_pins_[i]);
+  }
+  max_number_of_sensors_per_teensy_ = (int)sensor_pins_.size();
+  ROS_ASSERT_MSG(max_number_of_sensors_per_teensy_ > 0 && max_number_of_sensors_per_teensy_ <= 255,
+                 "Maximum number of sensors specified >%i< is invalid.", max_number_of_sensors_per_teensy_);
+
+  ROS_VERIFY(dec_utilities::read(node_handle, "light_pins", light_pins_));
+  for (unsigned int i = 0; i < light_pins_.size(); ++i)
+  {
+    const int PWM_PINS[9] = {0, 1, 14, 15, 16, 24, 25, 26, 27}; // Teensy++ 2.0 PWM pins
+    bool found = false;
+    for (unsigned int j = 0; !found && j < 9; ++j)
+    {
+      if (PWM_PINS[j] == light_pins_[i])
+      {
+        found = true;
+      }
+    }
+    ROS_ASSERT_MSG(found, "Invalid light pin >%i< specified. This pin is not PWM capable on a Teensy++ 2.0 !", light_pins_[i]);
+  }
+  max_number_of_light_strips_per_teensy_ = (int)light_pins_.size();
+  ROS_ASSERT_MSG(max_number_of_light_strips_per_teensy_ > 0 && max_number_of_light_strips_per_teensy_ <= 255,
+                 "Maximum number of light strips specified >%i< is invalid.", max_number_of_light_strips_per_teensy_);
+
   ROS_VERIFY(dec_utilities::read(node_handle, "max_number_of_leds_per_light_strip", max_number_of_leds_per_light_strip_));
   ROS_ASSERT_MSG(max_number_of_leds_per_light_strip_ > 0 && max_number_of_leds_per_light_strip_ <= 255,
                  "Maximum number of LEDs per light strip specified >%i< is invalid.", max_number_of_leds_per_light_strip_);
@@ -70,17 +101,17 @@ bool DECData::init(ros::NodeHandle node_handle)
   ROS_VERIFY(read(node_handle, "light_beams", light_beams_));
   ROS_VERIFY(read(node_handle, "sensors", sensors_));
 
-  ROS_VERIFY(read(node_handle, "light_beam_connections", light_beam_connections_, light_beam_index_counter_, arduino_to_light_beam_map_, light_beams_.size()));
-  ROS_VERIFY(read(node_handle, "light_node_connections", light_node_connections_, light_node_index_counter_, arduino_to_light_node_map_, light_nodes_.size()));
-  ROS_VERIFY(read(node_handle, "sensor_connections", sensor_connections_, sensor_index_counter_, arduino_to_sensor_map_, sensors_.size()));
-  for (int i = 0; i < number_of_arduinos_; ++i)
+  ROS_VERIFY(read(node_handle, "light_beam_connections", light_beam_connections_, light_beam_index_counter_, teensy_to_light_beam_map_, light_beams_.size()));
+  ROS_VERIFY(read(node_handle, "light_node_connections", light_node_connections_, light_node_index_counter_, teensy_to_light_node_map_, light_nodes_.size()));
+  ROS_VERIFY(read(node_handle, "sensor_connections", sensor_connections_, sensor_index_counter_, teensy_to_sensor_map_, sensors_.size()));
+  for (int i = 0; i < number_of_teensys_; ++i)
   {
-    ROS_ASSERT_MSG(static_cast<int>(arduino_to_light_beam_map_[i].size()) + static_cast<int>(arduino_to_light_node_map_[i].size())
-               <= max_number_of_light_strips_per_arduino_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
-               (int)arduino_to_light_beam_map_[i].size(), (int)arduino_to_light_node_map_[i].size(), max_number_of_light_strips_per_arduino_);
-    ROS_ASSERT_MSG(static_cast<int>(arduino_to_sensor_map_[i].size()) <= max_number_of_sensors_per_arduino_,
-                   "Number of sensors per arduino >%i< exceeds the limit >%i< of allowed sensors per arduino.",
-                   (int)arduino_to_sensor_map_[i].size(), max_number_of_sensors_per_arduino_);
+    ROS_ASSERT_MSG(static_cast<int>(teensy_to_light_beam_map_[i].size()) + static_cast<int>(teensy_to_light_node_map_[i].size())
+               <= max_number_of_light_strips_per_teensy_, "Number of lights (beams >%i< and nodes >%i<) exceed specified limit >%i<.",
+               (int)teensy_to_light_beam_map_[i].size(), (int)teensy_to_light_node_map_[i].size(), max_number_of_light_strips_per_teensy_);
+    ROS_ASSERT_MSG(static_cast<int>(teensy_to_sensor_map_[i].size()) <= max_number_of_sensors_per_teensy_,
+                   "Number of sensors per teensy >%i< exceeds the limit >%i< of allowed sensors per teensy.",
+                   (int)teensy_to_sensor_map_[i].size(), max_number_of_sensors_per_teensy_);
   }
 
   ROS_VERIFY(dec_utilities::read(node_handle, "num_leds_of_each_light_beam", num_leds_of_each_light_beam_));
@@ -92,32 +123,15 @@ bool DECData::init(ros::NodeHandle node_handle)
                  "Number of LEDs for each light node is incorrect >%i<. It should equal the number of light nodes >%i<.",
                  (int)num_leds_of_each_light_node_.size(), (int)light_nodes_.size());
 
-  //  ROS_VERIFY(dec_utilities::read(node_handle, "node_icsc_de_pins", node_icsc_de_pins_));
-  //  ROS_ASSERT_MSG((int)node_icsc_de_pins_.size() ==  number_of_arduinos_,
-  //                 "Number of DE pins for the RS-485 interface >%i< must be equal to the number of arduinos >%i<.",
-  //                 (int)node_icsc_de_pins_.size(), number_of_arduinos_);
-  //  for (unsigned int i = 0; i < node_icsc_de_pins_.size(); ++i)
-  //  {
-  //    ROS_ASSERT_MSG(node_icsc_de_pins_[i] >= 0 && node_icsc_de_pins_[i] <= 255,
-  //                   "DE pin specified for arduino >%i< is invalid >%i<. Check node_icsc_de_pins parameter.", (int)i, node_icsc_de_pins_[i]);
-  //  }
-  //  ROS_VERIFY(dec_utilities::read(node_handle, "controller_icsc_de_pin", controller_icsc_de_pin_));
-  //  ROS_ASSERT_MSG(controller_icsc_de_pin_ >= 0 && controller_icsc_de_pin_ <= 255,
-  //                 "DE pin specified for the controller arduino is invalid >%i<. Check controller_icsc_de_pin parameter.", controller_icsc_de_pin_);
-
-  ROS_VERIFY(dec_utilities::read(node_handle, "io_pin_ordering", io_pin_ordering_));
-  for (unsigned int i = 0; i < io_pin_ordering_.size(); ++i)
-  {
-    ROS_ASSERT_MSG(io_pin_ordering_[i] >= 0 && io_pin_ordering_[i] <= 255,
-                   "IO pin specified for pin >%i< is invalid >%i<. Check io_pin_ordering parameter.", (int)i, io_pin_ordering_[i]);
-  }
+  // light_node_data_.resize((size_t)number_of_teensys_);
+  // light_beam_data_.resize((size_t)number_of_teensys_);
 
   const int NUM_ENTRIES_PER_ARDUINO =
-      + NUM_ENTRIES_FOR_ARDUINO_LEVEL
-      + max_number_of_sensors_per_arduino_
-      + 4 * max_number_of_light_strips_per_arduino_; // for RGBA
+      + NUM_ENTRIES_FOR_TEENSY_LEVEL
+      + max_number_of_sensors_per_teensy_
+      + 4 * max_number_of_light_strips_per_teensy_; // for RGBA
 
-  data_ = Eigen::MatrixXi::Zero(number_of_arduinos_, NUM_ENTRIES_PER_ARDUINO);
+  data_ = Eigen::MatrixXi::Zero(number_of_teensys_, NUM_ENTRIES_PER_ARDUINO);
   ROS_INFO("Created >%i< by >%i< data matrix.", (int)data_.rows(), (int)data_.cols());
 
   // Lastly, generate the configuration file
@@ -135,9 +149,11 @@ bool DECData::init(ros::NodeHandle node_handle)
   {
     std::string path = ros::package::getPath("dec_communication");
     dec_utilities::appendTrailingSlash(path);
-    // generateStructureFile(path + "DEC_structure_arduino.h", "PROGMEM ", "prog_");
+    // generateStructureFile(path + "DEC_structure_teensy.h", "PROGMEM ", "prog_");
     generateStructureFile(path + "include/dec_communication/DEC_structure.h");
   }
+
+  ROS_VERIFY(dec_utilities::read(node_handle, "enable_communication", enable_communication_));
 
   return (initialized_ = true);
 }
@@ -154,15 +170,15 @@ bool DECData::read(ros::NodeHandle node_handle,
 
   for (unsigned int i = 0; i < values.size(); ++i)
   {
-    ROS_ASSERT_MSG(values[i] >= 0 && values[i] < number_of_arduinos_,
+    ROS_ASSERT_MSG(values[i] >= 0 && values[i] < number_of_teensys_,
                    ">%s< >%i< is >%i< and therefore invalid. Must be within [0, %i]",
-                   array_name.c_str(), (int)i, values[i], number_of_arduinos_-1);
+                   array_name.c_str(), (int)i, values[i], number_of_teensys_-1);
   }
 
   index_values.resize(values.size(), -1);
-  map.resize(number_of_arduinos_);
-  std::vector<int> counts(number_of_arduinos_, 0);
-  for (int i = 0; i < number_of_arduinos_; ++i)
+  map.resize(number_of_teensys_);
+  std::vector<int> counts(number_of_teensys_, 0);
+  for (int i = 0; i < number_of_teensys_; ++i)
   {
     std::vector<int> v;
     for (unsigned int j = 0; j < values.size(); ++j)
@@ -291,30 +307,30 @@ void DECData::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positi
   }
 }
 
-int DECData::getNumArduinos() const
+int DECData::getNumTeensys() const
 {
   ROS_ASSERT(initialized_);
-  return number_of_arduinos_;
+  return number_of_teensys_;
 }
 
-int DECData::getSensorValue(const int arduino_index,
+int DECData::getSensorValue(const int teensy_index,
                     const int sensor_index)
 {
-  return data_(arduino_index, NUM_ENTRIES_FOR_ARDUINO_LEVEL + sensor_index);
+  return data_(teensy_index, NUM_ENTRIES_FOR_TEENSY_LEVEL + sensor_index);
 }
 
-void DECData::addSensorValue(const int arduino_index,
+void DECData::addSensorValue(const int teensy_index,
                              const int sensor_index,
                              const int sensor_value)
 {
-  data_(arduino_index, NUM_ENTRIES_FOR_ARDUINO_LEVEL + sensor_index) += sensor_value;
+  data_(teensy_index, NUM_ENTRIES_FOR_TEENSY_LEVEL + sensor_index) += sensor_value;
 }
 
-void DECData::setSensorValue(const int arduino_index,
+void DECData::setSensorValue(const int teensy_index,
                                 const int sensor_index,
                                 const int sensor_value)
 {
-  data_(arduino_index, NUM_ENTRIES_FOR_ARDUINO_LEVEL + sensor_index) = sensor_value;
+  data_(teensy_index, NUM_ENTRIES_FOR_TEENSY_LEVEL + sensor_index) = sensor_value;
 }
 
 bool DECData::generateConfigurationFile(const std::string& abs_file_name)
@@ -330,11 +346,11 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   header_file << "#ifndef _DEC_CONFIG_H" << endl;
   header_file << "#define _DEC_CONFIG_H\n" << endl;
 
-  header_file << "// Number of arduinos in the structure.\n";
-  header_file << "#define DEC_NUMBER_OF_ARDUINOS (uint8_t)" << number_of_arduinos_ << "\n\n";
+  header_file << "// Number of teensys in the structure.\n";
+  header_file << "#define DEC_NUMBER_OF_ARDUINOS (uint8_t)" << number_of_teensys_ << "\n\n";
   header_file << "// Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)\n";
-  header_file << "#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t)" << max_number_of_sensors_per_arduino_ << "\n";
-  header_file << "#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t)" << max_number_of_light_strips_per_arduino_ << "\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t)" << max_number_of_sensors_per_teensy_ << "\n";
+  header_file << "#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t)" << max_number_of_light_strips_per_teensy_ << "\n";
   header_file << "#define DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP (uint8_t)" << max_number_of_leds_per_light_strip_ << "\n";
 
   header_file << "\n#endif // _DEC_CONFIG_H" << endl;
@@ -343,15 +359,15 @@ bool DECData::generateConfigurationFile(const std::string& abs_file_name)
   return true;
 }
 
-std::vector<std::vector<int> > DECData::getArduinoToSensorsDistances(const int& arduino_id) const
+std::vector<std::vector<int> > DECData::getTeensyToSensorsDistances(const int& teensy_id) const
 {
-  ROS_ASSERT(arduino_id >= 0 && arduino_id < number_of_arduinos_);
+  ROS_ASSERT(teensy_id >= 0 && teensy_id < number_of_teensys_);
 
-  std::vector<std::vector<double> > arduino_to_sensor_distances;
-  for (int i = 0; i < number_of_arduinos_; ++i)
+  std::vector<std::vector<double> > teensy_to_sensor_distances;
+  for (int i = 0; i < number_of_teensys_; ++i)
   {
     std::vector<double> distances;
-    for (unsigned int j = 0; j < arduino_to_sensor_map_[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_sensor_map_[i].size(); ++j)
     {
       tf::Vector3 point_1, point_2;
       convert(node_positions_[sensors_[j].first], point_1);
@@ -361,18 +377,18 @@ std::vector<std::vector<int> > DECData::getArduinoToSensorsDistances(const int& 
       double distance = fabs(tf::Vector3(point_1 - point_2).length());
       distances.push_back(distance);
     }
-    arduino_to_sensor_distances.push_back(distances);
+    teensy_to_sensor_distances.push_back(distances);
   }
 
   // compute maximum and scale accordingly
   double max = -1.0;
-  for (unsigned int i = 0; i < arduino_to_sensor_distances.size(); ++i)
+  for (unsigned int i = 0; i < teensy_to_sensor_distances.size(); ++i)
   {
-    for (unsigned int j = 0; j < arduino_to_sensor_distances[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_sensor_distances[i].size(); ++j)
     {
-      if (arduino_to_sensor_distances[i][j] > max)
+      if (teensy_to_sensor_distances[i][j] > max)
       {
-        max = arduino_to_sensor_distances[i][j];
+        max = teensy_to_sensor_distances[i][j];
       }
     }
   }
@@ -380,18 +396,18 @@ std::vector<std::vector<int> > DECData::getArduinoToSensorsDistances(const int& 
   ROS_ASSERT(max > 0.0);
   const double RATIO = static_cast<double>(1.0)/max;
 
-  std::vector<std::vector<int> > arduino_to_sensor_metric;
-  for (unsigned int i = 0; i < arduino_to_sensor_distances.size(); ++i)
+  std::vector<std::vector<int> > teensy_to_sensor_metric;
+  for (unsigned int i = 0; i < teensy_to_sensor_distances.size(); ++i)
   {
     std::vector<int> metric;
-    for (unsigned int j = 0; j < arduino_to_sensor_distances[i].size(); ++j)
+    for (unsigned int j = 0; j < teensy_to_sensor_distances[i].size(); ++j)
     {
-      metric.push_back(static_cast<int>(arduino_to_sensor_distances[i][j] * RATIO));
+      metric.push_back(static_cast<int>(teensy_to_sensor_distances[i][j] * RATIO));
     }
-    arduino_to_sensor_metric.push_back(metric);
+    teensy_to_sensor_metric.push_back(metric);
   }
 
-  return arduino_to_sensor_metric;
+  return teensy_to_sensor_metric;
 }
 
 bool DECData::generateStructureFile(const std::string& abs_file_name,
@@ -410,51 +426,78 @@ bool DECData::generateStructureFile(const std::string& abs_file_name,
   if (!progmem_prefix.empty())
     header_file << "#include <avr/pgmspace.h>\n\n";
 
-  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t IO_PIN_ORDERING[" << io_pin_ordering_.size() << "] = {";
-  for (unsigned int i = 0; i < io_pin_ordering_.size(); ++i)
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t LIGHT_PIN_ORDERING[" << light_pins_.size() << "] = {";
+  // first lights (nodes, then beams)
+  for (unsigned int i = 0; i < light_pins_.size(); ++i)
   {
-    header_file << io_pin_ordering_[i];
-    if (i + 1 < io_pin_ordering_.size())
+    header_file << light_pins_[i];
+    if (i + 1 < light_pins_.size())
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t SENSOR_PIN_ORDERING[" << sensor_pins_.size() << "] = {";
+  for (unsigned int i = 0; i < sensor_pins_.size(); ++i)
+  {
+    header_file << sensor_pins_[i];
+    if (i + 1 < sensor_pins_.size())
       header_file << ", ";
   }
   header_file << "};" << endl << endl;
 
-  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
-  for (int i = 0; i < number_of_arduinos_; ++i)
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LED_NODES_PER_ARDUINO[" << number_of_teensys_ << "] = {";
+  for (int i = 0; i < number_of_teensys_; ++i)
   {
-    int num_light_strips = 0;
-    num_light_strips += (int)arduino_to_light_beam_map_[i].size();
-    num_light_strips += (int)arduino_to_light_node_map_[i].size();
-    header_file << num_light_strips;
-    if (i + 1 < number_of_arduinos_)
+    header_file << (int)teensy_to_light_node_map_[i].size();
+    if (i + 1 < number_of_teensys_)
       header_file << ", ";
   }
   header_file << "};" << endl;
 
-  unsigned int num_leds_for_each_light = num_leds_of_each_light_beam_.size() + num_leds_of_each_light_node_.size();
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LED_BEAMS_PER_ARDUINO[" << number_of_teensys_ << "] = {";
+  for (int i = 0; i < number_of_teensys_; ++i)
+  {
+    header_file << (int)teensy_to_light_beam_map_[i].size();
+    if (i + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+
+//  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_teensys_ << "] = {";
+//  for (int i = 0; i < number_of_teensys_; ++i)
+//  {
+//    int num_light_strips = 0;
+//    num_light_strips += (int)teensy_to_light_beam_map_[i].size();
+//    num_light_strips += (int)teensy_to_light_node_map_[i].size();
+//    header_file << num_light_strips;
+//    if (i + 1 < number_of_teensys_)
+//      header_file << ", ";
+//  }
+//  header_file << "};" << endl;
+
+  unsigned int num_leds_for_each_light = num_leds_of_each_light_node_.size() + num_leds_of_each_light_beam_.size();
   header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LEDS_OF_EACH_LIGHT[" << num_leds_for_each_light << "] = {";
   for (unsigned int i = 0; i < num_leds_for_each_light; ++i)
   {
-    if (i < num_leds_of_each_light_beam_.size())
+    if (i < num_leds_of_each_light_node_.size())
     {
-      header_file << num_leds_of_each_light_beam_[i];
-      if (!num_leds_of_each_light_node_.empty())
+      header_file << num_leds_of_each_light_node_[i];
+      if (!num_leds_of_each_light_beam_.empty())
         header_file << ", ";
     }
     else
     {
-      header_file << num_leds_of_each_light_node_[i - num_leds_of_each_light_beam_.size()];
-      if (i + 1 < num_leds_of_each_light_beam_.size() + num_leds_of_each_light_node_.size())
+      header_file << num_leds_of_each_light_beam_[i - num_leds_of_each_light_node_.size()];
+      if (i + 1 < num_leds_of_each_light_node_.size() + num_leds_of_each_light_beam_.size())
         header_file << ", ";
 
     }
   }
   header_file << "};" << endl;
-  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_SENSORS_PER_ARDUINO[" << number_of_arduinos_ << "] = {";
-  for (int i = 0; i < number_of_arduinos_; ++i)
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_SENSORS_PER_ARDUINO[" << number_of_teensys_ << "] = {";
+  for (int i = 0; i < number_of_teensys_; ++i)
   {
-    header_file << arduino_to_sensor_map_[i].size();
-    if (i + 1 < number_of_arduinos_)
+    header_file << teensy_to_sensor_map_[i].size();
+    if (i + 1 < number_of_teensys_)
       header_file << ", ";
   }
   header_file << "};" << endl << endl;
@@ -471,10 +514,10 @@ bool DECData::generateStructureFile(const std::string& abs_file_name,
   counters.push_back(light_beam_index_counter_);
   counters.push_back(light_node_index_counter_);
   counters.push_back(sensor_index_counter_);
-  std::vector<std::vector<std::vector<int> > > arduino_to_thing_maps;
-  arduino_to_thing_maps.push_back(arduino_to_light_beam_map_);
-  arduino_to_thing_maps.push_back(arduino_to_light_node_map_);
-  arduino_to_thing_maps.push_back(arduino_to_sensor_map_);
+  std::vector<std::vector<std::vector<int> > > teensy_to_thing_maps;
+  teensy_to_thing_maps.push_back(teensy_to_light_beam_map_);
+  teensy_to_thing_maps.push_back(teensy_to_light_node_map_);
+  teensy_to_thing_maps.push_back(teensy_to_sensor_map_);
 
   for (unsigned int i = 0; i < things.size(); ++i)
   {
@@ -504,25 +547,25 @@ bool DECData::generateStructureFile(const std::string& abs_file_name,
   {
     header_file << "// A value of 255 is assigned to invalidate the entry.\n";
     const std::string NAME = "ARDUINO_TO_" + things[i] + "_MAP";
-    header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t " << NAME << "[" << number_of_arduinos_ << "][" << arduino_to_thing_maps[i].size() << "] = {";
-    for (int j = 0; j < number_of_arduinos_; ++j)
+    header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t " << NAME << "[" << number_of_teensys_ << "][" << teensy_to_thing_maps[i].size() << "] = {";
+    for (int j = 0; j < number_of_teensys_; ++j)
     {
       header_file << "{";
-      for (int k = 0; k < number_of_arduinos_; ++k)
+      for (int k = 0; k < number_of_teensys_; ++k)
       {
-        if (k < (int)arduino_to_thing_maps[i][j].size())
+        if (k < (int)teensy_to_thing_maps[i][j].size())
         {
-          header_file << arduino_to_thing_maps[i][j][k];
+          header_file << teensy_to_thing_maps[i][j][k];
         }
         else
         {
           header_file << "255";
         }
-        if (k + 1 < number_of_arduinos_)
+        if (k + 1 < number_of_teensys_)
           header_file << ", ";
       }
       header_file << "}";
-      if (j + 1 < number_of_arduinos_)
+      if (j + 1 < number_of_teensys_)
         header_file << ", ";
     }
     header_file << "};" << endl;

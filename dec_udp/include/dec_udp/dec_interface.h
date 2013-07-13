@@ -36,13 +36,22 @@ public:
   void print(const sensor_data_t& light_data);
   void print(const light_data_t& sensor_data);
 
+  /*!
+   * @param node_id
+   * @return True on success, otherwise False
+   */
   bool sendSetupData(const uint8_t node_id);
+
+  /*!
+   * @param node_id
+   * @param light_data
+   * @return True on success, otherwise False
+   */
+  bool sendLightData(const int node_id, const light_data_t& light_data);
 
 private:
 
   boost::shared_ptr<UDPSocket> udp_socket_;
-
-  int received_data_length_;
 
 };
 

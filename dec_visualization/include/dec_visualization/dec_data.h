@@ -33,33 +33,33 @@ public:
   bool init(ros::NodeHandle node_handle);
 
   /*!
-   * @return number of arduinos
+   * @return number of teensys
    */
-  int getNumArduinos() const;
+  int getNumTeensys() const;
 
   /*!
-   * @param arduino_index
+   * @param teensy_index
    * @param sensor_index
    * @return sensor_value
    */
-  int getSensorValue(const int arduino_index,
+  int getSensorValue(const int teensy_index,
                       const int sensor_index);
 
   /*!
-   * @param arduino_index
+   * @param teensy_index
    * @param sensor_index
    * @param sensor_value
    */
-  void addSensorValue(const int arduino_index,
+  void addSensorValue(const int teensy_index,
                         const int sensor_index,
                         const int sensor_value);
 
   /*!
-   * @param arduino_index
+   * @param teensy_index
    * @param sensor_index
    * @param sensor_value
    */
-  void setSensorValue(const int arduino_index,
+  void setSensorValue(const int teensy_index,
                          const int sensor_index,
                          const int sensor_value);
 
@@ -72,24 +72,24 @@ protected:
     eNUM_MODES = 2,
   };
 
-  static const int NUM_ENTRIES_FOR_ARDUINO_LEVEL = 1;
+  static const int NUM_ENTRIES_FOR_TEENSY_LEVEL = 1;
   static const int RED_OFFSET = 0;
   static const int GREEN_OFFSET = 1;
   static const int BLUE_OFFSET = 2;
   static const int ALPHA_OFFSET = 3;
 
-  static const int SENSOR_RESOLUTION = 1000;
+  static const int SENSOR_RESOLUTION = 255;
 
-  /*! Matrix of size number_of_arduinos x num_entries_per_arduino
+  /*! Matrix of size number_of_teensys x num_entries_per_teensy
    * Each entry contains
    * level | 4 * max_lights | max_sensors
    */
   Eigen::MatrixXi data_;
 
-  int number_of_arduinos_;
-  int max_number_of_light_strips_per_arduino_;
+  int number_of_teensys_;
+  int max_number_of_light_strips_per_teensy_;
   int max_number_of_leds_per_light_strip_;
-  int max_number_of_sensors_per_arduino_;
+  int max_number_of_sensors_per_teensy_;
 
   std::vector<geometry_msgs::Point> node_positions_;
 
@@ -110,49 +110,51 @@ protected:
   std::vector<int> num_leds_of_each_light_beam_;
   std::vector<int> num_leds_of_each_light_node_;
 
-  /*! Which light_beam/light_node/sensor is connected to which arduino
+  /*! Which light_beam/light_node/sensor is connected to which teensy
    * The size of each vector is equal to the size of
    * light_beams/light_nodes/sensors. The stored number is the
-   * id of the arduino to which this thing is connected.
+   * id of the teensy to which this thing is connected.
    */
   std::vector<int> light_beam_connections_;
   std::vector<int> light_node_connections_;
   std::vector<int> sensor_connections_;
 
-  /*! These vectors are of size number_of_arduinos
-   * Each entry (index by the arduino id) contains the index
-   * into arduino_to_*_map_ (see below) to obtain the "local" index of this
-   * thing at this arduino.
+  /*! These vectors are of size number_of_teensys
+   * Each entry (index by the teensy id) contains the index
+   * into teensy_to_*_map_ (see below) to obtain the "local" index of this
+   * thing at this teensy.
    */
   std::vector<int> light_beam_index_counter_;
   std::vector<int> light_node_index_counter_;
   std::vector<int> sensor_index_counter_;
 
-  /*! Number of light beams/light nodes/sensor for each arduino
-   * The size of these vectors is equal to the number of arduinos in the network
+  /*! Number of light beams/light nodes/sensor for each teensy
+   * The size of these vectors is equal to the number of teensys in the network
    * each entry contains a list of indices into light beams/light nodes/sensors
-   * to which this arduino is connected. Obviously, it can be empty, meaning that
-   * this arduino does not have a light beams/light nodes/sensors attached.
+   * to which this teensy is connected. Obviously, it can be empty, meaning that
+   * this teensy does not have a light beams/light nodes/sensors attached.
    */
-  std::vector<std::vector<int> > arduino_to_light_beam_map_;
-  std::vector<std::vector<int> > arduino_to_light_node_map_;
-  std::vector<std::vector<int> > arduino_to_sensor_map_;
+  std::vector<std::vector<int> > teensy_to_light_beam_map_;
+  std::vector<std::vector<int> > teensy_to_light_node_map_;
+  std::vector<std::vector<int> > teensy_to_sensor_map_;
 
-  /*! This vector contains the pin settings of the DE pin of the RS-485 interace
-   * of each arduino. Thus, the size of this vector must be the same as number_of_arduino
+  /*! This light pins vector contains the order of PWM capable output pins at which the
+   * lights are hooked up to the teensy
    */
-  // std::vector<int> node_icsc_de_pins_;
-  // int controller_icsc_de_pin_;
+  std::vector<int> light_pins_;
+  /*! This sensor pins vector contains the order of input pins at which the
+   * sensors are hooked up to the teensy
+   */
+  std::vector<int> sensor_pins_;
 
-  /*! The pin ordering describes the order of pins at which "first" the light beams led strips
-   * are connected then "second" the light node led strips are connected and "third" the
-   * sensors are connected.
-   * For example if a arduino has 3 light beams, 2 light nodes, and 5 sensors attached then
-   * the light node pins are the first three numbers in io_pin_ordering, the light beam pins are the
-   * next 2 numbers, and the sensor pins are the next 5 numbers.
-   * Obviously, the numbers are limited to the amount of io pins on the arduino
+  /*!
    */
-  std::vector<int> io_pin_ordering_;
+  bool enable_communication_;
+  /*! Data to be send to the micro controllers over udp
+   */
+  // std::vector<light_data_t> light_beam_data_;
+  // std::vector<light_data_t> light_node_data_;
+
 
 private:
   bool initialized_;
@@ -179,10 +181,10 @@ private:
                            const int node_index);
 
   /*!
-   * @param arduino_id
+   * @param teensy_id
    * @return distance of
    */
-  std::vector<std::vector<int> > getArduinoToSensorsDistances(const int& arduino_id) const;
+  std::vector<std::vector<int> > getTeensyToSensorsDistances(const int& teensy_id) const;
 
   /*!
    */

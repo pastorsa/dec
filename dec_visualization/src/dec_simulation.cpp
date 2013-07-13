@@ -20,6 +20,7 @@ namespace dec_visualization
 {
 
 DECSimulation::DECSimulation()
+  : number_of_simulated_objects_(0), simulated_object_name_(""), simualtion_sensor_object_threshold_(0.0)
 {
   ROS_INFO("Creating DEC simulation.");
 }
@@ -96,8 +97,6 @@ bool DECSimulation::process()
       }
     }
   }
-
-  ROS_INFO_STREAM("data: " << std::endl << data_);
 
   return DECProcessor::update();
 }

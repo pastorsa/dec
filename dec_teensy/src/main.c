@@ -14,60 +14,137 @@
 
  You should have received a copy of the GNU General Public License
  along with TeenC.  If not, see <http://www.gnu.org/licenses/>.
+
+ Taken from http://svn.redox.ws/listing.php?repname=TeenC
  */
+
+// for memcpy
+#include <string.h>
 
 // ENC28J60 related includes
 #include "common.h"
-#include "main.h"
 #include "spi.h"
 #include "enc28j60.h"
 #include "ustack.h"
 
+// This file needs to be adjusted for each upload
 #include "address.h"
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/pgmspace.h>
+#include <stdlib.h>
+
+// for input/output
+#include "Arduino.h"
+#include <avr/io.h>
 
 // DEC includes
 #include <dec_communication/dec_communication.h>
 
+#define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
+#define ADC_Prescaler (_BV(ADPS2) | _BV(ADPS1))
+#define ADC_Mux 0
 
-void handleMessage(uint8_t* buffer_ptr, uint16_t* length)
-{
-  dbg_s(" Got Message of size ");
-  dbg_n(*length);
-  dbg_s(" : ");
-  for (uint16_t i = 0; i < *length; ++i)
-    dbg_c(buffer_ptr[i]);
-  dbg_s("\n");
+#define TLed PORTD ^= _BV(6)
 
-
-  // parseSetupData()
-
-//  loadSetupData(0);
-//
-//  if(generateSetupData(NODE_ID, buffer_ptr, length))
-//  {
-//    dbg_s(" Sending Message of size ");
-//    dbg_n(*length);
-//    dbg_s(" : ");
-//
-//    for (uint16_t i = 0; i < *length; ++i)
-//      dbg_n(buffer_ptr[i]);
-//    dbg_s("\n");
-//  }
-
-//  for (uint16_t i = 0; i < length; ++i)
-//    buffer_ptr[i] = i;
+// spi.c
+void SPI_Init(unsigned char hof,unsigned char presc) {
+        /* Set MOSI, SCK and CS output all others input */
+        SPI_Port = _BV(SPI_MOSI)|_BV(SPI_SCLK)|_BV(SPI_CS);
+        SPI_PortD = _BV(SPI_MOSI)|_BV(SPI_SCLK)|_BV(SPI_CS);
+        /* Enable SPI, Master, set clock rate fck/16 */
+        SPCR = _BV(SPE)|_BV(MSTR)|(presc);
+        if(hof)
+                SPSR |= _BV(SPI2X);                                     /* Fosc/2 if no prescaler */
 }
 
-int main(void)
-{
-  uint16_t packet_length, data_length;
-  uint8_t *buffer_ptr;
-  uint8_t ip_header_length;
-  uint8_t aux_init;
+void SPI_Tx(unsigned char c) {
+        //dbgf_c('w'); dbgf_n(c); dbgf_c(' ');
+        SPDR = c;                                                                                        /* Start transmission */
+        while(!(SPSR & (1<<SPIF)));                      /* Wait for Tx complete */
+}
 
+void SPI_Send(unsigned char c) {
+        ChS;                                                                                                                            /* Chip Select */
+        SPI_Tx(c);                                                                                                                        /* Send Byte */
+        ChD;                                                                                                                    /* Chip Deselect */
+}
+
+unsigned char SPI_Rx(void) {
+        SPDR=0;                                                                                                   /* Clear Rx Value */
+        while(!(SPSR & (1<<SPIF)));                     /* Wait for Rx complete */
+        //dbgf_c('r'); dbgf_n(SPDR); dbgf_c(' ');
+        return SPDR;                                                                                             /* Return Value */
+}
+
+unsigned char SPI_Recv(void) {
+        ChS;                                                                                                                               /* Chip Select */
+        SPI_Rx();                                                                                                                                  /* SPI Rx */
+        ChD;                                                                                                                    /* Chip Deselect */
+        return SPDR;                                                                                         /* Return Value */
+}
+
+// ustack
+
+
+
+
+
+
+
+
+
+
+
+/*!
+ */
+void setupPins(const setup_data_t* setup_data)
+{
+  for (uint8_t i = 0; i < setup_data->num_led_nodes; ++i)
+  {
+    pinMode(setup_data->led_nodes[0].pin, OUTPUT);
+    digitalWrite(setup_data->led_nodes[0].pin, LOW);
+  }
+
+  for (uint8_t i = 0; i < setup_data->num_led_beams; ++i)
+  {
+    pinMode(setup_data->led_beams[i].pin, OUTPUT);
+    digitalWrite(setup_data->led_beams[i].pin, LOW);
+  }
+
+  for (uint8_t i = 0; i < setup_data->num_sensors; ++i)
+  {
+    pinMode(setup_data->sensors[i].pin, INPUT);
+  }
+}
+
+//int led_state = LOW;             // ledState used to set the LED
+//const uint8_t led_pin = 6; // Teensy2.0 uses pin 11
+
+//void blink(void)
+//{
+//  if (led_state == LOW)
+//    led_state = HIGH;
+//  else
+//    led_state = LOW;
+//  digitalWrite(led_pin, led_state);
+//}
+
+uint16_t packet_length;
+uint16_t protocol_type;
+uint8_t *buffer_ptr;
+uint8_t ip_header_length;
+uint8_t aux_init;
+uint8_t light_buffer[1 + sizeof(sensor_data_t)];
+
+void setup()
+{
   // init
-  // reset(&_setup_data, _sensor_data, _light_data);
+  resetData();
   // dec_init();
+
+  /*
 
   CPU_PRESCALE(0); /* Run at 16 MHz */
   DDRD = _BV(DDD6); /* Teensy onboard Led Enable */
@@ -76,6 +153,9 @@ int main(void)
   //PORTF = _BV(PORTF0);
   /* Enable Pullup */
   DIDR0 = _BV(ADC0D); /* Disable Digital Pin */
+
+  // initialize the digital pin as an output to blink the LED.
+  // pinMode(led_pin, OUTPUT);
 
   dbg_init
   ; /* If Debug State On, Init USB */
@@ -88,256 +168,128 @@ int main(void)
   } while (!aux_init);
 
   ENC_LEDInit; /* ENC Leds Init */
-  while (1)
-  {
-    //TLed;
-    //_delay_ms(300);
-    //dbg_c(ENC_LinkSt?'~':'_');
-    if (ENC_LinkSt)
-    {
-      if (ENC_hasRxd)
-      {
-        // return Packet Size
-        packet_length = ENC_PckRx(_rx_buffer, BUFFER_SIZE);
-        if (packet_length > 0)
-        {
-//          dbg_s("\nGot Packet:\n");
-//          for (uint16_t i = 0; i < BUFFER_SIZE; ++i)
-//          {
-//            dbg_n(_rx_buffer[i]);dbg_c(' ');
-//          }
-          // Return 1 if packet was ARP, and was handeld
-          if (!ifARP_Reply(_rx_buffer, packet_length))
-          {
-            // Return IPHLen if valid IP Packet, else 0
-            ip_header_length = IP_Check(_rx_buffer, packet_length);
-            if (ip_header_length > 0)
-            {
-              // dbg_s("\nIP - ");
-              // Return Protocol
-              data_length = IP_gProtocol(_rx_buffer);
-              if (data_length == IP_pICMP)
-              {
-                dbg_s("ICMP\n");
-                ICMP_Reply(_rx_buffer, ip_header_length, packet_length);
-              }
-              else if (data_length == IP_pUDP)
-              {
-                dbg_s("UDP\n");
-                // Return Data Len
-                data_length = UDP_Recv(_rx_buffer, ip_header_length, packet_length);
-                if (data_length > 0)
-                {
 
-//                  dbg_s("\n on Port ");
-//                  dbg_n(_rx_buffer[IP_Start+IPHLen+UDP_DestPort_H]);
-//                  dbg_n(_rx_buffer[IP_Start+IPHLen+UDP_DestPort_L]);
-
-                  //                  dbg_s(" on Port ");
-                  //                  dbg_n(_rx_buffer[IP_Start+j+UDP_DestPort_H]);
-                  //                  dbg_n(_rx_buffer[IP_Start+j+UDP_DestPort_L]);
-                  //                  dbg_s(" Got Message: ");
-//                  dbg_c(' ');
-//                  dbg_n(i);
-//                  for(l=0;l<i;l++)
-//                  dbg_c(_rx_buffer[IP_Start+j+UDP_HeaderLen+l]);
-                  buffer_ptr = _rx_buffer + IP_Start + ip_header_length + UDP_HeaderLen;
-
-                  handleMessage(buffer_ptr, &data_length);
-
-//                  if (SameStrPM(buffer_ptr, PSTR("Ts:sT"), 5))
-//                    data_length = BuffWritePM(buffer_ptr, PSTR("Not Auth"));
-//                  else
-//                  {
-//                    if (!SameStrPM(buffer_ptr + 6, PSTR("TLed"), 4))
-//                      TLed;
-//                    data_length = BuffWritePM(buffer_ptr, PSTR("Granted"));
-//                  }
-//                  data_length += BuffWritePM(buffer_ptr + data_length, PSTR("\n>> "));
-//                  //for(l=0;l<i-1;l++)
-//                  //_rx_buffer[IP_Start+j+UDP_HeaderLen+l]='0';
-                  UDP_Send(_rx_buffer, ip_header_length, data_length, ModeReply);
-                  //UDP_Send(_rx_buffer,j,i,ModeSend);
-                }
-//              }
-//              else
-//              {
-//                dbg_s("TCP");
-//                // Return 1 if accepted
-//                if (TCP_Recv(_rx_buffer, IPHLen, PLen, &Tcp))
-//                {
-//                  /*dbg_s(" on Port ");
-//                   dbg_n(_rx_buffer[IP_Start+j+TCP_DestPort_H]);
-//                   dbg_n(_rx_buffer[IP_Start+j+TCP_DestPort_L]);
-//                   dbg_s(" Packet Ok: Flags: ");
-//                   dbg_n16(Tcp.Flags);
-//                   dbg_s(" - HLen: ");
-//                   dbg_n16(Tcp.HLen);
-//                   dbg_s(" - DLen: ");
-//                   dbg_n16(Tcp.DLen);
-//                   if(Tcp.DLen > 0) {
-//                   dbg_s(" - Message: ");
-//                   dbg_c('\n');
-//                   for(i=0;i<Tcp.DLen;i++)
-//                   dbg_c(_rx_buffer[IP_Start+IPHLen+Tcp.HLen+i]);
-//                   } */
-//                  if (Tcp.Flags == TCP_fSYN)
-//                  {
-//                    //dbg_s(" - Got SYN, do SYN_ACK");
-//                    Tcp.Ss = 1;
-//                    Tcp.As = 0;
-//                    Tcp.Flags = TCP_fSYN | TCP_fACK;
-//                    TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
-//                    k = 0;
-//                  }
-//                  else if (Tcp.Flags == TCP_fACK)
-//                  {
-//                    //dbg_s(" - Got Ack");
-//                    if (k == 1)
-//                    {
-//                      Tcp.As = 0;
-//                      Tcp.Ss = 0;
-//                      Tcp.DLen = 0;
-//                      Tcp.Flags = TCP_fACK | TCP_fFIN;
-//                      TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
-//                      k = 2;
-//                    }
-//                  }
-//                  else if (Tcp.Flags == (TCP_fACK | TCP_fPSH))
-//                  {
-//                    //dbg_s(" - Got Push-Ack, do Ack");
-//                    Tcp.Ss = Tcp.DLen;
-//                    Tcp.As = 0;
-//                    Tcp.Flags = TCP_fACK;
-//                    DLen = Tcp.DLen;
-//                    Tcp.DLen = 0;
-//                    TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
-//                    Ptr = _rx_buffer + IP_Start + IPHLen + Tcp.HLen;
-//                    if (Get16B(Ptr-Tcp.HLen+TCP_SrcPort_H) == 0x50)
-//                    {
-//                      if (!SameStrPM(Ptr, PSTR("GET /"), 4))
-//                      {
-//                        Tcp.Ss = 1;
-//                        // Return 0xFF if str found
-//                        // If Non auth, deny access
-//                        if (FindStr(Ptr, 0x200, PSTR("dGVzdDp0ZXN0"), 12) != 0xFF)
-//                          Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 401 NoAuth\r\n"
-//                                                           "WWW-Authenticate: Basic realm=\"TeenSee\"\r\n"
-//                                                           "Content-Type: text/html\r\n\r\n"
-//                                                           "<html>\n\t<head><title>TeenC</title></head>"
-//                                                           "<body><h1>Auth Required</h1></body></html>"));
-//                        else
-//                        { // Else, allow access
-//                          // If page is not root: / -> 404
-//                          if (*(Ptr + 5) != ' ' && *(Ptr + 5) != '?')
-//                            Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 404 Not Found\r\n"
-//                                                             "Content-Type: text/html\r\n\r\n"
-//                                                             "<html><head><title>TeenC</title></head>"
-//                                                             "<body>"
-//                                                             "<h1>404 - I think you're lost...</h1>"
-//                                                             "</body></html>"));
-//                          else
-//                          {
-//                            if (*(Ptr + 6) == 'L' && *(Ptr + 7) == 'T')
-//                            {
-//                              TLed;
-//                              Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 303 Ok\r\n"
-//                                                               "Location: /\r\n\r\n"));
-//                            }
-//                            else
-//                            {
-//                              Tcp.DLen = BuffWritePM(Ptr, PSTR("HTTP/1.1 200 Ok\r\n"
-//                                                               "Content-Type: text/html\r\n\r\n"
-//                                                               "<html><head><title>TeenC</title></head>"
-//                                                               "<body><h1>It works!</h1><p>Led is O"));
-//                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, (PORTD & _BV(6) ? PSTR("n") : PSTR("ff")));
-//                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, PSTR(" - <a href=\"?LT\">Toggle</a>"
-//                                                                           "<br />ADC Pin Value: "));
-//                              Tcp.DLen += BuffWrite(Ptr + Tcp.DLen, itoa(ADC_Read(ADC_Mux), Str, 10));
-//                              Tcp.DLen += BuffWritePM(Ptr + Tcp.DLen, PSTR("</p></body></html>"));
-//                            }
-//                          }
-//                        }
-//                        /* Send Back Data */
-//                        TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeSingleSend);
-//                        k = 2;
-//                      }
-//                    }
-//                    else
-//                    {
-//                      if (!SameStrPM(Ptr, PSTR("TL"), 2))
-//                        TLed;
-//                      Tcp.DLen = BuffWritePM(Ptr, PSTR(">> "));
-//                      /* Send Back Data */
-//                      TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeSend);
-//                      k = 0;
-//                    }
-//                  }
-//                  else if (Tcp.Flags == (TCP_fACK | TCP_fFIN))
-//                  {
-//                    //dbg_s("End\n");
-//                    Tcp.As = 0;
-//                    Tcp.DLen = 0;
-//                    if (k != 2)
-//                    {
-//                      Tcp.Ss = 0;
-//                      Tcp.Flags = TCP_fACK | TCP_fFIN;
-//                    }
-//                    else
-//                    {
-//                      Tcp.Ss = 1;
-//                      Tcp.Flags = TCP_fACK;
-//                    }
-//                    TCP_Send(_rx_buffer, IPHLen, &Tcp, ModeReply);
-//                    k = 2;
-//                  } //else  dbg_s("Unknown Flag "); // Flags
-//                } // TCP Packet Accepted
-              } // IP Packet Type
-            } //else dbg_s("\nUnhandeld IP Packet.");
-          } //else dbg_s("\nARP");					// IP or ARP
-          //dbg_c('\n');
-        } //  GotEth Packet
-      } // Packet Available
-    } // Link is Up
-  } // Main Loop
+  */
 }
+
+void loop()
+{
+  /*
+  // TLed;
+  // _delay_ms(300);
+  // dbg_c(ENC_LinkSt?'~':'_');
+  if (ENC_LinkSt)
+  {
+    if (ENC_hasRxd)
+    {
+      packet_length = ENC_PckRx(_rx_buffer, BUFFER_SIZE);
+      if (packet_length > 0)
+      {
+        // Return 1 if packet was ARP, and was handeld
+        if (!ifARP_Reply(_rx_buffer, packet_length))
+        {
+          // Return IPHLen if valid IP Packet, else 0
+          ip_header_length = IP_Check(_rx_buffer, packet_length);
+          if (ip_header_length > 0)
+          {
+            protocol_type = IP_gProtocol(_rx_buffer);
+            if (protocol_type == IP_pICMP)
+            {
+              // dbg_s("ICMP\n");
+              ICMP_Reply(_rx_buffer, ip_header_length, packet_length);
+            }
+            else if (protocol_type == IP_pUDP)
+            {
+              // dbg_s("UDP\n");
+              _rx_buffer_length = UDP_Recv(_rx_buffer, ip_header_length, packet_length);
+              if (_rx_buffer_length > 0)
+              {
+                buffer_ptr = _rx_buffer + IP_Start + ip_header_length + UDP_HeaderLen;
+
+                if (isSetupData(buffer_ptr))
+                {
+                  // parse setup data and setup teensy
+                  parseSetupData(buffer_ptr);
+                  setupPins(&_setup_data);
+                  UDP_Send(_rx_buffer, ip_header_length, _rx_buffer_length, ModeReply);
+                }
+                else if (isLightData(buffer_ptr))
+                {
+                  // quickly store received light data to immediately send out sensor data
+                  memcpy(light_buffer, buffer_ptr, sizeof(light_buffer));
+                  // get sensor data and send it out
+                  for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
+                  {
+                    if (digitalRead(_setup_data.sensors[i].pin))
+                    {
+                      _sensor_data.sensor_value[i] = (uint8_t)1;
+                    }
+                    else
+                    {
+                      _sensor_data.sensor_value[i] = (uint8_t)0;
+                    }
+                  }
+                  generateSensorData(buffer_ptr, &_sensor_data);
+                  UDP_Send(_rx_buffer, ip_header_length, _rx_buffer_length, ModeReply);
+
+                  // overwrite the rx_buffer again and parse light data and set it
+                  memcpy(buffer_ptr, light_buffer, sizeof(light_buffer));
+                  parseLightData(buffer_ptr);
+                }
+              }
+            } // IP Packet Type
+          } // else dbg_s("\nUnhandeld IP Packet.");
+        } // else dbg_s("\nARP"); // IP or ARP //d bg_c('\n');
+      } //  GotEth Packet
+    } // Packet Available
+  } // Link is Up
+  */
+}
+
+//int main(void)
+//{
+//
+//  while (1)
+//  {
+//  } // Main Loop
+//}
 
 /* Input Strings, return 0 if they're the same, else -1 */
-signed char SameStrPM(uint8_t *is, char *is2, signed char l)
-{
-  while (l-- > 0)
-    if (*(is++) != pgm_read_byte(is2++))
-      l = -2;
-  return l + 1;
-}
+//signed char SameStrPM(uint8_t *is, char *is2, signed char l)
+//{
+//  while (l-- > 0)
+//    if (*(is++) != pgm_read_byte(is2++))
+//      l = -2;
+//  return l + 1;
+//}
 
 // Return 0xFF if str found
-uint8_t FindStr(uint8_t *p, uint16_t pl, char *s, uint8_t l)
-{
-  uint8_t j;
-  do
-  {
-    for (j = 0; j < l; j++)
-      if (*(p + j) != pgm_read_byte(s + j))
-        j = l << 2;
-    p++;
-    if (j < (l << 1))
-      l = 0xFF;
-  } while (l != 0xFF && (pl--) > l);
-  return l;
-}
+//uint8_t FindStr(uint8_t *p, uint16_t pl, char *s, uint8_t l)
+//{
+//  uint8_t j;
+//  do
+//  {
+//    for (j = 0; j < l; j++)
+//      if (*(p + j) != pgm_read_byte(s + j))
+//        j = l << 2;
+//    p++;
+//    if (j < (l << 1))
+//      l = 0xFF;
+//  } while (l != 0xFF && (pl--) > l);
+//  return l;
+//}
 
 /* Make ADC Conversion, return 16bits value */
-uint16_t ADC_Read(uint8_t ch)
-{
-  ADCSRA = _BV(ADEN) | /* Enable ADC */
-  ADC_Prescaler; /* Set ADC Prescaler */
-  ADCSRB = _BV(ADHSM) | /*  High Speed Mode */
-  (ch & 0x20); /* Pin Mux - Last Bit */
-  ADMUX = _BV(REFS0) | /* Analog Reference: Vcc */
-  (ch & 0x1F); /* Pin Mux - 4 First bits */
-  ADCSRA |= _BV(ADSC); /* Start the conversion */
-  while (ADCSRA & _BV(ADSC))
-    ; /* Wait for result */
-  return ADC;
-}
+//uint16_t ADC_Read(uint8_t ch)
+//{
+//  ADCSRA = _BV(ADEN) | /* Enable ADC */
+//  ADC_Prescaler; /* Set ADC Prescaler */
+//  ADCSRB = _BV(ADHSM) | /*  High Speed Mode */
+//  (ch & 0x20); /* Pin Mux - Last Bit */
+//  ADMUX = _BV(REFS0) | /* Analog Reference: Vcc */
+//  (ch & 0x1F); /* Pin Mux - 4 First bits */
+//  ADCSRA |= _BV(ADSC); /* Start the conversion */
+//  while (ADCSRA & _BV(ADSC))
+//    ; /* Wait for result */
+//  return ADC;
+//}
