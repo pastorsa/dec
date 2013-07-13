@@ -148,6 +148,8 @@ bool DECProcessor::update()
     localMode();
     ROS_ASSERT(setLightMarkers());
     publish();
+
+    ROS_INFO_STREAM("data\n" << data_);
   }
   else
   {

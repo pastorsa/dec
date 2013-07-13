@@ -10,7 +10,7 @@ static const uint8_t SENSOR_PIN_ORDERING[3] = {5, 6, 7};
 
 static const uint8_t NUM_LED_NODES_PER_ARDUINO[1] = {1};
 static const uint8_t NUM_LED_BEAMS_PER_ARDUINO[1] = {1};
-static const uint8_t NUM_LEDS_OF_EACH_LIGHT[2] = {14, 15};
+static const uint8_t NUM_LEDS_OF_EACH_LIGHT[2] = {15, 20};
 static const uint8_t NUM_SENSORS_PER_ARDUINO[1] = {2};
 
 static const uint8_t LIGHT_BEAM_CONNECTIONS[1] = {0};

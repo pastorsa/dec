@@ -102,6 +102,12 @@ Socket::Socket(int type, int protocol) throw (SocketException)
   {
     throw SocketException("Socket creation failed (socket())", true);
   }
+
+  // reuse socket if already binded
+  const int optVal = 1;
+  const socklen_t optLen = sizeof(optVal);
+  setsockopt(sockDesc, SOL_SOCKET, SO_REUSEADDR, (void*) &optVal, optLen);
+
 }
 
 Socket::Socket(int sockDesc)
@@ -154,7 +160,8 @@ void Socket::setLocalPort(unsigned int localPort) throw (SocketException)
 
   if (bind(sockDesc, (sockaddr *)&localAddr, sizeof(sockaddr_in)) < 0)
   {
-    throw SocketException("Set of local port failed (bind())", true);
+    // don't throw an exception... rather reuse the already binded socket
+    // throw SocketException("Set of local port failed (bind())", true);
   }
 }
 
@@ -166,7 +173,8 @@ void Socket::setLocalAddressAndPort(const string &localAddress, unsigned int loc
 
   if (bind(sockDesc, (sockaddr *)&localAddr, sizeof(sockaddr_in)) < 0)
   {
-    throw SocketException("Set of local address and port failed (bind())", true);
+    // don't throw an exception... rather reuse the already binded socket
+    // throw SocketException("Set of local address and port failed (bind())", true);
   }
 }
 
@@ -362,7 +370,7 @@ unsigned int UDPSocket::sendTo(const void *buffer, int bufferLen, const string &
 
   // Write out the whole buffer as a single message.
   unsigned int num_bytes_send = sendto(sockDesc, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&destAddr, sizeof(destAddr));
-  if (num_bytes_send != bufferLen)
+  if (static_cast<int>(num_bytes_send) != bufferLen)
   {
     throw SocketException("Send failed (sendto())", true);
   }

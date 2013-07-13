@@ -45,7 +45,7 @@ private:
   int number_of_simulated_objects_;
   std::string simulated_object_name_;
 
-  double simualtion_sensor_object_threshold_;
+  double simulation_sensor_object_threshold_;
 
 };
 

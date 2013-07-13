@@ -35,7 +35,12 @@
 
 #include "Adafruit_NeoPixel.h"
 
-Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t) {
+Adafruit_NeoPixel::Adafruit_NeoPixel()
+{
+}
+
+void Adafruit_NeoPixel::setup(uint16_t n, uint8_t p, uint8_t t)
+{
   numBytes = n * 3;
   if((pixels = (uint8_t *)malloc(numBytes))) {
     memset(pixels, 0, numBytes);
@@ -48,6 +53,11 @@ Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t) {
   } else {
     numLEDs = 0;
   }
+}
+
+Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, uint8_t t)
+{
+	setup(n, p, t);
 }
 
 void Adafruit_NeoPixel::begin(void) {

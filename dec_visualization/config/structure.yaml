@@ -300,9 +300,9 @@ light_beams:
 light_nodes: [17]
 
 # num_leds_of_each_light_beam: [1, 2, 3, 4]
-num_leds_of_each_light_beam: [15]
+num_leds_of_each_light_beam: [20]
 # num_leds_of_each_light_node: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-num_leds_of_each_light_node: [14]
+num_leds_of_each_light_node: [15]
 
 # This list contains the teensy id to which this 
 # light node is hooked up

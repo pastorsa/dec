@@ -20,7 +20,7 @@ namespace dec_visualization
 {
 
 DECSimulation::DECSimulation()
-  : number_of_simulated_objects_(0), simulated_object_name_(""), simualtion_sensor_object_threshold_(0.0)
+  : number_of_simulated_objects_(0), simulated_object_name_(""), simulation_sensor_object_threshold_(0.0)
 {
   ROS_INFO("Creating DEC simulation.");
 }
@@ -31,7 +31,7 @@ bool DECSimulation::initialize(ros::NodeHandle node_handle)
 
   ROS_VERIFY(dec_utilities::read(node_handle, "number_of_simulated_objects", number_of_simulated_objects_));
   ROS_VERIFY(dec_utilities::read(node_handle, "simulated_object_name", simulated_object_name_));
-  ROS_VERIFY(dec_utilities::read(node_handle, "simualtion_sensor_object_threshold", simualtion_sensor_object_threshold_));
+  ROS_VERIFY(dec_utilities::read(node_handle, "simulation_sensor_object_threshold", simulation_sensor_object_threshold_));
 
   ROS_DEBUG("Simulation up to >%i< objects.", number_of_simulated_objects_);
   return true;
@@ -85,12 +85,12 @@ bool DECSimulation::process()
       for (unsigned int i = 0; i < sensors_.size(); ++i)
       {
         double distance = getDistance(object_pose.getOrigin(), sensors_[i]);
-        if(distance < simualtion_sensor_object_threshold_)
+        if(distance < simulation_sensor_object_threshold_)
         {
-          ROS_DEBUG("Distance between object >%s< and sensor beam >%i< between node >%i< and >%i< is >%.2f< m.",
+          ROS_INFO("Distance between object >%s< and sensor beam >%i< between node >%i< and >%i< is >%.2f< m.",
                     object_name.c_str(), i, sensors_[i].first, sensors_[i].second, distance);
           // scale distance to interval [0..1]
-          double sensor_value = 1.0 - (distance / simualtion_sensor_object_threshold_);
+          double sensor_value = 1.0 - (distance / simulation_sensor_object_threshold_);
           sensor_value *= SENSOR_RESOLUTION;
           addSensorValue(sensor_connections_[i], sensor_index_counter_[i], (int)sensor_value);
         }
