@@ -8,10 +8,9 @@
 #ifndef DEC_PROCESSOR_H_
 #define DEC_PROCESSOR_H_
 
+#include <boost/shared_ptr.hpp>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
-
-// #include <dec_udp/dec_interface.h>
 
 #include <dec_visualization/dec_data.h>
 
@@ -91,7 +90,7 @@ private:
   void setupMode();
   void localMode();
 
-  // dec_udp::DecInterface dec_interface_;
+  boost::shared_ptr<dec_udp::DecInterface> dec_interface_;
 
 };
 

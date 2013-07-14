@@ -74,6 +74,9 @@ bool DECProcessor::init(ros::NodeHandle node_handle)
     }
   }
 
+  // setup dec interface
+  dec_interface_.reset(new dec_udp::DecInterface(number_of_teensys_));
+
   return true;
 }
 
@@ -81,10 +84,22 @@ void DECProcessor::setupMode()
 {
   if(enable_communication_)
   {
-    dec_udp::DecInterface dec_interface;
+    int setup_count = 0;
+    std::vector<bool> is_setup(number_of_teensys_, false);
     for (int i = 0; i < number_of_teensys_; ++i)
     {
-      ROS_ASSERT_MSG(dec_interface.sendSetupData(i), "Failed to setup node with id >%i<.", i);
+      if(!is_setup[i] && dec_interface_->sendSetupData(i))
+      {
+        ROS_INFO("Setup of node >%i< complete.", i);
+        is_setup[i] = true;
+        setup_count++;
+      }
+      ROS_WARN_COND(!is_setup[i], "Failed to setup node >%i<... retrying...", i);
+      ROS_INFO_COND(is_setup[i], "Setup of node >%i< complete.", i);
+      if (i + 1 >= number_of_teensys_ && setup_count < number_of_teensys_)
+      {
+        i = -1;
+      }
     }
   }
 }
@@ -148,8 +163,6 @@ bool DECProcessor::update()
     localMode();
     ROS_ASSERT(setLightMarkers());
     publish();
-
-    ROS_INFO_STREAM("data\n" << data_);
   }
   else
   {
@@ -162,8 +175,6 @@ bool DECProcessor::update()
 bool DECProcessor::setLightMarkers()
 {
 
-  dec_udp::DecInterface dec_interface;
-  std::vector<light_data_t> light_data(number_of_teensys_);
 
   for (unsigned int i = 0; i < light_beam_connections_.size(); ++i)
   {
@@ -178,10 +189,10 @@ bool DECProcessor::setLightMarkers()
     for (int j = 0; j < max_number_of_leds_per_light_strip_; ++j)
     {
       int index = light_beam_index_counter_[i];
-      light_data[TEENSY_INDEX].led_beams[index].red[j] = data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET);
-      light_data[TEENSY_INDEX].led_beams[index].green[j] = data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET);
-      light_data[TEENSY_INDEX].led_beams[index].blue[j] = data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET);
-      light_data[TEENSY_INDEX].led_beams[index].brightness[j] = data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET);
+      light_data_[TEENSY_INDEX].led_beams[index].red[j] = data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET);
+      light_data_[TEENSY_INDEX].led_beams[index].green[j] = data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET);
+      light_data_[TEENSY_INDEX].led_beams[index].blue[j] = data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET);
+      light_data_[TEENSY_INDEX].led_beams[index].brightness[j] = data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET);
     }
   }
 
@@ -196,20 +207,20 @@ bool DECProcessor::setLightMarkers()
 
     // also setup communication data
     int index = light_node_index_counter_[i];
-    light_data[TEENSY_INDEX].led_nodes[index].red = data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET);
-    light_data[TEENSY_INDEX].led_nodes[index].green = data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET);
-    light_data[TEENSY_INDEX].led_nodes[index].blue = data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET);
-    light_data[TEENSY_INDEX].led_nodes[index].brightness = data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET);
+    light_data_[TEENSY_INDEX].led_nodes[index].red = data_(TEENSY_INDEX, ENTRY_INDEX + RED_OFFSET);
+    light_data_[TEENSY_INDEX].led_nodes[index].green = data_(TEENSY_INDEX, ENTRY_INDEX + GREEN_OFFSET);
+    light_data_[TEENSY_INDEX].led_nodes[index].blue = data_(TEENSY_INDEX, ENTRY_INDEX + BLUE_OFFSET);
+    light_data_[TEENSY_INDEX].led_nodes[index].brightness = data_(TEENSY_INDEX, ENTRY_INDEX + ALPHA_OFFSET);
 
-    // ROS_DEBUG("Sending light data for teensy >%i< for node >%i< data >%u %u %u %u<.", TEENSY_INDEX, index, light_data[TEENSY_INDEX].led_nodes[index].red,
-    // light_data[TEENSY_INDEX].led_nodes[index].green, light_data[TEENSY_INDEX].led_nodes[index].blue, light_data[TEENSY_INDEX].led_nodes[index].brightness);
+    // ROS_DEBUG("Sending light data for teensy >%i< for node >%i< data >%u %u %u %u<.", TEENSY_INDEX, index, light_data_[TEENSY_INDEX].led_nodes[index].red,
+    // light_data_[TEENSY_INDEX].led_nodes[index].green, light_data_[TEENSY_INDEX].led_nodes[index].blue, light_data_[TEENSY_INDEX].led_nodes[index].brightness);
   }
 
   if(enable_communication_)
   {
     for (int n = 0; n < number_of_teensys_; ++n)
     {
-      if(!dec_interface.sendLightData(n, light_data[n]))
+      if(!dec_interface_->sendLightData(n, light_data_[n]))
       {
         ROS_ERROR("Problems sending light data for micro controller with node id >%i<.", n);
       }

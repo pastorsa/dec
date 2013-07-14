@@ -8,6 +8,7 @@
 #ifndef DEC_INTERFACE_H_
 #define DEC_INTERFACE_H_
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include <dec_communication/dec_communication.h>
@@ -21,15 +22,15 @@ namespace dec_udp
 static const std::string BASE_IP_ADDRESS = "10.0.0.";
 static const std::string SERVER_IP_ADDRESS = BASE_IP_ADDRESS + "100";
 static const std::string BROADCAST_IP_ADDRESS = BASE_IP_ADDRESS + "255";
-static const unsigned int SERVER_PORT = 1500;
-static const unsigned int FOREIGN_PORT = 1501;
+static const unsigned int SERVER_PORT = 1501;
+static const unsigned int FOREIGN_PORT = 1500;
 
 class DecInterface
 {
 
 public:
 
-  DecInterface();
+  DecInterface(const uint8_t num_sockets);
   virtual ~DecInterface() {};
 
   void print(const setup_data_t& setup_data);
@@ -51,7 +52,7 @@ public:
 
 private:
 
-  boost::shared_ptr<UDPSocket> udp_socket_;
+  std::vector<boost::shared_ptr<UDPSocket> > udp_sockets_;
 
 };
 

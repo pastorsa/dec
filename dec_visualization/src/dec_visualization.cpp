@@ -63,7 +63,7 @@ void DECVisualization::run()
   while (ros::ok())
   {
     ROS_VERIFY(dec_processor_->process());
-    ros::Duration(0.1).sleep();
+    ros::Duration(0.01).sleep();
     ros::spinOnce();
   }
 }

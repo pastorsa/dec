@@ -22,7 +22,7 @@
 
 #include <string>            // For string
 #include <exception>         // For exception class
-
+#include <fcntl.h>
 
 namespace dec_udp
 {
@@ -313,6 +313,17 @@ public:
   int recvFrom(void *buffer, int bufferLen, std::string &sourceAddress,
                unsigned int &sourcePort) throw(SocketException);
 
+  /*!
+   * @return
+   */
+  bool setNonBlocking();
+  int recvNonBlocking(void *buffer, int bufferLen,
+                      const long int& timeout_in_microseconds);
+  int recvFromNonBlocking(void *buffer, int bufferLen,
+                          std::string &sourceAddress, unsigned int &sourcePort,
+                          const long int& timeout_in_microseconds)
+    throw(SocketException);
+
   /**
    *   Set the multicast TTL
    *   @param multicastTTL multicast TTL
@@ -336,6 +347,10 @@ public:
 
 private:
   void setBroadcast();
+
+  fd_set read_fds_;
+  struct timeval timeout_value_;
+
 };
 
 }

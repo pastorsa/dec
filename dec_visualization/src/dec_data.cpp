@@ -123,8 +123,7 @@ bool DECData::init(ros::NodeHandle node_handle)
                  "Number of LEDs for each light node is incorrect >%i<. It should equal the number of light nodes >%i<.",
                  (int)num_leds_of_each_light_node_.size(), (int)light_nodes_.size());
 
-  // light_node_data_.resize((size_t)number_of_teensys_);
-  // light_beam_data_.resize((size_t)number_of_teensys_);
+  light_data_.resize((size_t)number_of_teensys_);
 
   const int NUM_ENTRIES_PER_ARDUINO =
       + NUM_ENTRIES_FOR_TEENSY_LEVEL

@@ -87,7 +87,7 @@ bool DECSimulation::process()
         double distance = getDistance(object_pose.getOrigin(), sensors_[i]);
         if(distance < simulation_sensor_object_threshold_)
         {
-          ROS_INFO("Distance between object >%s< and sensor beam >%i< between node >%i< and >%i< is >%.2f< m.",
+          ROS_DEBUG("Distance between object >%s< and sensor beam >%i< between node >%i< and >%i< is >%.2f< m.",
                     object_name.c_str(), i, sensors_[i].first, sensors_[i].second, distance);
           // scale distance to interval [0..1]
           double sensor_value = 1.0 - (distance / simulation_sensor_object_threshold_);

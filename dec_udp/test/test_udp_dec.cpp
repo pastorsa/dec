@@ -19,9 +19,11 @@ int main(int argc, char** argv)
   // ros::init(argc, argv, "");
   // ros::NodeHandle node_handle("~");
 
-  dec_udp::DecInterface dec_interface;
-
+  const int NUM_NODES = 1;
   int node_id = 1;
+
+  dec_udp::DecInterface dec_interface(NUM_NODES);
+
 
   if(!dec_interface.sendSetupData(node_id))
   {

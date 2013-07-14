@@ -16,6 +16,8 @@
 #include <std_msgs/ColorRGBA.h>
 #include <geometry_msgs/Point.h>
 
+#include <dec_udp/dec_interface.h>
+
 namespace dec_visualization
 {
 
@@ -150,10 +152,9 @@ protected:
   /*!
    */
   bool enable_communication_;
-  /*! Data to be send to the micro controllers over udp
+  /*! Data to be send to the teensys over udp
    */
-  // std::vector<light_data_t> light_beam_data_;
-  // std::vector<light_data_t> light_node_data_;
+  std::vector<light_data_t> light_data_;
 
 
 private:

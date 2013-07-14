@@ -11,8 +11,6 @@
 #include <stdint.h>
 
 // generated files
-// #include <dec_communication/DEC_config.h>
-// #include <dec_communication/DEC_structure.h>
 #include "DEC_config.h"
 #include "DEC_structure.h"
 
@@ -59,10 +57,10 @@ extern "C" {
 
 /*!
  */
-uint16_t _rx_buffer_length;
-uint8_t _rx_buffer[BUFFER_SIZE];
+extern uint16_t _rx_buffer_length;
+extern uint8_t _rx_buffer[BUFFER_SIZE];
 
-uint8_t _light_buffer[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE + (uint8_t)1];
+extern uint8_t _light_buffer[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE + (uint8_t)1];
 
 /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
 /*! >>>>>>>>>>>>>>>>>>>>>>>>>>>> DEC_SETUP_DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
@@ -90,7 +88,7 @@ typedef struct
 /*! Data type to which the "data" gets parsed and which gets generated
  * by the functions below based on the
  */
-setup_data_t _setup_data;
+extern setup_data_t _setup_data;
 
 /*! Parse the received data into the _setup_data structure.
  * @param data : Received data being parsed
@@ -117,7 +115,7 @@ typedef struct
 /*! Data type to which the data gets parsed and which gets generated
  * by the functions below.
  */
-sensor_data_t _sensor_data;
+extern sensor_data_t _sensor_data;
 
 /*! Parse the received data into the the _sensor_data structure.
  * @param buffer  : Received data being parsed
@@ -164,7 +162,7 @@ typedef struct
 /*! Data type to which the "data" gets parsed and which gets generated
  * by the functions below.
  */
-light_data_t _light_data;
+extern light_data_t _light_data;
 
 /*! Parse the received data into the the _light_data structure.
  * @param buffer  : Received data being parsed

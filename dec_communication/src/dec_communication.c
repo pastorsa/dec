@@ -8,9 +8,15 @@
 #include <string.h>
 #include <inttypes.h>
 
-// File generated from dec_visualization/config/config.yaml
 #include "dec_communication.h"
-// #include <dec_communication/dec_communication.h>
+
+uint16_t _rx_buffer_length;
+uint8_t _rx_buffer[BUFFER_SIZE];
+uint8_t _light_buffer[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE + (uint8_t)1];
+
+setup_data_t _setup_data;
+sensor_data_t _sensor_data;
+light_data_t _light_data;
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DEC_SETUP >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

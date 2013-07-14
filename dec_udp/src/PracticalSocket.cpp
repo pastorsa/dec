@@ -29,6 +29,10 @@
 #include <stdlib.h>
 typedef void raw_type; // Type used for raw data on this platform
 
+
+// #include <stdio.h>
+
+
 #include <errno.h>             // For errno
 using namespace std;
 
@@ -391,6 +395,113 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, string &sourceAddress, unsi
   sourcePort = ntohs(clntAddr.sin_port);
 
   return rtn;
+}
+
+int UDPSocket::recvNonBlocking(void *buffer, int bufferLen,
+                               const long int& timeout_in_microseconds)
+{
+  std::string sourceAddress;
+  unsigned int sourcePort;
+  return recvFromNonBlocking(buffer, bufferLen, sourceAddress, sourcePort, timeout_in_microseconds);
+}
+
+int UDPSocket::recvFromNonBlocking(void *buffer, int bufferLen,
+                                   std::string &sourceAddress, unsigned int &sourcePort,
+                                   const long int& timeout_in_microseconds)
+  throw(SocketException)
+{
+  sockaddr_in clntAddr;
+  socklen_t addrLen = sizeof(clntAddr);
+  int rtn;
+
+  timeout_value_.tv_sec = 0;
+  timeout_value_.tv_usec = timeout_in_microseconds;
+
+  rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
+
+  if (rtn == -1)
+  {
+    throw SocketException("Select error (select())", true);
+  }
+  else if (rtn == 0)
+  {
+    // timeout
+    return -1;
+  }
+  else
+  {
+    // printf("Checking for message.\n");
+    // one or both of the descriptors have data
+    if (FD_ISSET(sockDesc, &read_fds_))
+    {
+      if ((rtn = recvfrom(sockDesc, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen)) < 0)
+      {
+        throw SocketException("Receive failed (recvfrom())", true);
+      }
+      sourceAddress = inet_ntoa(clntAddr.sin_addr);
+      sourcePort = ntohs(clntAddr.sin_port);
+    }
+    else
+    {
+      throw SocketException("Select failed, socket was empty", true);
+    }
+  }
+  return rtn;
+}
+
+/*
+int s1, s2, n;
+char buf1[256], buf2[256];
+
+// pretend we've connected both to a server at this point
+//s1 = socket(...);
+//s2 = socket(...);
+//connect(s1, ...)...
+//connect(s2, ...)...
+
+// since we got s2 second, it's the "greater", so we use that for
+// the n param in select()
+n = s2 + 1;
+
+// wait until either socket has data ready to be recv()d (timeout 10.5 secs)
+tv.tv_sec = 10;
+tv.tv_usec = 500000;
+rv = select(n, &readfds, NULL, NULL, &tv);
+
+if (rv == -1) {
+    perror("select"); // error occurred in select()
+} else if (rv == 0) {
+    printf("Timeout occurred!  No data after 10.5 seconds.\n");
+} else {
+    // one or both of the descriptors have data
+    if (FD_ISSET(s1, &readfds)) {
+        recv(s1, buf1, sizeof buf1, 0);
+    }
+    if (FD_ISSET(s2, &readfds)) {
+        recv(s1, buf2, sizeof buf2, 0);
+    }
+}
+
+
+
+*/
+
+bool UDPSocket::setNonBlocking()
+{
+  int flags = fcntl(sockDesc, F_GETFL);
+  flags |= O_NONBLOCK;
+  if(fcntl(sockDesc, F_SETFL, flags) < 0)
+  {
+    throw SocketException("Problem when setting socket to non-blocking", true);
+    return false;
+  }
+
+  // clear the set ahead of time
+  FD_ZERO(&read_fds_);
+  // add our descriptors to the set
+  FD_SET(sockDesc, &read_fds_);
+
+  return true;
 }
 
 void UDPSocket::setMulticastTTL(unsigned char multicastTTL) throw (SocketException)

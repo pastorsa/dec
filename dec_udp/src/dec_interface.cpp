@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+
 #include <dec_udp/dec_interface.h>
 
 #include <boost/lexical_cast.hpp>
@@ -13,10 +14,15 @@
 namespace dec_udp
 {
 
-DecInterface::DecInterface()
+DecInterface::DecInterface(const uint8_t num_sockets)
 {
-  udp_socket_.reset(new UDPSocket(SERVER_IP_ADDRESS, SERVER_PORT));
-  // printf("Created socket at %s:%i\n", udp_socket_->getLocalAddress().c_str(), udp_socket_->getLocalPort());
+  for (uint8_t i = 0; i < num_sockets; ++i )
+  {
+    boost::shared_ptr<UDPSocket> udp_socket(new UDPSocket(SERVER_IP_ADDRESS, SERVER_PORT + i));
+    assert(udp_socket->setNonBlocking());
+    printf("Created socket at %s:%i\n", udp_socket->getLocalAddress().c_str(), udp_socket->getLocalPort());
+    udp_sockets_.push_back(udp_socket);
+  }
 
   // initialize data
   resetData();
@@ -60,14 +66,32 @@ bool DecInterface::sendSetupData(const uint8_t node_id)
   std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
 
   printf("Sending >%i< bytes of setup data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-  if(udp_socket_->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
+  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
   {
     printf("Problems when sending setup data to node id >%i< to >%s:%i<.\n", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
     return false;
   }
 
   printf("Waiting to receive setup data answer.\n");
-  _rx_buffer_length = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
+  _rx_buffer_length = 0;
+  unsigned long int TIMEOUT_SETUP_IN_MICROSECONDS = 1000000;
+  std::string source_address;
+  unsigned int source_port;
+  int return_code = udp_sockets_[node_id]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_SETUP_IN_MICROSECONDS);
+  if (return_code < 0)
+  {
+    printf("Missed setup packet from node with id >%i< : return code was >%i<.\n", node_id, return_code);
+    return false;
+  }
+
+  if(source_address.compare(foreign_address) != 0)
+  {
+    printf("Missed sensor packet from node with id >%i<.\n", node_id);
+    return false;
+  }
+
+  _rx_buffer_length = (uint16_t)return_code;
+  // _rx_buffer_length = udp_sockets[node_id]_->recv((void*)_rx_buffer, BUFFER_SIZE);
 
   printData();
 
@@ -90,14 +114,31 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
 
   // printf("Sending >%i< bytes of light data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-  if(udp_socket_->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
+  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
   {
     printf("Problems when sending light data to node id >%i< to >%s:%i<.\n", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
     return false;
   }
 
+  _rx_buffer_length = 0;
+  unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000;
+  std::string source_address;
+  unsigned int source_port;
+  int return_code = udp_sockets_[node_id]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
+  if (return_code < 0)
+  {
+    printf("Missed sensor packet from node with id >%i<.\n", node_id);
+  }
+  else
+  {
+    if(source_address.compare(foreign_address) == 0)
+      _rx_buffer_length = (uint16_t)return_code;
+    else
+      printf("Missed sensor packet from node with id >%i<.\n", node_id);
+  }
+
   // printf("Waiting to receive light data answer.\n");
-  _rx_buffer_length = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
+  // _rx_buffer_length = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
 
   // printf("Done communicating light data.\n");
   return true;
