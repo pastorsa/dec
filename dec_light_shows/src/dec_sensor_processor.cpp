@@ -26,6 +26,8 @@ DecSensorProcessor::DecSensorProcessor()
 bool DecSensorProcessor::initialize(XmlRpc::XmlRpcValue& config)
 {
   ROS_VERIFY(DecLightShowUtilities::getParam(config, "build_up_window_size", build_up_window_size_));
+  ROS_INFO("Configured for >%i< teensys.", data_->getNumTeensys());
+
   return true;
 }
 

@@ -20,16 +20,5 @@ DecLightShowData::~DecLightShowData()
 
 }
 
-bool DecLightShowData::copySensorInformationFromStructure()
-{
-
-  return true;
-}
-
-bool DecLightShowData::copyLightDataToStructure()
-{
-
-  return true;
-}
 
 }

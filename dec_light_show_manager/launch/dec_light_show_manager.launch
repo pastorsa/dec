@@ -6,6 +6,9 @@
 -->
 
   <include file="$(find dec_light_show_manager)/launch/load_light_show_params.launch"/>
-  <node pkg="dec_light_show_manager" type="dec_light_show_manager_node" name="DecLightShowManager" output="screen"/>
+  <node pkg="dec_light_show_manager" type="dec_light_show_manager_node" name="DecLightShowManager" output="screen">
+    <rosparam command="load" file="$(find dec_light_show_manager)/config/config.yaml" />
+    <rosparam command="load" file="$(find dec_light_show_manager)/config/structure.yaml" />
+  </node>
 
 </launch>

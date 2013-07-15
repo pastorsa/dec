@@ -69,14 +69,28 @@ public:
                          const int sensor_index,
                          const int sensor_value);
 
+  /*! Sends setup data to each teensy and keeps doing that
+   * until all teensys have responded.
+   * @return True on success, otherwise False
+   */
+  bool sendSetupData();
+
+  /*!
+   * @return
+   */
+  bool copySensorInformationToStructure();
+  bool copySensorInformationFromStructure();
+  bool copyLightDataToStructure();
+  bool copyLightDataFromStructure();
+
 protected:
 
-  int interaction_mode_;
-  enum {
-    eSETUP = 0,
-    eLOCAL = 1,
-    eNUM_MODES = 2,
-  };
+//  int interaction_mode_;
+//  enum {
+//    eSETUP = 0,
+//    eLOCAL = 1,
+//    eNUM_MODES = 2,
+//  };
 
   static const int NUM_ENTRIES_FOR_TEENSY_LEVEL = 1;
   static const int RED_OFFSET = 0;
@@ -91,6 +105,17 @@ protected:
    * level | 4 * max_lights | max_sensors
    */
   Eigen::MatrixXi data_;
+
+  /*! Vector of size number_of_teensys
+   * Each entry is a set of vectors (one for each light nodes)
+   * Each Eigen vector is of size num_leds of that light node (for now 1)
+   */
+  std::vector<std::vector<Eigen::VectorXi> > light_node_data_;
+  /*! Vector of size number_of_teensys
+   * Each entry is a set of vectors (one for each light beams)
+   * Each Eigen vector is of size num_leds of that light beam
+   */
+  std::vector<std::vector<Eigen::VectorXi> > light_beam_data_;
 
   int number_of_teensys_;
   int max_number_of_light_strips_per_teensy_;
@@ -155,11 +180,6 @@ protected:
 
   /*!
    */
-  bool enable_communication_;
-  /*! Data to be send to the teensys over udp
-   */
-  std::vector<light_data_t> light_data_;
-
   ros::Time ros_time_;
   double ros_time_sec_;
 
@@ -199,6 +219,14 @@ private:
   bool generateStructureFile(const std::string& abs_file_name,
                              const std::string progmem_prefix = "",
                              const std::string unit_prefix = "");
+
+
+  /*! To send/receive data over udp
+   */
+  boost::shared_ptr<dec_udp::DecInterface> dec_interface_;
+  std::vector<light_data_t> dec_interface_sensor_data_;
+  std::vector<sensor_data_t> dec_interface_light_data_;
+
 };
 
 }

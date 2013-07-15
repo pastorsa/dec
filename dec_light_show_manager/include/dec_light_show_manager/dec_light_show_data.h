@@ -35,11 +35,6 @@ public:
   DecLightShowData();
   virtual ~DecLightShowData();
 
-  /*!
-   */
-  bool copySensorInformationFromStructure();
-  bool copyLightDataToStructure();
-
 private:
 
 };

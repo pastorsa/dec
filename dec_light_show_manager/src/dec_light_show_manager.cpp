@@ -36,6 +36,10 @@ bool DecLightShowManager::initialize()
 {
   light_show_factory_.reset(new DecLightShowFactory());
   light_show_data_.reset(new DecLightShowData());
+  if(!light_show_data_->initialize(local_node_handle_))
+  {
+    return false;
+  }
 
   if (!loadLightShows())
   {
