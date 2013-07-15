@@ -1,0 +1,25 @@
+<package>
+  <description brief="dec_light_shows">
+
+     dec_light_shows
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_light_shows</url>
+
+  <depend package="roscpp"/>
+  <depend package="pluginlib"/>
+
+  <depend package="dec_utilities"/>
+  <depend package="dec_light_show_manager"/>
+
+  <export>
+    <dec_light_show_manager plugin="${prefix}/light_show_plugins.xml"/>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec_light_shows"/>
+  </export>
+
+</package>
+
+

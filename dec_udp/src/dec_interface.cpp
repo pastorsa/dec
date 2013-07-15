@@ -121,7 +121,7 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   }
 
   _rx_buffer_length = 0;
-  unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000;
+  unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000 + 100000;
   std::string source_address;
   unsigned int source_port;
   int return_code = udp_sockets_[node_id]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
@@ -134,7 +134,7 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
     if(source_address.compare(foreign_address) == 0)
       _rx_buffer_length = (uint16_t)return_code;
     else
-      printf("Missed sensor packet from node with id >%i<.\n", node_id);
+      printf("Missed sensor packet from node with id >%i<. Got package from >%s<.\n", node_id, source_address.c_str());
   }
 
   // printf("Waiting to receive light data answer.\n");

@@ -417,6 +417,7 @@ int UDPSocket::recvFromNonBlocking(void *buffer, int bufferLen,
   timeout_value_.tv_sec = 0;
   timeout_value_.tv_usec = timeout_in_microseconds;
 
+  // rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
   rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
 
   if (rtn == -1)

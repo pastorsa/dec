@@ -1,0 +1,11 @@
+<launch>
+
+<!--
+  <include file="$(find dec_light_show_manager)/config/dec.machines" />
+  <node pkg="dec_light_show_manager" type="dec_light_show_manager" args="" name="DecLightShowManager" output="screen" machine="mandy"/>
+-->
+
+  <include file="$(find dec_light_show_manager)/launch/load_light_show_params.launch"/>
+  <node pkg="dec_light_show_manager" type="dec_light_show_manager_node" name="DecLightShowManager" output="screen"/>
+
+</launch>

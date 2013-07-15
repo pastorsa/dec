@@ -1,0 +1,2 @@
+OpenLoopLightGenerator:
+  type: "dec_light_shows/DecOpenLoopLightGenerator"

@@ -72,12 +72,22 @@ void setupPins(const setup_data_t* setup_data)
   for (uint8_t i = 0; i < setup_data->num_led_nodes; ++i)
   {
     light_strips[strip_index].setup((uint16_t)setup_data->led_nodes[i].num_leds, (uint8_t)setup_data->led_nodes[i].pin, NEO_PIXEL_TYPE);
+    // Initialize all pixels to 'off'
+    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+    {
+      light_strips[strip_index].setPixelColor(j, (uint8_t)0, (uint8_t)0, (uint8_t)0);
+    }
     strip_index++;
   }
 
   for (uint8_t i = 0; i < setup_data->num_led_beams; ++i)
   {
     light_strips[strip_index].setup((uint16_t)setup_data->led_beams[i].num_leds, (uint8_t)setup_data->led_beams[i].pin, NEO_PIXEL_TYPE);
+    // Initialize all pixels to 'off
+    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+    {
+      light_strips[strip_index].setPixelColor(j, (uint8_t)0, (uint8_t)0, (uint8_t)0);
+    }
     strip_index++;
   }
 
@@ -112,6 +122,8 @@ uint8_t ip_header_length;
 uint8_t aux_init;
 uint8_t light_buffer[1 + sizeof(sensor_data_t)];
 
+uint8_t is_setup;
+
 void setup()
 {
   // Serial.begin(9600);
@@ -142,6 +154,7 @@ void setup()
   } while (!aux_init);
 
   ENC_LEDInit; /* ENC Leds Init */
+  is_setup = 0;
 }
 
 void loop()
@@ -184,8 +197,9 @@ void loop()
                   parseSetupData(buffer_ptr);
                   setupPins(&_setup_data);
                   UDP_Send(_rx_buffer, ip_header_length, _rx_buffer_length, ModeReply);
+                  is_setup = 1;
                 }
-                else if (isLightData(buffer_ptr))
+                else if (is_setup && isLightData(buffer_ptr))
                 {
                   // quickly store received light data to immediately send out sensor data
                   memcpy(light_buffer, buffer_ptr, sizeof(light_buffer));
@@ -216,16 +230,15 @@ void loop()
                     {
                       light_strips[strip_index].setPixelColor(j, _light_data.led_nodes[i].red, _light_data.led_nodes[i].green, _light_data.led_nodes[i].blue);
                     }
-                    light_strips[strip_index].show();
                     strip_index++;
                   }
-                  /*
 
                   for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
                   {
-                    for (uint8_t j = 0; j < _setup_data.led_beams[i].num_leds; ++j)
+                    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
                     {
-                      light_strips[strip_index].setPixelColor(j, _light_data.led_beams[i].red[j], _light_data.led_beams[i].green[j], _light_data.led_beams[i].blue[j]);
+                      uint8_t index = (uint8_t)j;
+                      light_strips[strip_index].setPixelColor(j, _light_data.led_beams[i].red[index], _light_data.led_beams[i].green[index], _light_data.led_beams[i].blue[index]);
                     }
                     strip_index++;
                   }
@@ -234,7 +247,6 @@ void loop()
                   {
                     light_strips[i].show();
                   }
-*/
                 }
               }
             } // IP Packet Type

@@ -1,0 +1,3 @@
+SensorProcessor:
+  type: "dec_light_shows/DecSensorProcessor"
+  build_up_window_size: 10

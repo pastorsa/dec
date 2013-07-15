@@ -1,0 +1,14 @@
+<package>
+  <description brief="dec_light_show_msgs">
+
+     dec_light_show_msgs
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_light_show_msgs</url>
+
+</package>
+
+

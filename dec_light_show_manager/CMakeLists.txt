@@ -25,19 +25,23 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_executable(dec_visualization 
-  src/dec_visualization.cpp
-#  src/dec_communication.cpp
-  src/dec_simulation.cpp
+rosbuild_add_library(dec_data
   src/dec_data.cpp
-  src/dec_processor.cpp
-  src/dec_visualization_node.cpp
 )
 
-rosbuild_add_executable(udp_sniffer
-  src/dec_sniffer.cpp
+rosbuild_add_library(${PROJECT_NAME}
+  src/dec_light_show_manager.cpp
+  src/dec_light_show_factory.cpp
+  src/dec_light_show_stack.cpp
+  src/dec_light_show_utilities.cpp
+  src/dec_light_show_data.cpp
 )
+target_link_libraries(${PROJECT_NAME} dec_data)
 
+rosbuild_add_executable(dec_light_show_manager_node
+  src/dec_light_show_manager_node.cpp
+)
+target_link_libraries(dec_light_show_manager_node ${PROJECT_NAME})
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)

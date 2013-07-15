@@ -1,0 +1,37 @@
+### PRE and POST ###
+-
+  name: "StaticPreLightShowStack"
+  groups: ["PRE"]
+  light_shows:
+    - "SensorProcessor"
+    - "LightProcessor"
+-
+  name: "StaticPostLightShowStack"
+  groups: ["POST"]
+  light_shows:
+    - "SensorProcessor"
+    - "LightProcessor"
+
+### SENSOR ###
+
+-
+  name: "SensorProcessorStack"
+  groups: ["SENSOR"]
+  light_shows:
+    - "SensorProcessor"
+
+### LIGHT ###
+
+-
+  name: "LightProcessorStack"
+  groups: ["LIGHT"]
+  light_shows:
+    - "LightProcessor"
+
+### SENSOR and LIGHT ###
+
+-
+  name: "OpenLoopLightStack"
+  groups: ["SENSOR", "LIGHT"]
+  light_shows:
+    - "OpenLoopLightGenerator"

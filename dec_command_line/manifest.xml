@@ -13,6 +13,7 @@
 
   <depend package="dec_msgs"/>
   <depend package="dec_world_state"/>
+  <depend package="dec_light_show_manager"/>
 
 </package>
 

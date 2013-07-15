@@ -1,0 +1,2 @@
+LightProcessor:
+  type: "dec_light_shows/DecLightProcessor"

@@ -1,0 +1,13 @@
+# A light show stack can belong to any of the following groups.
+# Only one stack in each group will be active at a time.
+# They will be executed in this priority order:
+stack_groups:
+  - PRE
+  - SENSOR
+  - LIGHT
+  - POST
+
+default_light_show_stacks:
+  - StaticPreLightShowStack
+  - SensorProcessorStack
+  - StaticPostLightShowStack

@@ -9,6 +9,7 @@ from dec_msgs.msg import Object
 import dec_msgs.msg
 import roslib.packages
 from dec_world_state.world_state import WorldState
+from dec_light_show_manager.light_show_stack_switcher import LightShowStackSwitcher
 from visualization_msgs.msg import Marker
 from tf import transformations
 import math
@@ -27,6 +28,8 @@ def main():
 
   global world_state
   world_state = WorldState()
+  global light_show
+  light_show = LightShowStackSwitcher()
   global object_poses
   object_poses = world_state.object_poses
 
