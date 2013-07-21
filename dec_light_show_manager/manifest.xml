@@ -13,9 +13,11 @@
   <depend package="roscpp"/>
   <depend package="pluginlib"/>
 
+  <depend package="visualization_msgs"/>
   <depend package="geometry_msgs"/>
   <depend package="std_msgs"/>
 
+  <depend package="dec_world_state"/>
   <depend package="dec_light_show_msgs"/>
   <depend package="dec_utilities"/>
 

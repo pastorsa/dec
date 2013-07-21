@@ -12,6 +12,12 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecColorProcessor" type="dec_light_shows::DecColorProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Processes colors
+    </description>
+  </class>
+
   <class name="dec_light_shows/DecOpenLoopLightGenerator" type="dec_light_shows::DecOpenLoopLightGenerator" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
       Generates an open loop light pattern

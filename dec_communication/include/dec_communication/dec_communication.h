@@ -70,6 +70,7 @@ typedef struct
 } sensor_setup_t;
 typedef struct
 {
+  uint8_t index;
   uint8_t num_leds;
   uint8_t pin;
 } led_strip_setup_t;
@@ -77,10 +78,10 @@ typedef struct
  */
 typedef struct
 {
-  uint8_t num_led_nodes;
-  led_strip_setup_t led_nodes[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
-  uint8_t num_led_beams;
-  led_strip_setup_t led_beams[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  uint8_t num_block_leds;
+  led_strip_setup_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
+  uint8_t num_pixel_leds;
+  led_strip_setup_t pixel_leds[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
   uint8_t num_sensors;
   sensor_setup_t sensors[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE];
 } setup_data_t;
@@ -139,24 +140,24 @@ void generateSensorData(uint8_t* buffer, const sensor_data_t* sensor_data);
  */
 typedef struct
 {
-  uint8_t red;
-  uint8_t green;
-  uint8_t blue;
-  uint8_t brightness;
-} led_node_data_t;
+  uint8_t red[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
+  uint8_t green[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
+  uint8_t blue[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
+  uint8_t brightness[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
+} led_block_data_t;
 
 typedef struct
 {
-  uint8_t red[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
-  uint8_t green[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
-  uint8_t blue[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
-  uint8_t brightness[DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP];
-} led_beam_data_t;
+  uint8_t red[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+  uint8_t green[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+  uint8_t blue[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+  uint8_t brightness[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+} led_pixel_data_t;
 
 typedef struct
 {
-  led_node_data_t led_nodes[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
-  led_beam_data_t led_beams[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  led_block_data_t block_leds[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
 } light_data_t;
 
 /*! Data type to which the "data" gets parsed and which gets generated
@@ -203,6 +204,12 @@ uint8_t isLightData(uint8_t* buffer);
 /*! Zeros all data
  */
 void resetData(void);
+
+/*! Zero sensor data
+ */
+void resetSetupData(setup_data_t* setup_data);
+void resetSensorData(sensor_data_t* sensor_data);
+void resetLightData(light_data_t* light_data);
 
 /*! Prints internal data
  */

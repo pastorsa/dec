@@ -5,8 +5,11 @@
  *      Author: pastor
  */
 
+#include <dec_utilities/assert.h>
 #include <dec_utilities/param_server.h>
 #include <dec_light_show_manager/dec_light_show_manager.h>
+
+#include <boost/thread.hpp>
 
 #define LIGHT_SHOW_NAMESPACE "light_shows"
 #define LIGHT_SHOW_STACKS_NAMESPACE "light_show_stacks"
@@ -17,10 +20,10 @@ namespace dec_light_show_manager
 static const int ROS_TIME_OFFSET = 1340100000;
 
 DecLightShowManager::DecLightShowManager() :
+    initialized_(false),
     num_light_show_stacks_(0), num_light_shows_(0), light_shows_running_(false),
     switching_light_shows_(false), switching_light_shows_success_(false),
-    local_node_handle_("~"),
-    start_ros_time_in_sec_(0.0)
+    local_node_handle_("~"), start_ros_time_in_sec_(0.0), simulation_mode_(false)
 {
   dec_mutex_init(&switching_light_shows_mutex_);
   dec_cond_init(&switching_light_shows_cond_);
@@ -41,6 +44,10 @@ bool DecLightShowManager::initialize()
     return false;
   }
 
+  ROS_VERIFY(dec_utilities::read(local_node_handle_, "control_frequency", light_show_data_->control_frequency_));
+  ROS_ASSERT(light_show_data_->control_frequency_ > 0.0);
+  light_show_data_->control_dt_ = (double)1.0 / light_show_data_->control_frequency_;
+
   if (!loadLightShows())
   {
     return false;
@@ -54,7 +61,30 @@ bool DecLightShowManager::initialize()
   ROS_INFO_COND(light_shows_running_, "DEC light show manager is running.");
   start_ros_time_ = ros::Time::now();
   start_ros_time_in_sec_ = start_ros_time_.toSec();
-  return true;
+
+  ROS_VERIFY(dec_utilities::read(local_node_handle_, "simulation_mode", simulation_mode_));
+  if(simulation_mode_)
+  {
+    dec_light_show_simulation_.reset(new DecLightShowSimulation(light_show_data_));
+    ROS_VERIFY(dec_light_show_simulation_->initialize(local_node_handle_));
+  }
+
+  dec_light_show_visualization_.reset(new DecLightShowVisualization());
+  ROS_VERIFY(dec_light_show_visualization_->initialize(light_show_data_, local_node_handle_));
+
+  return (initialized_ = true);
+}
+
+void DecLightShowManager::run()
+{
+  ROS_ASSERT(initialized_);
+  ros::Rate rate(light_show_data_->control_frequency_);
+  bool manager_is_running = true;
+  while (ros::ok() && manager_is_running)
+  {
+    manager_is_running = update();
+    rate.sleep();
+  }
 }
 
 bool DecLightShowManager::loadLightShows()
@@ -103,20 +133,24 @@ bool DecLightShowManager::loadLightShows()
   light_show_next_active_list_.clear();
 
   // get the default light_show stack running:
+  boost::thread(boost::bind(&DecLightShowManager::setDefaultStacks, this));
+
+  return true;
+}
+
+void DecLightShowManager::setDefaultStacks()
+{
   std::vector<std::string> default_light_show_stacks;
   if (!dec_utilities::read(local_node_handle_, "default_light_show_stacks", default_light_show_stacks))
   {
     ROS_ERROR("Couldn't read default_light_show_stacks.");
-    return false;
+    return;
   }
-
-//  if (!switchLightShowStack(default_light_show_stacks))
-//  {
-//    ROS_ERROR("Error loading default light_show stacks.");
-//    return false;
-//  }
-
-  return true;
+  if (!switchLightShowStack(default_light_show_stacks))
+  {
+    ROS_ERROR("Error loading default light_show stacks.");
+    return;
+  }
 }
 
 bool DecLightShowManager::switchLightShowStackService(dec_light_show_msgs::SwitchLightShowStack::Request& request,
@@ -319,7 +353,7 @@ bool DecLightShowManager::update()
   light_show_data_->ros_time_sec_ = (light_show_data_->ros_time_ - ros::Duration(ROS_TIME_OFFSET)).toSec();
 
   // fill sensor information
-  light_show_data_->copySensorInformationFromStructure();
+  copySensorInformationFromStructure();
 
   if (light_shows_running_)
   {
@@ -387,6 +421,7 @@ bool DecLightShowManager::update()
     }
 
     // run the light_show stacks in order
+    ROS_WARN_COND(active_light_show_stacks_.empty(), "No stack loaded.");
     for (unsigned int i = 0; i < active_light_show_stacks_.size(); ++i)
     {
       ret = active_light_show_stacks_[i]->update();
@@ -399,10 +434,13 @@ bool DecLightShowManager::update()
   }
 
   // send light data
-  if (!light_show_data_->copyLightDataToStructure())
+  if (!copyLightDataToStructure())
   {
     return false;
   }
+
+  if (!dec_light_show_visualization_->update())
+    ROS_ERROR("Problem when visualization data.");
 
   return ret;
 }
@@ -575,6 +613,24 @@ bool DecLightShowManager::getLightShowByName(const std::string& name, boost::sha
 
   light_show = light_show_it->second;
   return true;
+}
+
+bool DecLightShowManager::copySensorInformationFromStructure()
+{
+  if(simulation_mode_)
+  {
+    return dec_light_show_simulation_->copySimulatedSensorInformation();
+  }
+  return light_show_data_->copySensorInformationFromStructure();
+}
+
+bool DecLightShowManager::copyLightDataToStructure()
+{
+  if(simulation_mode_)
+  {
+    return true;
+  }
+  return light_show_data_->copyLightDataToStructure();
 }
 
 }

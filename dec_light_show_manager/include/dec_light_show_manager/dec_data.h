@@ -17,18 +17,40 @@
 #include <Eigen/Eigen>
 #include <geometry_msgs/Point.h>
 
-#include <dec_udp/dec_interface.h>
+#include <dec_light_show_manager/dec_structure.h>
+
+#define RED_OFFSET   0
+#define GREEN_OFFSET 1
+#define BLUE_OFFSET  2
+#define ALPHA_OFFSET 3
+// static const double COLOR_RESOLUTION = 255.0;
+// static const int SENSOR_RESOLUTION = 255;
 
 namespace dec_light_show_manager
 {
 
+const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 10;
+const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 255;
+
+//typedef uint8_t led_channel_t;
+//typedef uint8_t sensor_channel_t;
+typedef int led_channel_t;
+typedef int sensor_channel_t;
+
 /**
  * This class contains public data to be shared across light shows
  */
-class DecData
+class DecData : public DecStructure
 {
 
 public:
+
+#define DEC_EXTRA 1
+#ifdef DEC_EXTRA
+  friend class DecLightShowVisualization;
+  friend class DecLightShowSimulation;
+#endif
+
   DecData();
   virtual ~DecData() {};
 
@@ -42,32 +64,6 @@ public:
    * @return number of teensys
    */
   int getNumTeensys() const;
-
-  /*!
-   * @param teensy_index
-   * @param sensor_index
-   * @return sensor_value
-   */
-  int getSensorValue(const int teensy_index,
-                      const int sensor_index);
-
-  /*!
-   * @param teensy_index
-   * @param sensor_index
-   * @param sensor_value
-   */
-  void addSensorValue(const int teensy_index,
-                        const int sensor_index,
-                        const int sensor_value);
-
-  /*!
-   * @param teensy_index
-   * @param sensor_index
-   * @param sensor_value
-   */
-  void setSensorValue(const int teensy_index,
-                         const int sensor_index,
-                         const int sensor_value);
 
   /*! Sends setup data to each teensy and keeps doing that
    * until all teensys have responded.
@@ -83,100 +79,81 @@ public:
   bool copyLightDataToStructure();
   bool copyLightDataFromStructure();
 
-protected:
+  double control_frequency_;
+  double control_dt_;
 
-//  int interaction_mode_;
-//  enum {
-//    eSETUP = 0,
-//    eLOCAL = 1,
-//    eNUM_MODES = 2,
-//  };
-
-  static const int NUM_ENTRIES_FOR_TEENSY_LEVEL = 1;
-  static const int RED_OFFSET = 0;
-  static const int GREEN_OFFSET = 1;
-  static const int BLUE_OFFSET = 2;
-  static const int ALPHA_OFFSET = 3;
-
-  static const int SENSOR_RESOLUTION = 255;
-
-  /*! Matrix of size number_of_teensys x num_entries_per_teensy
-   * Each entry contains
-   * level | 4 * max_lights | max_sensors
+  /*! Sensor values as received by the teensys or simulation
    */
-  Eigen::MatrixXi data_;
+  typedef Eigen::Matrix<sensor_channel_t, 1, Eigen::Dynamic> VectorX_sensor_channel_t;
+  VectorX_sensor_channel_t sensor_values_;
+  VectorX_sensor_channel_t prev_sensor_values_;
 
-  /*! Vector of size number_of_teensys
-   * Each entry is a set of vectors (one for each light nodes)
-   * Each Eigen vector is of size num_leds of that light node (for now 1)
+  /*! Light values as send to the teensys or simulation
+   * The size of each matrix corresponds 4 (r,g,b,a) times the total number of node/beam leds
    */
-  std::vector<std::vector<Eigen::VectorXi> > light_node_data_;
-  /*! Vector of size number_of_teensys
-   * Each entry is a set of vectors (one for each light beams)
-   * Each Eigen vector is of size num_leds of that light beam
-   */
-  std::vector<std::vector<Eigen::VectorXi> > light_beam_data_;
+  typedef Eigen::Matrix<led_channel_t, 4, Eigen::Dynamic> MatrixX_led_channel_t;
+  MatrixX_led_channel_t node_led_values_;
+  MatrixX_led_channel_t block_beam_led_values_;
+  MatrixX_led_channel_t pixel_beam_led_values_;
 
-  int number_of_teensys_;
-  int max_number_of_light_strips_per_teensy_;
-  int max_number_of_leds_per_light_strip_;
-  int max_number_of_sensors_per_teensy_;
-
-  std::vector<geometry_msgs::Point> node_positions_;
-
-  /*!
+  /*! The vector is of size total_num_node_leds_ and total_num_beam_leds_
+   * The value range is [0..1] and will be converted to a color
    */
-  std::vector<int> light_nodes_;
-  std::vector<geometry_msgs::Point> light_node_positions_;;
+  Eigen::VectorXf node_led_levels_;
+  Eigen::VectorXf block_beam_led_levels_;
+  Eigen::VectorXf pixel_beam_led_levels_;
+  /*! The vector is of size total_num_sensors_;
+   * The value is set by the sensor processor light show
+   */
+  Eigen::VectorXf sensor_levels_;
 
-  /*! Pairs of nodes in node_positions_ (indexed from 0)
+  /*! These matrices are of size num_sensor x {num_node_leds,num_beam_leds}
+   * Each entry corresponds to the distance of that sensor-led pair in meters
    */
-  std::vector<std::pair<int, int> > beams_;
-  std::vector<std::pair<int, int> > sensors_;
-  std::vector<std::pair<int, int> > light_beams_;
+  Eigen::MatrixXf node_led_distances_to_sensor_;
+  Eigen::MatrixXf pixel_beam_led_distances_to_sensor_;
+  Eigen::MatrixXf block_beam_led_distances_to_sensor_;
 
-  /*! Number of LEDs for each light beam and light node.
-   * The size corresponds to the number of light beams and light nodes in the structure.
-   */
-  std::vector<int> num_leds_of_each_light_beam_;
-  std::vector<int> num_leds_of_each_light_node_;
 
-  /*! Which light_beam/light_node/sensor is connected to which teensy
-   * The size of each vector is equal to the size of
-   * light_beams/light_nodes/sensors. The stored number is the
-   * id of the teensy to which this thing is connected.
-   */
-  std::vector<int> light_beam_connections_;
-  std::vector<int> light_node_connections_;
-  std::vector<int> sensor_connections_;
+//  //std::vector<std::vector<Eigen::VectorXi> > light_beam_data_;
+//  // #include<Eigen/StdVector>
+//  // \/* ... *\/
+//  // std::vector<Eigen::Vector4f,Eigen::aligned_allocator<Eigen::Vector4f> >
+//
+//  /*! Number of LEDs for each light beam and light node.
+//   * The size corresponds to the number of light beams and light nodes in the structure.
+//   */
+//   std::vector<int> num_leds_of_each_light_beam_;
+//   std::vector<int> num_leds_of_each_light_node_;
+//
+//  /*! Which light_beam/light_node/sensor is connected to which teensy
+//   * The size of each vector is equal to the size of
+//   * light_beams/light_nodes/sensors. The stored number is the
+//   * id of the teensy to which this thing is connected.
+//   */
+//   std::vector<int> light_beam_connections_;
+//   std::vector<int> light_node_connections_;
+//   std::vector<int> sensor_connections_;
+//
+//  /*! These vectors are of size number_of_teensys
+//   * Each entry (index by the teensy id) contains the index
+//   * into teensy_to_*_map_ (see below) to obtain the "local" index of this
+//   * thing at this teensy.
+//   */
+//   std::vector<int> light_beam_index_counter_;
+//   std::vector<int> light_node_index_counter_;
+//   std::vector<int> sensor_index_counter_;
+//
+//  /*! Number of light beams/light nodes/sensor for each teensy
+//   * The size of these vectors is equal to the number of teensys in the network
+//   * each entry contains a list of indices into light beams/light nodes/sensors
+//   * to which this teensy is connected. Obviously, it can be empty, meaning that
+//   * this teensy does not have a light beams/light nodes/sensors attached.
+//   */
+//  std::vector<std::vector<int> > teensy_to_light_beam_map_;
+//  std::vector<std::vector<int> > teensy_to_light_node_map_;
+//  std::vector<std::vector<int> > teensy_to_sensor_map_;
 
-  /*! These vectors are of size number_of_teensys
-   * Each entry (index by the teensy id) contains the index
-   * into teensy_to_*_map_ (see below) to obtain the "local" index of this
-   * thing at this teensy.
-   */
-  std::vector<int> light_beam_index_counter_;
-  std::vector<int> light_node_index_counter_;
-  std::vector<int> sensor_index_counter_;
-
-  /*! Number of light beams/light nodes/sensor for each teensy
-   * The size of these vectors is equal to the number of teensys in the network
-   * each entry contains a list of indices into light beams/light nodes/sensors
-   * to which this teensy is connected. Obviously, it can be empty, meaning that
-   * this teensy does not have a light beams/light nodes/sensors attached.
-   */
-  std::vector<std::vector<int> > teensy_to_light_beam_map_;
-  std::vector<std::vector<int> > teensy_to_light_node_map_;
-  std::vector<std::vector<int> > teensy_to_sensor_map_;
-
-  /*! This light pins vector contains the order of PWM capable output pins at which the
-   * lights are hooked up to the teensy
-   */
-  std::vector<int> light_pins_;
-  /*! This sensor pins vector contains the order of input pins at which the
-   * sensors are hooked up to the teensy
-   */
-  std::vector<int> sensor_pins_;
 
   /*!
    */
@@ -186,32 +163,22 @@ protected:
 private:
   bool initialized_;
 
-  bool read(ros::NodeHandle node_handle,
-            const std::string& array_name,
-            std::vector<geometry_msgs::Point>& array);
-  bool read(ros::NodeHandle node_handle,
-            const std::string& array_name,
-            std::vector<std::pair<int, int> >& nodes);
-
-  bool read(ros::NodeHandle node_handle,
-            const::std::string& array_name,
-            std::vector<int>& values,
-            std::vector<int>& index_values,
-            std::vector<std::vector<int> >& map,
-            const unsigned int& num);
-
-  /*! Offset all nodes such that the node node_index is at (0.0, 0.0, 0.0)
-   * @param node_positions
-   * @param node_index
-   */
-  void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
-                           const int node_index);
-
+//  bool read(ros::NodeHandle node_handle,
+//            const std::string& array_name,
+//            std::vector<std::pair<int, int> >& nodes);
+//
+//  bool read(ros::NodeHandle node_handle,
+//            const::std::string& array_name,
+//            std::vector<int>& values,
+//            std::vector<int>& index_values,
+//            std::vector<std::vector<int> >& map,
+//            const unsigned int& num);
+//
   /*!
    * @param teensy_id
    * @return distance of
    */
-  std::vector<std::vector<int> > getTeensyToSensorsDistances(const int& teensy_id) const;
+  std::vector<std::vector<int> > getTeensyToSensorsDistances(const unsigned int& teensy_id) const;
 
   /*!
    */
@@ -224,8 +191,12 @@ private:
   /*! To send/receive data over udp
    */
   boost::shared_ptr<dec_udp::DecInterface> dec_interface_;
-  std::vector<light_data_t> dec_interface_sensor_data_;
-  std::vector<sensor_data_t> dec_interface_light_data_;
+  std::vector<sensor_data_t> dec_interface_sensor_data_;
+  std::vector<light_data_t> dec_interface_light_data_;
+  std::vector<setup_data_t> dec_interface_setup_data_;
+
+  // geometry_msgs::Pose getBeamLedPose(const int beam_id, const int led, const int num_leds);
+  float computeDistance(const geometry_msgs::Point& sensor, const geometry_msgs::Point& thing);
 
 };
 

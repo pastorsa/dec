@@ -21,17 +21,45 @@ DecLightShowStack::~DecLightShowStack()
 
 bool DecLightShowStack::start()
 {
-  return true;
+  bool ret = true;
+  for (unsigned int i = 0; i < light_shows_.size(); ++i)
+  {
+    bool this_ret = light_shows_[i]->start();
+    if (!this_ret)
+      ROS_WARN("Light show >%s< failed to start.\n", light_shows_[i]->getName().c_str());
+    ret = ret && this_ret;
+  }
+  return ret;
 }
 
 bool DecLightShowStack::update()
 {
-  return true;
+  bool ret = true;
+  for (unsigned int i = 0; i < light_shows_.size(); ++i)
+  {
+    bool this_ret = light_shows_[i]->update();
+    if (!this_ret)
+    {
+      ROS_ERROR("Light show >%s< failed to update.\n", light_shows_[i]->getName().c_str());
+      // skip running the remaining light shows
+      return false;
+    }
+    ret = ret && this_ret;
+  }
+  return ret;
 }
 
 bool DecLightShowStack::stop()
 {
-  return true;
+  bool ret = true;
+  for (unsigned int i = 0; i < light_shows_.size(); ++i)
+  {
+    bool this_ret = light_shows_[i]->stop();
+    if (!this_ret)
+      ROS_WARN("Controller %s failed to stop\n", light_shows_[i]->getName().c_str());
+    ret = ret && this_ret;
+  }
+  return ret;
 }
 
 void DecLightShowStack::addLightShow(boost::shared_ptr<DecLightShow> light_show)

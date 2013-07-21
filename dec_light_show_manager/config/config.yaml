@@ -1,12 +1,11 @@
+# Frequency (in Hz) of the control loop
+control_frequency: 10.0
+
 # Switches between simulation and real communication mode
 simulation_mode: true
 
-interaction_mode: 0
-# SETUP = 0
-# LOCAL_ONLY = 1
-
 # Number of teensys in the structure (limited to 255)
-number_of_teensys: 1
+# number_of_teensys: 1
 
 # 38 Digital pins according to http://www.pjrc.com/teensy/td_digital.html for the Teensy++ 2.0
 #      =========================================================================================
@@ -35,18 +34,11 @@ number_of_teensys: 1
 # next 2 numbers
 light_pins: [0, 1, 14, 15, 16, 24, 25, 26, 27]
 # Input pins used for the lights (need to be digital and not overlapping with the PWM capable pins)
-sensor_pins: [5, 6, 7]
-
-# Maximum number of leds that can be controlled by each teensy
-# Currently implemented as uint8_t so must be smaller or equal to 255
-max_number_of_leds_per_light_strip: 100
+sensor_pins: [5, 6, 7, 8, 9, 10, 11, 12, 13, 17]
 
 # Whether or not the header files should be created
 generate_configuration_file: true
 generate_structure_file: true
 
 # Setup, Receive sensor and send light data
-enable_communication: true
-
-# The rs-485 serial interface device name
-rs485_device_name: /dev/ttyUSB0  
+enable_communication: false

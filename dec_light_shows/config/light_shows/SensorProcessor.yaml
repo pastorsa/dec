@@ -1,3 +1,10 @@
 SensorProcessor:
   type: "dec_light_shows/DecSensorProcessor"
-  build_up_window_size: 10
+  num_cycles_to_load: 10
+  num_cycles_to_unload: 2
+  sensor_filter:
+    name: Filter
+    type: TransferFunctionFilter<float>
+    params:
+      a: [1.0000,   -0.5095]
+      b: [0.7548,   -0.7548]

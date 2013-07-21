@@ -370,5 +370,5 @@ sensors_size:
   x: 0.04
   y: 0.04
   z: 0.9
-sensors_color: [0.2, 0.2, 0.9, 0.9] # r,g,b,a
+sensors_color: [0.0, 0.0, 0.0, 0.6] # r,g,b,a
 

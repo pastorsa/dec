@@ -1,0 +1,3 @@
+number_of_simulated_objects: 20
+simulated_object_name: ball
+simulation_sensor_object_threshold: 0.3

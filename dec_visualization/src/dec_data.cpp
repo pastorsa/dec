@@ -42,7 +42,7 @@ bool DECData::init(ros::NodeHandle node_handle)
     const int SENSOR_PINS[29] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 20, 21, 22, 23,
                                  28, 29, 30, 31, 32, 33, 34, 35, 36, 37}; // Teensy++ 2.0 digital pins that are not PWM capable
     bool found = false;
-    for (unsigned int j = 0; !found && j < 9; ++j)
+    for (unsigned int j = 0; !found && j < 29; ++j)
     {
       if (SENSOR_PINS[j] == sensor_pins_[i])
       {

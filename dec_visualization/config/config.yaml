@@ -46,7 +46,7 @@ generate_configuration_file: true
 generate_structure_file: true
 
 # Setup, Receive sensor and send light data
-enable_communication: true
+enable_communication: false
 
 # The rs-485 serial interface device name
 rs485_device_name: /dev/ttyUSB0  

@@ -15,13 +15,13 @@ void printSetupData()
 {
   printData();
 
-  printf("Setup Data:\n");
-  printf(" Number of LED nodes is >%u<\n", _setup_data.num_led_nodes);
-  for (uint8_t i = 0; i < _setup_data.num_led_nodes; ++i)
-    printf("  Node >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_nodes[i].num_leds, _setup_data.led_nodes[i].pin);
-  printf(" Number of LED beams is >%u<\n", _setup_data.num_led_beams);
-  for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
-    printf("  Beam >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_beams[i].num_leds, _setup_data.led_beams[i].pin);
+//  printf("Setup Data:\n");
+//  printf(" Number of LED nodes is >%u<\n", _setup_data.num_led_nodes);
+//  for (uint8_t i = 0; i < _setup_data.num_led_nodes; ++i)
+//    printf("  Node >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_nodes[i].num_leds, _setup_data.led_nodes[i].pin);
+//  printf(" Number of LED beams is >%u<\n", _setup_data.num_led_beams);
+//  for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
+//    printf("  Beam >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_beams[i].num_leds, _setup_data.led_beams[i].pin);
 
   printf(" Number of sensors is >%u<\n", _setup_data.num_sensors);
   for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)

@@ -26,6 +26,7 @@ public:
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, double& i);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::string& str);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<int>& i_array);
+  static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<float>& d_array);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<double>& d_array);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<std::string>& str_array);
 

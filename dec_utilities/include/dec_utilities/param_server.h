@@ -53,11 +53,14 @@
 namespace dec_utilities
 {
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, int& value);
+bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, unsigned int& value);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, double& value);
+bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, float& value);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::string& str);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<int>& int_array);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<unsigned int>& unsigned_int_array);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<double>& double_array);
+bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<float>& double_array);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<std::string>& str_array);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, geometry_msgs::Point& position);
 bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, geometry_msgs::Vector3& vector3);
@@ -80,7 +83,7 @@ bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, unsig
 bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, unsigned long& parameter_value, const bool verbose = true);
 bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, bool& parameter_value, const bool verbose = true);
 bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, std::vector<int>& array, const bool verbose = true);
-bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, std::vector<unsigned>& array, const bool verbose = true);
+bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, std::vector<unsigned int>& array, const bool verbose = true);
 bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, std::vector<double>& array, const bool verbose = true);
 bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, std::vector<std::string>& str_array, const bool verbose = true);
 bool read(ros::NodeHandle& node_handle, const std::string& parameter_name, geometry_msgs::Point& position, const bool verbose = true);
@@ -114,6 +117,26 @@ inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, int& v
   return true;
 }
 
+inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, unsigned int& value)
+{
+  if (!config.hasMember(key))
+  {
+    return false;
+  }
+  XmlRpc::XmlRpcValue param = config[key];
+  if (param.getType() != XmlRpc::XmlRpcValue::TypeInt)
+  {
+    return false;
+  }
+  int int_value = param;
+  if (int_value < 0)
+  {
+    return false;
+  }
+  value = static_cast<int>(int_value);
+  return true;
+}
+
 inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, double& value)
 {
   if (!config.hasMember(key))
@@ -126,6 +149,22 @@ inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, double
     return false;
   }
   value = param;
+  return true;
+}
+
+inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, float& value)
+{
+  if (!config.hasMember(key))
+  {
+    return false;
+  }
+  XmlRpc::XmlRpcValue param = config[key];
+  if (param.getType() != XmlRpc::XmlRpcValue::TypeDouble)
+  {
+    return false;
+  }
+  double double_value = param;
+  value = static_cast<float>(double_value);
   return true;
 }
 
@@ -225,6 +264,47 @@ inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::v
       value = static_cast<double>(d_array_xml[i]);
     }
     double_array.push_back(value);
+  }
+
+  return true;
+}
+
+inline bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::vector<float>& float_array)
+{
+  if (!config.hasMember(key))
+  {
+    ROS_ERROR("XmlRpcValue does not contain key %s.", key.c_str());
+    return false;
+  }
+
+  XmlRpc::XmlRpcValue d_array_xml = config[key];
+
+  if (d_array_xml.getType() != XmlRpc::XmlRpcValue::TypeArray)
+  {
+    ROS_ERROR("XmlRpcValue is not of type array.");
+    return false;
+  }
+
+  float_array.clear();
+  for (int i=0; i<d_array_xml.size(); ++i)
+  {
+    if (d_array_xml[i].getType() != XmlRpc::XmlRpcValue::TypeDouble &&
+        d_array_xml[i].getType() != XmlRpc::XmlRpcValue::TypeInt)
+    {
+      ROS_ERROR("XmlRpcValue is neither a double nor a integer array.");
+      return false;
+    }
+    double double_value = 0.0;
+    if (d_array_xml[i].getType() == XmlRpc::XmlRpcValue::TypeInt)
+    {
+      double_value = static_cast<double>(static_cast<int>(d_array_xml[i]));
+    }
+    else
+    {
+      double_value = static_cast<double>(d_array_xml[i]);
+    }
+    float float_value = static_cast<float>(double_value);
+    float_array.push_back(float_value);
   }
 
   return true;

@@ -23,7 +23,12 @@ DecInterface::DecInterface(const uint8_t num_sockets)
     printf("Created socket at %s:%i\n", udp_socket->getLocalAddress().c_str(), udp_socket->getLocalPort());
     udp_sockets_.push_back(udp_socket);
   }
-
+  // to store received sensor data
+  received_sensor_data_.resize(num_sockets);
+  for (unsigned int i = 0; i < received_sensor_data_.size(); ++i)
+  {
+    resetSensorData(&(received_sensor_data_[i]));
+  }
   // initialize data
   resetData();
 }
@@ -31,12 +36,14 @@ DecInterface::DecInterface(const uint8_t num_sockets)
 void DecInterface::print(const setup_data_t& setup_data)
 {
   printf("Setup Data:\n");
-  printf(" Number of LED nodes is >%u<.\n", _setup_data.num_led_nodes);
-  for (uint8_t i = 0; i < _setup_data.num_led_nodes; ++i)
-    printf("  Node >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_nodes[i].num_leds, _setup_data.led_nodes[i].pin);
-  printf(" Number of LED beams is >%u<.\n", _setup_data.num_led_beams);
-  for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
-    printf("  Beam >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_beams[i].num_leds, _setup_data.led_beams[i].pin);
+  printf(" Number of block LEDs is >%u<.\n", _setup_data.num_block_leds);
+  for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
+    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and ends at >%u<.\n", i,
+           _setup_data.block_leds[i].pin, _setup_data.block_leds[i].start_index, _setup_data.block_leds[i].end_index);
+  printf(" Number of pixel LEDs is >%u<.\n", _setup_data.num_pixel_leds);
+  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
+    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and ends at >%u<.\n", i,
+           _setup_data.pixel_leds[i].pin, _setup_data.pixel_leds[i].start_index, _setup_data.pixel_leds[i].end_index);
   printf(" Number of sensors is >%u<.\n", setup_data.num_sensors);
   for (uint8_t i = 0; i < setup_data.num_sensors; ++i)
     printf("  Sensor >%u< is at pin >%u<.\n", i, setup_data.sensors[i].pin);
@@ -50,6 +57,12 @@ void DecInterface::print(const sensor_data_t& sensor_data)
 void DecInterface::print(const light_data_t& light_data)
 {
   printf("Light Data:\n");
+}
+
+setup_data_t DecInterface::getSetupData(const uint8_t node_id)
+{
+  loadSetupData(node_id);
+  return _setup_data;
 }
 
 bool DecInterface::sendSetupData(const uint8_t node_id)
@@ -104,8 +117,6 @@ bool DecInterface::sendSetupData(const uint8_t node_id)
 
 bool DecInterface::sendLightData(const int node_id, const light_data_t& light_data)
 {
-  loadSetupData(node_id);
-
   // printf("Generating light data for node >%i<.\n", node_id);
   generateLightData(_rx_buffer, &light_data);
   // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
@@ -124,23 +135,31 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000 + 100000;
   std::string source_address;
   unsigned int source_port;
+  // printf("Waiting to receive sensor data answer.\n");
   int return_code = udp_sockets_[node_id]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
   if (return_code < 0)
   {
     printf("Missed sensor packet from node with id >%i<.\n", node_id);
+    return false;
   }
   else
   {
     if(source_address.compare(foreign_address) == 0)
+    {
       _rx_buffer_length = (uint16_t)return_code;
+      parseSensorData(_rx_buffer);
+      received_sensor_data_[node_id] = _sensor_data;
+      printf("Received data for node %i.\n", node_id);
+      printData();
+    }
     else
+    {
       printf("Missed sensor packet from node with id >%i<. Got package from >%s<.\n", node_id, source_address.c_str());
+      return false;
+    }
   }
 
-  // printf("Waiting to receive light data answer.\n");
-  // _rx_buffer_length = udp_socket_->recv((void*)_rx_buffer, BUFFER_SIZE);
-
-  // printf("Done communicating light data.\n");
+  // printf("Done communicating light data and receiving sensor data.\n");
   return true;
 }
 

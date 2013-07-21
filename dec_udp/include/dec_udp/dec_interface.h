@@ -33,9 +33,24 @@ public:
   DecInterface(const uint8_t num_sockets);
   virtual ~DecInterface() {};
 
+  /*!
+   * @param setup_data
+   */
   void print(const setup_data_t& setup_data);
+  /*!
+   * @param setup_data
+   */
   void print(const sensor_data_t& light_data);
+  /*!
+   * @param setup_data
+   */
   void print(const light_data_t& sensor_data);
+
+  /*!
+   * @param node_id
+   * @return the setup data
+   */
+  setup_data_t getSetupData(const uint8_t node_id);
 
   /*!
    * @param node_id
@@ -50,14 +65,15 @@ public:
    */
   bool sendLightData(const int node_id, const light_data_t& light_data);
 
+  /*!
+   */
+  std::vector<sensor_data_t> received_sensor_data_;
+
 private:
 
   std::vector<boost::shared_ptr<UDPSocket> > udp_sockets_;
-
 };
 
 }
-
-
 
 #endif /* DEC_INTERFACE_H_ */

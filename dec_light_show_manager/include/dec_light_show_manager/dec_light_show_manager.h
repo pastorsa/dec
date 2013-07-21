@@ -17,6 +17,8 @@
 #include <dec_light_show_manager/dec_light_show.h>
 #include <dec_light_show_manager/dec_light_show_factory.h>
 #include <dec_light_show_manager/dec_light_show_stack.h>
+#include <dec_light_show_manager/dec_light_show_simulation.h>
+#include <dec_light_show_manager/dec_light_show_visualization.h>
 
 #include <dec_light_show_msgs/SwitchLightShowStack.h>
 
@@ -31,12 +33,16 @@ public:
   virtual ~DecLightShowManager();
 
   /*!
-   * @return
+   * @return True on success, otherwise False
    */
   bool initialize();
 
+  /*! This runs the manager
+   */
+  void run();
+
   /*!
-   * @return
+   * @return True on success, otherwise False
    */
   bool update();
 
@@ -64,6 +70,8 @@ public:
   bool getLightShowByName(const std::string& name, boost::shared_ptr<DecLightShow>& light_show);
 
 private:
+
+  bool initialized_;
 
   boost::shared_ptr<DecLightShowFactory> light_show_factory_;
   typedef std::tr1::unordered_map<std::string, boost::shared_ptr<DecLightShow> > LightShowMap;
@@ -128,6 +136,15 @@ private:
 
   void debugLightShowList(const std::vector<int>& light_shows);
   void debugLightShowStackList(const std::vector<int>& light_shows);
+
+  bool simulation_mode_;
+  boost::shared_ptr<DecLightShowSimulation> dec_light_show_simulation_;
+  bool copySensorInformationFromStructure();
+  bool copyLightDataToStructure();
+
+  boost::shared_ptr<DecLightShowVisualization> dec_light_show_visualization_;
+
+  void setDefaultStacks();
 
 };
 

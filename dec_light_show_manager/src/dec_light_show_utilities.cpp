@@ -68,6 +68,30 @@ bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
 
 bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
                                    const std::string& key,
+                                   std::vector<float>& f_array)
+{
+  if (!config.hasMember(key))
+    return false;
+
+  XmlRpc::XmlRpcValue f_array_xml = config[key];
+
+  if (f_array_xml.getType() != XmlRpc::XmlRpcValue::TypeArray)
+    return false;
+
+  f_array.clear();
+  for (int i = 0; i < f_array_xml.size(); ++i)
+  {
+    if (f_array_xml[i].getType() != XmlRpc::XmlRpcValue::TypeDouble)
+      return false;
+    double value = static_cast<double>(f_array_xml[i]);
+    f_array.push_back(static_cast<float>(value));
+  }
+
+  return true;
+}
+
+bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
+                                   const std::string& key,
                                    std::vector<double>& d_array)
 {
   if (!config.hasMember(key))

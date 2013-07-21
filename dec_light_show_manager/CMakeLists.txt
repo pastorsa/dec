@@ -33,8 +33,12 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_light_show_manager.cpp
   src/dec_light_show_factory.cpp
   src/dec_light_show_stack.cpp
+  src/dec_light_show_simulation.cpp
+  src/dec_light_show_visualization.cpp
   src/dec_light_show_utilities.cpp
   src/dec_light_show_data.cpp
+  src/dec_components.cpp
+  src/dec_structure.cpp
 )
 target_link_libraries(${PROJECT_NAME} dec_data)
 

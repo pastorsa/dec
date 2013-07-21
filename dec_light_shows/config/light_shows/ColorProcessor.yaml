@@ -1,0 +1,4 @@
+ColorProcessor:
+  type: "dec_light_shows/DecColorProcessor"
+  low_level_color: [0.8, 0.0, 0.0, 0.6] # RGBA
+  high_level_color: [0.1, 0.2, 1.0, 0.9] # RGBA

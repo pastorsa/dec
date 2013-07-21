@@ -6,24 +6,14 @@
 #define _DEC_STRUCTURE_H
 
 static const uint8_t LIGHT_PIN_ORDERING[9] = {0, 1, 14, 15, 16, 24, 25, 26, 27};
-static const uint8_t SENSOR_PIN_ORDERING[3] = {5, 6, 7};
+static const uint8_t SENSOR_PIN_ORDERING[10] = {5, 6, 7, 8, 9, 10, 11, 12, 13, 17};
 
-static const uint8_t NUM_LED_NODES_PER_ARDUINO[1] = {1};
-static const uint8_t NUM_LED_BEAMS_PER_ARDUINO[1] = {1};
-static const uint8_t NUM_LEDS_OF_EACH_LIGHT[2] = {15, 15};
-static const uint8_t NUM_SENSORS_PER_ARDUINO[1] = {2};
+static const uint8_t NUM_SENSORS_PER_TEENSY[1] = {3};
 
-static const uint8_t LIGHT_BEAM_CONNECTIONS[1] = {0};
-static const uint8_t LIGHT_NODE_CONNECTIONS[1] = {0};
-static const uint8_t SENSOR_CONNECTIONS[2] = {0, 0};
-static const uint8_t LIGHT_BEAM_INDEX_COUNTER[1] = {0};
-static const uint8_t LIGHT_NODE_INDEX_COUNTER[1] = {0};
-static const uint8_t SENSOR_INDEX_COUNTER[2] = {0, 1};
+static const uint8_t NUM_BLOCK_LEDS_PER_TEENSY[1] = {11};
 // A value of 255 is assigned to invalidate the entry.
-static const uint8_t ARDUINO_TO_LIGHT_BEAM_MAP[1][1] = {{0}};
-// A value of 255 is assigned to invalidate the entry.
-static const uint8_t ARDUINO_TO_LIGHT_NODE_MAP[1][1] = {{0}};
-// A value of 255 is assigned to invalidate the entry.
-static const uint8_t ARDUINO_TO_SENSOR_MAP[1][1] = {{0}};
+static const uint8_t BLOCK_LEDS_START_INDEX[1][10] = {{0, 21, 43, 0, 21, 0, 21, 43, 0, 10}};
+static const uint8_t NUM_PIXEL_LEDS_PER_TEENSY[1] = {6};
+
 
 #endif // _DEC_STRUCTURE_H

@@ -8,7 +8,15 @@
 #ifndef DEC_SENSOR_PROCESSOR_H_
 #define DEC_SENSOR_PROCESSOR_H_
 
+#include <vector>
+#include <boost/shared_ptr.hpp>
+#include <filters/transfer_function.h>
+
 #include <dec_light_show_manager/dec_light_show.h>
+#include <dec_light_show_manager/dec_data.h>
+
+// local include
+#include <dec_light_shows/dec_circular_buffer.h>
 
 namespace dec_light_shows
 {
@@ -26,7 +34,14 @@ public:
 
 private:
 
-  int build_up_window_size_;
+//  filters::MultiChannelTransferFunctionFilter<float> filter_;
+//  std::vector<float> unfiltered_data_;
+//  std::vector<float> filtered_data_;
+
+//   int num_cycles_to_load_;
+//   int num_cycles_to_unload_;
+//   std::vector<boost::shared_ptr<DecCircularBuffer<dec_light_show_manager::sensor_channel_t> > > load_circular_buffers_;
+//   std::vector<boost::shared_ptr<DecCircularBuffer<dec_light_show_manager::sensor_channel_t> > > unload_circular_buffers_;
 
 };
 

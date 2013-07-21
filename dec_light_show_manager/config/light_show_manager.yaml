@@ -5,9 +5,12 @@ stack_groups:
   - PRE
   - SENSOR
   - LIGHT
+  - COLOR
   - POST
 
 default_light_show_stacks:
-  - StaticPreLightShowStack
+#  - StaticPreLightShowStack
   - SensorProcessorStack
-  - StaticPostLightShowStack
+  - LightProcessorStack
+  - ColorProcessorStack
+#  - StaticPostLightShowStack

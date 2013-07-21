@@ -224,6 +224,13 @@ bool DECProcessor::setLightMarkers()
       {
         ROS_ERROR("Problems sending light data for micro controller with node id >%i<.", n);
       }
+
+      for (unsigned int i=0; i < dec_interface_->received_sensor_data_.size(); ++i)
+      {
+        ROS_INFO("Data: %i is %i", (int)i, (int)dec_interface_->received_sensor_data_[i].sensor_value[0]);
+      }
+
+
     }
   }
 
