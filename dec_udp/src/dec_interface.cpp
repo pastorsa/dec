@@ -36,14 +36,14 @@ DecInterface::DecInterface(const uint8_t num_sockets)
 void DecInterface::print(const setup_data_t& setup_data)
 {
   printf("Setup Data:\n");
-  printf(" Number of block LEDs is >%u<.\n", _setup_data.num_block_leds);
-  for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
-    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and ends at >%u<.\n", i,
-           _setup_data.block_leds[i].pin, _setup_data.block_leds[i].start_index, _setup_data.block_leds[i].end_index);
-  printf(" Number of pixel LEDs is >%u<.\n", _setup_data.num_pixel_leds);
-  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
-    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and ends at >%u<.\n", i,
-           _setup_data.pixel_leds[i].pin, _setup_data.pixel_leds[i].start_index, _setup_data.pixel_leds[i].end_index);
+  printf(" Number of block LEDs is >%u<.\n", setup_data.num_block_leds);
+  for (uint8_t i = 0; i < setup_data.num_block_leds; ++i)
+    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+           setup_data.block_leds[i].pin, setup_data.block_leds[i].index, setup_data.block_leds[i].num_leds);
+  printf(" Number of pixel LEDs is >%u<.\n", setup_data.num_pixel_leds);
+  for (uint8_t i = 0; i < setup_data.num_pixel_leds; ++i)
+    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+           setup_data.pixel_leds[i].pin, setup_data.pixel_leds[i].index, setup_data.pixel_leds[i].num_leds);
   printf(" Number of sensors is >%u<.\n", setup_data.num_sensors);
   for (uint8_t i = 0; i < setup_data.num_sensors; ++i)
     printf("  Sensor >%u< is at pin >%u<.\n", i, setup_data.sensors[i].pin);

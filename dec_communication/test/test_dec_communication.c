@@ -15,15 +15,16 @@ void printSetupData()
 {
   printData();
 
-//  printf("Setup Data:\n");
-//  printf(" Number of LED nodes is >%u<\n", _setup_data.num_led_nodes);
-//  for (uint8_t i = 0; i < _setup_data.num_led_nodes; ++i)
-//    printf("  Node >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_nodes[i].num_leds, _setup_data.led_nodes[i].pin);
-//  printf(" Number of LED beams is >%u<\n", _setup_data.num_led_beams);
-//  for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
-//    printf("  Beam >%u< : #LEDs is >%u< at pin >%u<.\n", i, _setup_data.led_beams[i].num_leds, _setup_data.led_beams[i].pin);
-
-  printf(" Number of sensors is >%u<\n", _setup_data.num_sensors);
+  printf("Setup Data:\n");
+  printf(" Number of block LEDs is >%u<.\n", _setup_data.num_block_leds);
+  for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
+    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+           _setup_data.block_leds[i].pin, _setup_data.block_leds[i].index, _setup_data.block_leds[i].num_leds);
+  printf(" Number of pixel LEDs is >%u<.\n", _setup_data.num_pixel_leds);
+  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
+    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+           _setup_data.pixel_leds[i].pin, _setup_data.pixel_leds[i].index, _setup_data.pixel_leds[i].num_leds);
+  printf(" Number of sensors is >%u<.\n", _setup_data.num_sensors);
   for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
     printf("  Sensor >%u< is at pin >%u<.\n", i, _setup_data.sensors[i].pin);
   printf("====================================================================\n");
@@ -42,9 +43,9 @@ void printData()
 int main()
 {
   resetData();
-  printSetupData();
+  // printSetupData();
 
-  uint8_t node_id = 1;
+  uint8_t node_id = 0;
   loadSetupData(node_id);
 
   generateSetupData(_rx_buffer);
@@ -56,7 +57,7 @@ int main()
   parseSetupData(_rx_buffer);
   printSetupData();
 
-  node_id = 0;
+  node_id = 1;
   loadSetupData(node_id);
   generateSetupData(_rx_buffer);
 

@@ -39,8 +39,8 @@ public:
 
 private:
 
-  double getMinimumDistance(tf::Point point, std::vector<std::pair<int, int> > beams);
-  double getDistance(tf::Point point, std::pair<int, int> beam);
+  double getMinimumDistance(tf::Point point, std::vector<std::pair<unsigned int, unsigned int> > beams);
+  double getDistance(tf::Point point, std::pair<unsigned int, unsigned int> beam);
 
   dec_world_state::WorldState world_state_;
   int number_of_simulated_objects_;

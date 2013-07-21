@@ -1,391 +1,984 @@
 # This is the index into node_positions set
 # to determine the node which sets the zero coordinate of the structure
-offset_node_index: 17
+offset_node_index: 4
 
 # List of all nodes in the structure
 # Values correspond to x,y,z in meters
+
 node_positions:
-  - position: [5.416697, 3.93552, 1.21057]
-  - position: [4.675475, 0.08346, 1.21057]
-  - position: [8.382068, 1.367573, 1.21057]
-  - position: [7.640729, 0.083573, 1.210573]
-  - position: [3.934168, 1.367478, 1.210573]
-  - position: [6.899343, 3.935502, 1.210573]
-  - position: [3.934067, 3.935517, 1.210594]
-  - position: [8.382077, 3.935593, 1.210594]
-  - position: [6.158123, 0.083468, 1.210597]
-  - position: [7.640722, 2.651603, 1.210597]
-  - position: [6.899428, -1.200548, 1.210597]
-  - position: [4.675355, 2.651495, 1.210599]
-  - position: [9.123368, 2.651563, 1.210603]
-  - position: [5.416789, -1.200506, 1.210603]
-  - position: [3.192699, 2.651549, 1.210605]
-  - position: [5.416782, 1.367488, 1.210624]
-  - position: [6.899413, 1.367549, 1.210624]
-  - position: [6.158045, 2.651515, 1.210624]
-  - position: [3.192794, 0.939451, 2.421154]
-  - position: [6.899348, 4.791563, 2.421154]
-  - position: [8.382098, -0.344462, 2.421154]
-  - position: [7.640731, 3.507586, 2.421159]
-  - position: [6.89943, -0.344524, 2.421159]
-  - position: [3.934056, 2.223516, 2.421159]
-  - position: [5.416708, 4.791548, 2.421159]
-  - position: [9.123405, 0.939549, 2.421159]
-  - position: [3.934127, -0.344545, 2.421159]
-  - position: [3.934071, 4.791549, 2.42116]
-  - position: [8.382079, 4.791622, 2.42116]
-  - position: [4.675486, 0.939478, 2.421162]
-  - position: [6.158025, 3.507502, 2.421162]
-  - position: [7.640729, 0.939573, 2.421162]
-  - position: [2.451349, 2.223533, 2.421163]
-  - position: [8.382046, 2.22361, 2.421165]
-  - position: [4.675354, 3.507502, 2.421165]
-  - position: [5.416817, -0.344533, 2.421165]
-  - position: [4.675454, -1.628508, 2.421169]
-  - position: [3.192719, 3.507508, 2.421171]
-  - position: [9.123365, 3.507607, 2.421171]
-  - position: [9.864709, 2.22355, 2.421177]
-  - position: [6.158106, 0.939505, 2.421178]
-  - position: [6.899384, 2.223557, 2.421179]
-  - position: [5.416724, 2.223496, 2.421182]
-  - position: [7.640755, -1.628548, 2.421182]
-  - position: [6.158124, -1.628532, 2.421187]
-  - position: [6.158029, 4.363545, 3.631738]
-  - position: [3.934128, 0.51146, 3.631738]
-  - position: [8.382083, 0.511552, 3.631761]
-  - position: [6.158068, 1.795516, 3.631764]
-  - position: [7.640774, -0.772525, 3.631765]
-  - position: [3.192735, 1.795492, 3.631765]
-  - position: [7.640722, 4.363598, 3.631765]
-  - position: [6.899397, 3.079564, 3.631765]
-  - position: [4.675403, 1.795503, 3.631765]
-  - position: [6.89943, 0.511498, 3.631765]
-  - position: [5.416701, 3.079489, 3.631768]
-  - position: [5.416816, 0.511487, 3.631768]
-  - position: [7.640713, 1.795588, 3.631768]
-  - position: [4.675374, 4.363514, 3.63177]
-  - position: [4.675482, -0.772533, 3.63177]
-  - position: [9.123375, 1.795584, 3.63177]
-  - position: [2.451422, 3.079547, 3.631775]
-  - position: [9.123389, 4.36357, 3.631775]
-  - position: [3.192759, 4.363559, 3.631775]
-  - position: [9.864706, 3.079547, 3.631775]
-  - position: [6.158135, -0.772503, 3.631779]
-  - position: [8.382018, 3.079599, 3.631779]
-  - position: [3.934058, 3.079487, 3.631779]
-  - position: [6.158077, 2.651511, 4.842356]
-  - position: [9.864722, 1.367563, 4.842356]
-  - position: [4.67538, 5.21954, 4.842356]
-  - position: [3.934142, -1.20055, 4.842356]
-  - position: [5.41676, 1.367507, 4.842356]
-  - position: [6.899396, 1.367521, 4.842364]
-  - position: [9.123418, 0.083556, 4.84237]
-  - position: [7.640767, 0.083518, 4.84238]
-  - position: [8.382049, 1.367566, 4.842383]
-  - position: [6.899379, 3.935568, 4.842386]
-  - position: [4.675484, 0.083488, 4.842386]
-  - position: [5.416719, 3.935499, 4.842386]
-  - position: [3.934094, 1.367475, 4.842386]
-  - position: [7.640722, 5.219606, 4.842417]
-  - position: [2.451413, 1.367477, 4.842417]
-  - position: [8.382109, -1.200531, 4.842417]
-  - position: [6.158039, 0.939514, 6.052924]
-  - position: [5.416787, 2.223533, 6.052924]
-  - position: [6.899406, 2.223466, 6.052924]
-  - position: [6.158047, 3.507535, 6.052931]
-  - position: [4.675445, 0.939471, 6.052931]
-  - position: [9.123401, 0.939553, 6.052937]
-  - position: [3.934134, -0.344543, 6.052937]
-  - position: [5.416708, 4.791542, 6.052937]
-  - position: [7.640751, 0.939549, 6.052943]
-  - position: [8.382085, -0.344466, 6.052951]
-  - position: [3.1928, 0.939466, 6.052951]
-  - position: [6.899359, 4.791553, 6.052951]
+  - position: [6096.0,-880.0,0.0]
+  - position: [5334.0,440.0,0.0]
+  - position: [6858.0,440.0,0.0]
+  - position: [4572.0,1760.0,0.0]
+  - position: [6096.0,1760.0,0.0]
+  - position: [7620.0,1760.0,0.0]
+  - position: [3810.0,3080.0,0.0]
+  - position: [5334.0,3080.0,0.0]
+  - position: [6858.0,3080.0,0.0]
+  - position: [8382.0,3080.0,0.0]
+  - position: [5334.0,-1320.0,1244.0]
+  - position: [6858.0,-1320.0,1244.0]
+  - position: [4572.0,0.0,1244.0]
+  - position: [6096.0,0.0,1244.0]
+  - position: [7620.0,0.0,1244.0]
+  - position: [3810.0,1320.0,1244.0]
+  - position: [5334.0,1320.0,1244.0]
+  - position: [6858.0,1320.0,1244.0]
+  - position: [8382.0,1320.0,1244.0]
+  - position: [3048.0,2640.0,1244.0]
+  - position: [4572.0,2640.0,1244.0]
+  - position: [6096.0,2640.0,1244.0]
+  - position: [7620.0,2640.0,1244.0]
+  - position: [9144.0,2640.0,1244.0]
+  - position: [3810.0,3959.0,1244.0]
+  - position: [5334.0,3959.0,1244.0]
+  - position: [6858.0,3959.0,1244.0]
+  - position: [8382.0,3959.0,1244.0]
+  - position: [4572.0,-1760.0,2489.0]
+  - position: [6096.0,-1760.0,2489.0]
+  - position: [7620.0,-1760.0,2489.0]
+  - position: [3810.0,-440.0,2489.0]
+  - position: [5334.0,-440.0,2489.0]
+  - position: [6858.0,-440.0,2489.0]
+  - position: [8382.0,-440.0,2489.0]
+  - position: [3048.0,880.0,2489.0]
+  - position: [4572.0,880.0,2489.0]
+  - position: [6096.0,880.0,2489.0]
+  - position: [7620.0,880.0,2489.0]
+  - position: [9144.0,880.0,2489.0]
+  - position: [2286.0,2200.0,2489.0]
+  - position: [3810.0,2200.0,2489.0]
+  - position: [5334.0,2200.0,2489.0]
+  - position: [6858.0,2200.0,2489.0]
+  - position: [8382.0,2200.0,2489.0]
+  - position: [9906.0,2200.0,2489.0]
+  - position: [3048.0,3519.0,2489.0]
+  - position: [4572.0,3519.0,2489.0]
+  - position: [6096.0,3519.0,2489.0]
+  - position: [7620.0,3519.0,2489.0]
+  - position: [9144.0,3519.0,2489.0]
+  - position: [3810.0,4839.0,2489.0]
+  - position: [5334.0,4839.0,2489.0]
+  - position: [6858.0,4839.0,2489.0]
+  - position: [8382.0,4839.0,2489.0]
+  - position: [3810.0,-2200.0,3733.0]
+  - position: [5334.0,-2200.0,3733.0]
+  - position: [6858.0,-2200.0,3733.0]
+  - position: [8382.0,-2200.0,3733.0]
+  - position: [3048.0,-880.0,3733.0]
+  - position: [4572.0,-880.0,3733.0]
+  - position: [6096.0,-880.0,3733.0]
+  - position: [7620.0,-880.0,3733.0]
+  - position: [9144.0,-880.0,3733.0]
+  - position: [2286.0,440.0,3733.0]
+  - position: [3810.0,440.0,3733.0]
+  - position: [5334.0,440.0,3733.0]
+  - position: [6858.0,440.0,3733.0]
+  - position: [8382.0,440.0,3733.0]
+  - position: [9906.0,440.0,3733.0]
+  - position: [1524.0,1760.0,3733.0]
+  - position: [3048.0,1760.0,3733.0]
+  - position: [4572.0,1760.0,3733.0]
+  - position: [6096.0,1760.0,3733.0]
+  - position: [7620.0,1760.0,3733.0]
+  - position: [9144.0,1760.0,3733.0]
+  - position: [10668.0,1760.0,3733.0]
+  - position: [2286.0,3080.0,3733.0]
+  - position: [3810.0,3080.0,3733.0]
+  - position: [5334.0,3080.0,3733.0]
+  - position: [6858.0,3080.0,3733.0]
+  - position: [8382.0,3080.0,3733.0]
+  - position: [9906.0,3080.0,3733.0]
+  - position: [3048.0,4399.0,3733.0]
+  - position: [4572.0,4399.0,3733.0]
+  - position: [6096.0,4399.0,3733.0]
+  - position: [7620.0,4399.0,3733.0]
+  - position: [9144.0,4399.0,3733.0]
+  - position: [3810.0,5719.0,3733.0]
+  - position: [5334.0,5719.0,3733.0]
+  - position: [6858.0,5719.0,3733.0]
+  - position: [8382.0,5719.0,3733.0]
+  - position: [3810.0,-1320.0,4977.0]
+  - position: [8382.0,-1320.0,4977.0]
+  - position: [3048.0,0.0,4977.0]
+  - position: [4572.0,0.0,4977.0]
+  - position: [7620.0,0.0,4977.0]
+  - position: [9144.0,0.0,4977.0]
+  - position: [2286.0,1320.0,4977.0]
+  - position: [3810.0,1320.0,4977.0]
+  - position: [5334.0,1320.0,4977.0]
+  - position: [6858.0,1320.0,4977.0]
+  - position: [8382.0,1320.0,4977.0]
+  - position: [9906.0,1320.0,4977.0]
+  - position: [6096.0,2640.0,4977.0]
+  - position: [5334.0,3959.0,4977.0]
+  - position: [6858.0,3959.0,4977.0]
+  - position: [4572.0,5279.0,4977.0]
+  - position: [6096.0,5279.0,4977.0]
+  - position: [7620.0,5279.0,4977.0]
+  - position: [3810.0,-440.0,6222.0]
+  - position: [8382.0,-440.0,6222.0]
+  - position: [3048.0,880.0,6222.0]
+  - position: [4572.0,880.0,6222.0]
+  - position: [6096.0,880.0,6222.0]
+  - position: [7620.0,880.0,6222.0]
+  - position: [9144.0,880.0,6222.0]
+  - position: [5334.0,2200.0,6222.0]
+  - position: [6858.0,2200.0,6222.0]
+  - position: [6096.0,3519.0,6222.0]
+  - position: [5334.0,4839.0,6222.0]
+  - position: [6858.0,4839.0,6222.0]
+  - position: [3810.0,440.0,7466.0]
+  - position: [5334.0,440.0,7466.0]
+  - position: [6858.0,440.0,7466.0]
+  - position: [8382.0,440.0,7466.0]
+  - position: [4572.0,1760.0,7466.0]
+  - position: [7620.0,1760.0,7466.0]
+  - position: [5334.0,3080.0,7466.0]
+  - position: [6858.0,3080.0,7466.0]
+  - position: [6096.0,4399.0,7466.0]
 
 # List of all beams in the structure
 # List correspond to pairs of indices of nodes
 # nodes: [0, 1] constructs a beam from node 0 to node 1
 beams:
-  - nodes: [61,32]
-  - nodes: [32,50]
-  - nodes: [37,61]
-  - nodes: [50,82]
-  - nodes: [37,14]
-  - nodes: [63,37]
-  - nodes: [18,50]
-  - nodes: [14,23]
-  - nodes: [50,23]
-  - nodes: [67,37]
-  - nodes: [6,37]
-  - nodes: [27,63]
-  - nodes: [80,50]
-  - nodes: [18,46]
-  - nodes: [80,94]
-  - nodes: [18,4]
-  - nodes: [67,23]
-  - nodes: [27,6]
-  - nodes: [26,46]
-  - nodes: [4,23]
-  - nodes: [23,11]
-  - nodes: [23,53]
-  - nodes: [58,27]
-  - nodes: [34,6]
-  - nodes: [67,34]
-  - nodes: [53,80]
-  - nodes: [26,59]
-  - nodes: [88,80]
-  - nodes: [90,78]
-  - nodes: [71,59]
-  - nodes: [26,1]
-  - nodes: [4,29]
-  - nodes: [46,29]
-  - nodes: [34,58]
-  - nodes: [11,34]
-  - nodes: [70,58]
-  - nodes: [78,88]
-  - nodes: [1,29]
-  - nodes: [59,36]
-  - nodes: [59,78]
-  - nodes: [29,53]
-  - nodes: [53,42]
-  - nodes: [55,34]
-  - nodes: [0,34]
-  - nodes: [58,79]
-  - nodes: [24,58]
-  - nodes: [42,11]
-  - nodes: [88,72]
-  - nodes: [72,53]
-  - nodes: [29,15]
-  - nodes: [36,13]
-  - nodes: [1,35]
-  - nodes: [78,56]
-  - nodes: [35,59]
-  - nodes: [29,56]
-  - nodes: [42,55]
-  - nodes: [24,0]
-  - nodes: [91,79]
-  - nodes: [79,55]
-  - nodes: [85,72]
-  - nodes: [15,42]
-  - nodes: [56,72]
-  - nodes: [35,13]
-  - nodes: [56,35]
-  - nodes: [0,30]
-  - nodes: [30,55]
-  - nodes: [79,87]
-  - nodes: [72,84]
-  - nodes: [24,45]
-  - nodes: [17,42]
-  - nodes: [55,68]
-  - nodes: [72,48]
-  - nodes: [48,42]
-  - nodes: [13,44]
-  - nodes: [15,40]
-  - nodes: [68,85]
-  - nodes: [65,35]
-  - nodes: [8,35]
-  - nodes: [40,56]
-  - nodes: [45,30]
-  - nodes: [30,17]
-  - nodes: [8,40]
-  - nodes: [40,48]
-  - nodes: [48,68]
-  - nodes: [68,87]
-  - nodes: [65,44]
-  - nodes: [5,30]
-  - nodes: [30,52]
-  - nodes: [19,45]
-  - nodes: [87,77]
-  - nodes: [68,52]
-  - nodes: [84,73]
-  - nodes: [17,41]
-  - nodes: [48,41]
-  - nodes: [86,68]
-  - nodes: [44,10]
-  - nodes: [73,48]
-  - nodes: [16,40]
-  - nodes: [65,22]
-  - nodes: [54,40]
-  - nodes: [22,8]
-  - nodes: [19,5]
-  - nodes: [77,95]
-  - nodes: [52,77]
-  - nodes: [73,86]
-  - nodes: [16,41]
-  - nodes: [52,41]
-  - nodes: [73,54]
-  - nodes: [22,54]
-  - nodes: [10,22]
-  - nodes: [5,21]
-  - nodes: [19,51]
-  - nodes: [41,57]
-  - nodes: [77,51]
-  - nodes: [41,9]
-  - nodes: [57,73]
-  - nodes: [31,54]
-  - nodes: [3,22]
-  - nodes: [92,73]
-  - nodes: [31,16]
-  - nodes: [49,22]
-  - nodes: [21,52]
-  - nodes: [10,43]
-  - nodes: [54,75]
-  - nodes: [51,81]
-  - nodes: [31,57]
-  - nodes: [3,31]
-  - nodes: [43,49]
-  - nodes: [92,75]
-  - nodes: [21,9]
-  - nodes: [51,21]
-  - nodes: [75,49]
-  - nodes: [66,21]
-  - nodes: [9,33]
-  - nodes: [76,57]
-  - nodes: [57,33]
-  - nodes: [47,31]
-  - nodes: [20,3]
-  - nodes: [2,31]
-  - nodes: [76,92]
-  - nodes: [47,75]
-  - nodes: [75,93]
+  - nodes: [0,1]
+  - nodes: [0,2]
+  - nodes: [1,2]
+  - nodes: [1,3]
+  - nodes: [1,4]
+  - nodes: [2,4]
+  - nodes: [2,5]
+  - nodes: [3,4]
+  - nodes: [4,5]
+  - nodes: [3,6]
+  - nodes: [3,7]
+  - nodes: [4,7]
+  - nodes: [4,8]
+  - nodes: [5,8]
+  - nodes: [5,9]
+  - nodes: [6,7]
+  - nodes: [7,8]
+  - nodes: [8,9]
+  - nodes: [0,10]
+  - nodes: [0,11]
+  - nodes: [0,13]
+  - nodes: [1,12]
+  - nodes: [1,13]
+  - nodes: [2,13]
+  - nodes: [2,14]
+  - nodes: [1,16]
+  - nodes: [2,17]
+  - nodes: [3,15]
+  - nodes: [3,16]
+  - nodes: [5,17]
+  - nodes: [5,18]
+  - nodes: [3,20]
+  - nodes: [5,22]
+  - nodes: [6,19]
+  - nodes: [6,20]
+  - nodes: [7,20]
   - nodes: [7,21]
-  - nodes: [49,83]
-  - nodes: [20,49]
-  - nodes: [28,51]
-  - nodes: [66,33]
-  - nodes: [28,7]
-  - nodes: [2,33]
-  - nodes: [47,76]
+  - nodes: [8,21]
+  - nodes: [8,22]
+  - nodes: [9,22]
+  - nodes: [9,23]
+  - nodes: [6,24]
+  - nodes: [7,25]
+  - nodes: [8,26]
+  - nodes: [9,27]
+  - nodes: [10,11]
+  - nodes: [10,12]
+  - nodes: [10,13]
+  - nodes: [11,13]
+  - nodes: [11,14]
+  - nodes: [12,13]
+  - nodes: [13,14]
+  - nodes: [12,15]
+  - nodes: [12,16]
+  - nodes: [13,16]
+  - nodes: [13,17]
+  - nodes: [14,17]
+  - nodes: [14,18]
+  - nodes: [15,16]
+  - nodes: [17,18]
+  - nodes: [15,19]
+  - nodes: [15,20]
+  - nodes: [16,20]
+  - nodes: [17,22]
+  - nodes: [18,22]
+  - nodes: [18,23]
+  - nodes: [19,20]
+  - nodes: [20,21]
+  - nodes: [21,22]
+  - nodes: [22,23]
+  - nodes: [19,24]
+  - nodes: [20,24]
+  - nodes: [20,25]
+  - nodes: [21,25]
+  - nodes: [21,26]
+  - nodes: [22,26]
+  - nodes: [22,27]
+  - nodes: [23,27]
+  - nodes: [24,25]
+  - nodes: [25,26]
+  - nodes: [26,27]
+  - nodes: [10,28]
+  - nodes: [10,29]
+  - nodes: [11,29]
+  - nodes: [11,30]
+  - nodes: [10,32]
+  - nodes: [11,33]
+  - nodes: [12,31]
+  - nodes: [12,32]
+  - nodes: [13,32]
+  - nodes: [13,33]
+  - nodes: [14,33]
+  - nodes: [14,34]
+  - nodes: [12,36]
+  - nodes: [13,37]
+  - nodes: [14,38]
+  - nodes: [15,35]
+  - nodes: [15,36]
+  - nodes: [16,36]
+  - nodes: [16,37]
+  - nodes: [17,37]
+  - nodes: [17,38]
+  - nodes: [18,38]
+  - nodes: [18,39]
+  - nodes: [15,41]
+  - nodes: [16,42]
+  - nodes: [17,43]
+  - nodes: [18,44]
+  - nodes: [19,40]
+  - nodes: [19,41]
+  - nodes: [20,41]
+  - nodes: [20,42]
+  - nodes: [21,42]
+  - nodes: [21,43]
+  - nodes: [22,43]
+  - nodes: [22,44]
+  - nodes: [23,44]
+  - nodes: [23,45]
+  - nodes: [19,46]
   - nodes: [20,47]
-  - nodes: [66,38]
-  - nodes: [33,12]
-  - nodes: [60,76]
-  - nodes: [33,60]
-  - nodes: [62,28]
-  - nodes: [38,7]
-  - nodes: [89,76]
-  - nodes: [25,2]
+  - nodes: [21,48]
+  - nodes: [22,49]
+  - nodes: [23,50]
+  - nodes: [24,46]
+  - nodes: [24,47]
   - nodes: [25,47]
-  - nodes: [74,47]
-  - nodes: [38,62]
-  - nodes: [12,38]
-  - nodes: [25,60]
-  - nodes: [60,39]
-  - nodes: [64,38]
-  - nodes: [39,12]
-  - nodes: [69,60]
-  - nodes: [39,64]
+  - nodes: [25,48]
+  - nodes: [26,48]
+  - nodes: [26,49]
+  - nodes: [27,49]
+  - nodes: [27,50]
+  - nodes: [24,51]
+  - nodes: [25,52]
+  - nodes: [26,53]
+  - nodes: [27,54]
+  - nodes: [28,29]
+  - nodes: [29,30]
+  - nodes: [28,31]
+  - nodes: [28,32]
+  - nodes: [29,32]
+  - nodes: [29,33]
+  - nodes: [30,33]
+  - nodes: [30,34]
+  - nodes: [31,32]
+  - nodes: [32,33]
+  - nodes: [33,34]
+  - nodes: [31,35]
+  - nodes: [31,36]
+  - nodes: [32,36]
+  - nodes: [32,37]
+  - nodes: [33,37]
+  - nodes: [33,38]
+  - nodes: [34,38]
+  - nodes: [34,39]
+  - nodes: [35,36]
+  - nodes: [36,37]
+  - nodes: [37,38]
+  - nodes: [38,39]
+  - nodes: [35,40]
+  - nodes: [35,41]
+  - nodes: [36,41]
+  - nodes: [36,42]
+  - nodes: [37,42]
+  - nodes: [37,43]
+  - nodes: [38,43]
+  - nodes: [38,44]
+  - nodes: [39,44]
+  - nodes: [39,45]
+  - nodes: [40,41]
+  - nodes: [41,42]
+  - nodes: [42,43]
+  - nodes: [43,44]
+  - nodes: [44,45]
+  - nodes: [40,46]
+  - nodes: [41,46]
+  - nodes: [41,47]
+  - nodes: [42,47]
+  - nodes: [42,48]
+  - nodes: [43,48]
+  - nodes: [43,49]
+  - nodes: [44,49]
+  - nodes: [44,50]
+  - nodes: [45,50]
+  - nodes: [46,47]
+  - nodes: [47,48]
+  - nodes: [48,49]
+  - nodes: [49,50]
+  - nodes: [46,51]
+  - nodes: [47,51]
+  - nodes: [47,52]
+  - nodes: [48,52]
+  - nodes: [48,53]
+  - nodes: [49,53]
+  - nodes: [49,54]
+  - nodes: [50,54]
+  - nodes: [51,52]
+  - nodes: [52,53]
+  - nodes: [53,54]
+  - nodes: [28,55]
+  - nodes: [28,56]
+  - nodes: [29,56]
+  - nodes: [29,57]
+  - nodes: [30,57]
+  - nodes: [30,58]
+  - nodes: [28,60]
+  - nodes: [29,61]
+  - nodes: [30,62]
+  - nodes: [31,59]
+  - nodes: [31,60]
+  - nodes: [32,60]
+  - nodes: [32,61]
+  - nodes: [33,61]
+  - nodes: [33,62]
+  - nodes: [34,62]
+  - nodes: [34,63]
+  - nodes: [31,65]
+  - nodes: [32,66]
+  - nodes: [33,67]
+  - nodes: [34,68]
+  - nodes: [35,64]
+  - nodes: [35,65]
+  - nodes: [36,65]
+  - nodes: [36,66]
+  - nodes: [37,66]
+  - nodes: [37,67]
+  - nodes: [38,67]
+  - nodes: [38,68]
+  - nodes: [39,68]
+  - nodes: [39,69]
+  - nodes: [35,71]
+  - nodes: [36,72]
+  - nodes: [37,73]
+  - nodes: [38,74]
+  - nodes: [39,75]
+  - nodes: [40,70]
+  - nodes: [40,71]
+  - nodes: [41,71]
+  - nodes: [41,72]
+  - nodes: [42,72]
+  - nodes: [42,73]
+  - nodes: [43,73]
+  - nodes: [43,74]
+  - nodes: [44,74]
+  - nodes: [44,75]
+  - nodes: [45,75]
+  - nodes: [45,76]
+  - nodes: [40,77]
+  - nodes: [41,78]
+  - nodes: [42,79]
+  - nodes: [43,80]
+  - nodes: [44,81]
+  - nodes: [45,82]
+  - nodes: [46,77]
+  - nodes: [46,78]
+  - nodes: [47,78]
+  - nodes: [47,79]
+  - nodes: [48,79]
+  - nodes: [48,80]
+  - nodes: [49,80]
+  - nodes: [49,81]
+  - nodes: [50,81]
+  - nodes: [50,82]
+  - nodes: [46,83]
+  - nodes: [47,84]
+  - nodes: [48,85]
+  - nodes: [49,86]
+  - nodes: [50,87]
+  - nodes: [51,83]
+  - nodes: [51,84]
+  - nodes: [52,84]
+  - nodes: [52,85]
+  - nodes: [53,85]
+  - nodes: [53,86]
+  - nodes: [54,86]
+  - nodes: [54,87]
+  - nodes: [51,88]
+  - nodes: [52,89]
+  - nodes: [53,90]
+  - nodes: [54,91]
+  - nodes: [55,56]
+  - nodes: [56,57]
+  - nodes: [57,58]
+  - nodes: [55,59]
+  - nodes: [55,60]
+  - nodes: [56,60]
+  - nodes: [56,61]
+  - nodes: [57,61]
+  - nodes: [57,62]
+  - nodes: [58,62]
+  - nodes: [58,63]
+  - nodes: [59,60]
+  - nodes: [60,61]
+  - nodes: [61,62]
+  - nodes: [62,63]
+  - nodes: [59,64]
+  - nodes: [59,65]
+  - nodes: [60,65]
+  - nodes: [60,66]
+  - nodes: [61,66]
+  - nodes: [61,67]
+  - nodes: [62,67]
+  - nodes: [62,68]
+  - nodes: [63,68]
+  - nodes: [63,69]
+  - nodes: [64,65]
+  - nodes: [65,66]
+  - nodes: [66,67]
+  - nodes: [67,68]
+  - nodes: [68,69]
+  - nodes: [64,70]
+  - nodes: [64,71]
+  - nodes: [65,71]
+  - nodes: [65,72]
+  - nodes: [66,72]
+  - nodes: [66,73]
+  - nodes: [67,73]
+  - nodes: [67,74]
+  - nodes: [68,74]
+  - nodes: [68,75]
+  - nodes: [69,75]
+  - nodes: [69,76]
+  - nodes: [70,71]
+  - nodes: [71,72]
+  - nodes: [72,73]
+  - nodes: [73,74]
+  - nodes: [74,75]
+  - nodes: [75,76]
+  - nodes: [70,77]
+  - nodes: [71,77]
+  - nodes: [71,78]
+  - nodes: [72,78]
+  - nodes: [72,79]
+  - nodes: [73,79]
+  - nodes: [73,80]
+  - nodes: [74,80]
+  - nodes: [74,81]
+  - nodes: [75,81]
+  - nodes: [75,82]
+  - nodes: [76,82]
+  - nodes: [77,78]
+  - nodes: [78,79]
+  - nodes: [79,80]
+  - nodes: [80,81]
+  - nodes: [81,82]
+  - nodes: [77,83]
+  - nodes: [78,83]
+  - nodes: [78,84]
+  - nodes: [79,84]
+  - nodes: [79,85]
+  - nodes: [80,85]
+  - nodes: [80,86]
+  - nodes: [81,86]
+  - nodes: [81,87]
+  - nodes: [82,87]
+  - nodes: [83,84]
+  - nodes: [84,85]
+  - nodes: [85,86]
+  - nodes: [86,87]
+  - nodes: [83,88]
+  - nodes: [84,88]
+  - nodes: [84,89]
+  - nodes: [85,89]
+  - nodes: [85,90]
+  - nodes: [86,90]
+  - nodes: [86,91]
+  - nodes: [87,91]
+  - nodes: [88,89]
+  - nodes: [89,90]
+  - nodes: [90,91]
+  - nodes: [55,92]
+  - nodes: [58,93]
+  - nodes: [59,92]
+  - nodes: [60,92]
+  - nodes: [62,93]
+  - nodes: [63,93]
+  - nodes: [59,94]
+  - nodes: [60,95]
+  - nodes: [62,96]
+  - nodes: [63,97]
+  - nodes: [64,94]
+  - nodes: [65,94]
+  - nodes: [65,95]
+  - nodes: [66,95]
+  - nodes: [67,96]
+  - nodes: [68,96]
+  - nodes: [68,97]
+  - nodes: [69,97]
+  - nodes: [64,98]
+  - nodes: [65,99]
+  - nodes: [66,100]
+  - nodes: [67,101]
+  - nodes: [68,102]
+  - nodes: [69,103]
+  - nodes: [70,98]
+  - nodes: [71,98]
+  - nodes: [71,99]
+  - nodes: [72,99]
+  - nodes: [72,100]
+  - nodes: [73,100]
+  - nodes: [73,101]
+  - nodes: [74,101]
+  - nodes: [74,102]
+  - nodes: [75,102]
+  - nodes: [75,103]
+  - nodes: [76,103]
+  - nodes: [73,104]
+  - nodes: [79,104]
+  - nodes: [80,104]
+  - nodes: [79,105]
+  - nodes: [80,106]
+  - nodes: [84,105]
+  - nodes: [85,105]
+  - nodes: [85,106]
+  - nodes: [86,106]
+  - nodes: [84,107]
+  - nodes: [85,108]
+  - nodes: [86,109]
+  - nodes: [88,107]
+  - nodes: [89,107]
+  - nodes: [89,108]
+  - nodes: [90,108]
+  - nodes: [90,109]
+  - nodes: [91,109]
+  - nodes: [92,94]
+  - nodes: [92,95]
+  - nodes: [93,96]
+  - nodes: [93,97]
+  - nodes: [94,95]
+  - nodes: [96,97]
+  - nodes: [94,98]
+  - nodes: [94,99]
+  - nodes: [95,99]
+  - nodes: [95,100]
+  - nodes: [96,101]
+  - nodes: [96,102]
+  - nodes: [97,102]
+  - nodes: [97,103]
+  - nodes: [98,99]
+  - nodes: [99,100]
+  - nodes: [100,101]
+  - nodes: [101,102]
+  - nodes: [102,103]
+  - nodes: [100,104]
+  - nodes: [101,104]
+  - nodes: [104,105]
+  - nodes: [104,106]
+  - nodes: [105,106]
+  - nodes: [105,107]
+  - nodes: [105,108]
+  - nodes: [106,108]
+  - nodes: [106,109]
+  - nodes: [107,108]
+  - nodes: [108,109]
+  - nodes: [92,110]
+  - nodes: [93,111]
+  - nodes: [94,110]
+  - nodes: [95,110]
+  - nodes: [96,111]
+  - nodes: [97,111]
+  - nodes: [94,112]
+  - nodes: [95,113]
+  - nodes: [96,115]
+  - nodes: [97,116]
+  - nodes: [98,112]
+  - nodes: [99,112]
+  - nodes: [99,113]
+  - nodes: [100,113]
+  - nodes: [100,114]
+  - nodes: [101,114]
+  - nodes: [101,115]
+  - nodes: [102,115]
+  - nodes: [102,116]
+  - nodes: [103,116]
+  - nodes: [100,117]
+  - nodes: [101,118]
+  - nodes: [104,117]
+  - nodes: [104,118]
+  - nodes: [104,119]
+  - nodes: [105,119]
+  - nodes: [106,119]
+  - nodes: [105,120]
+  - nodes: [106,121]
+  - nodes: [107,120]
+  - nodes: [108,120]
+  - nodes: [108,121]
+  - nodes: [109,121]
+  - nodes: [110,112]
+  - nodes: [110,113]
+  - nodes: [111,115]
+  - nodes: [111,116]
+  - nodes: [112,113]
+  - nodes: [113,114]
+  - nodes: [114,115]
+  - nodes: [115,116]
+  - nodes: [113,117]
+  - nodes: [114,117]
+  - nodes: [114,118]
+  - nodes: [115,118]
+  - nodes: [117,118]
+  - nodes: [117,119]
+  - nodes: [118,119]
+  - nodes: [119,120]
+  - nodes: [119,121]
+  - nodes: [120,121]
+  - nodes: [110,122]
+  - nodes: [111,125]
+  - nodes: [112,122]
+  - nodes: [113,122]
+  - nodes: [113,123]
+  - nodes: [114,123]
+  - nodes: [114,124]
+  - nodes: [115,124]
+  - nodes: [115,125]
+  - nodes: [116,125]
+  - nodes: [113,126]
+  - nodes: [115,127]
+  - nodes: [117,126]
+  - nodes: [118,127]
+  - nodes: [117,128]
+  - nodes: [118,129]
+  - nodes: [119,128]
+  - nodes: [119,129]
+  - nodes: [119,130]
+  - nodes: [120,130]
+  - nodes: [121,130]
+  - nodes: [122,123]
+  - nodes: [123,124]
+  - nodes: [124,125]
+  - nodes: [122,126]
+  - nodes: [123,126]
+  - nodes: [124,127]
+  - nodes: [125,127]
+  - nodes: [126,128]
+  - nodes: [127,129]
+  - nodes: [128,129]
+  - nodes: [128,130]
+  - nodes: [129,130]
 
 # Which beams are sensors
 # nodes: [[2, 4], [1, 7]] constructs sensor from node 2 to node 4 and node 1 to 7
 # both the sensors are connected 
 sensors:
   -
-    nodes: [[0, 24], [0, 30]]
+    nodes: [[10,28], [10,29], [10,32], [11,29], [11,30], [11,33]]
     teensy: 0
   -
-    nodes: [[2, 4], [2, 5], [2, 7]]
+    nodes: [[12,31], [12,32], [12,36], [13,32], [13,33], [13,37]]
     teensy: 0
   -
-    nodes: [[2, 8]]
+    nodes: [[14,33], [14,34], [14,38], [15,35], [15,36], [15,41]]
     teensy: 0
+
+  -
+    nodes: [[16,36], [16,37], [16,42], [17,37], [17,38], [17,43]]
+    teensy: 1
+  -
+    nodes: [[18,38], [18,39], [18,44], [19,41], [19,46]]
+    teensy: 1
+  -
+    nodes: [[20,41], [20,42], [20,47], [21,42], [21,43], [21,48]]
+    teensy: 1
+
+  -
+    nodes: [[22,43], [22,44], [22,49], [23,44], [23,45], [23,50]]
+    teensy: 2
+  -
+    nodes: [[24,46], [24,47], [24,51], [26,48], [26,49], [26,53]]
+    teensy: 2
+  -
+    nodes: [[25,47], [25,48], [25,52], [27,49], [27,50], [27,54]]
+    teensy: 2
+
+  -
+    nodes: [[28,60], [29,61], [30,62], [31,60], [31,65]]
+    teensy: 3
+  -
+    nodes: [[32,60], [32,61], [32,66], [33,61], [33,62], [33,67]]
+    teensy: 3
+  -
+    nodes: [[34,62], [34,68], [35,65], [35,71]]
+    teensy: 3
+  -
+    nodes: [[36,65], [36,66], [36,72], [37,66], [37,67], [37,73]]
+    teensy: 3
+  -
+    nodes: [[38,67], [38,68], [38,74], [39,68], [39,75]]
+    teensy: 3
+  -
+    nodes: [[40,71], [40,77], [41,71], [41,72], [41,78]]
+    teensy: 3
+  -
+    nodes: [[42,72], [42,73], [42,79], [43,73], [43,74], [43,80]]
+    teensy: 3
+  -
+    nodes: [[44,74], [44,75], [44,81], [45,75], [45,82]]
+    teensy: 3
+  -
+    nodes: [[46,77], [46,78], [46,83], [47,78], [47,79], [47,84]]
+    teensy: 3
+
+  -
+    nodes: [[48,79], [48,80], [48,85], [49,80], [49,81], [49,86]]
+    teensy: 4
+  -
+    nodes: [[50,81], [50,82], [50,87], [51,83], [51,84]]
+    teensy: 4
+  -
+    nodes: [[52,84], [52,85], [53,85], [53,86]]
+    teensy: 4
+  -
+    nodes: [[54,86], [54,87], [60,92], [60,95]]
+    teensy: 4
+  -
+    nodes: [[62,93], [62,96], [66,95], [66,100]]
+    teensy: 4
+  -
+    nodes: [[67,96], [67,101], [68,96], [68,97], [68,102]]
+    teensy: 4
+  -
+    nodes: [[71,98], [71,99], [72,99], [72,100]]
+    teensy: 4
+  -
+    nodes: [[73,100], [73,101], [73,104], [74,101], [74,102]]
+    teensy: 4
+
+  -
+    nodes: [[75,102], [75,103], [79,104], [79,105]]
+    teensy: 5
+  -
+    nodes: [[80,104], [80,106], [84,105], [84,107]]
+    teensy: 5
+  -
+    nodes: [[86,106], [86,109], [95,110], [95,113]]
+    teensy: 5
+  -
+    nodes: [[96,111], [96,115], [99,112], [99,113]]
+    teensy: 5
+  -
+    nodes: [[100,113], [100,114], [100,117]]
+    teensy: 5
+
+  -
+    nodes: [[101,114], [101,115], [101,118], [102,115], [102,116]]
+    teensy: 6
+  -
+    nodes: [[104,117], [104,118], [104,119], [105,119], [105,120]]
+    teensy: 6
+  -
+    nodes: [[106,119], [106,121], [123,126], [124,127], [128,129]]
+    teensy: 6
+
+# Which nodes have light strips wrapped around
+light_nodes: 
+  -
+    nodes: [12, 13, 14]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 0
+  -
+    nodes: [15, 16, 17]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 0
+  -
+    nodes: [18, 20, 21]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 0
+
+  -
+    nodes: [22, 25, 26]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 1
+  -
+    nodes: [32, 33, 36]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 1
+  -
+    nodes: [37, 38, 41]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 1
+
+  -
+    nodes: [42, 43, 44]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 2
+  -
+    nodes: [47, 48, 49]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 2
+  -
+    nodes: [60, 61, 62]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 2
+
+  -
+    nodes: [65, 66, 67]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 3
+  -
+    nodes: [68, 71, 72]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 3
+  -
+    nodes: [73, 74, 75]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 3
+
+  -
+    nodes: [78, 79, 80]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 4
+  -
+    nodes: [81, 84, 85]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 4
+  -
+    nodes: [86, 95, 96]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 4
+ 
+  -
+    nodes: [99, 100, 101]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 5
+  -
+    nodes: [102, 104, 105]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 5
+  -
+    nodes: [106, 113, 114]
+    num_leds: [20, 20, 20]
+    num_leds_per_meter: 60
+    teensy: 5
+
+  -
+    nodes: [115, 117]
+    num_leds: [20, 20]
+    num_leds_per_meter: 60
+    teensy: 6
+  -
+    nodes: [118, 119]
+    num_leds: [20, 20]
+    num_leds_per_meter: 60
+    teensy: 6
+
+#block_light_beams:
+#  -
+#    nodes: [[10,28], [11,30], [19,40], [23,45]]
+#    centers: [0.5, 0.5, 0.5, 0.5]
+#    num_leds: [30, 30, 30, 30]
+#    num_leds_per_meter: 30
+#    teensy: 0
+#  -
+#    nodes: [[24,51], [27,54], [28,55], [30,58]]
+#    centers: [0.5, 0.5, 0.5, 0.5]
+#    num_leds: [30, 30, 30, 30]
+#    num_leds_per_meter: 30
+#    teensy: 1
+#  -
+#    nodes: [[40,70], [45,76], [51,88], [54,91]]
+#    centers: [0.5, 0.5, 0.5, 0.5]
+#    num_leds: [30, 30, 30, 30]
+#    num_leds_per_meter: 30
+#    teensy: 2
+#  -
+#    nodes: [[58,93], [55,92], [70,98], [76,103]]
+#    centers: [0.5, 0.5, 0.5, 0.5]
+#    num_leds: [30, 30, 30, 30]
+#    num_leds_per_meter: 30
+#    teensy: 3
+#  -
+#    nodes: [[88,107], [91,109], [92,110], [93,111]]
+#    centers: [0.5, 0.5, 0.5, 0.5]
+#    num_leds: [30, 30, 30, 30]
+#    num_leds_per_meter: 30
+#    teensy: 4
+#  -
+#    nodes: [[98,112], [103,116], [107,120], [109,121]]
+#    centers: [0.5, 0.5, 0.5, 0.5]
+#    num_leds: [30, 30, 30, 30]
+#    num_leds_per_meter: 30
+#    teensy: 5
 
 # Which beams have light strips
 # nodes: [0, 1] constructs a light strip from node 0 to node 1
 pixel_light_beams:
   -
-    nodes: [[17, 42]]
-    centers: [0.5]
-    num_leds: [1]
+    nodes: [[10,28], [11,30], [19,40], [23,45]]
+    centers: [0.5, 0.5, 0.5, 0.5]
+    num_leds: [30, 30, 30, 30]
     num_leds_per_meter: 30
     teensy: 0
   -
-    nodes: [[14, 22]]
-    centers: [0.5]
-    num_leds: [2]
+    nodes: [[24,51], [27,54], [28,55], [30,58]]
+    centers: [0.5, 0.5, 0.5, 0.5]
+    num_leds: [30, 30, 30, 30]
     num_leds_per_meter: 30
-    teensy: 0
+    teensy: 1
   -
-    nodes: [[12, 2]]
-    centers: [0.5]
-    num_leds: [3]
+    nodes: [[40,70], [45,76], [51,88], [54,91]]
+    centers: [0.5, 0.5, 0.5, 0.5]
+    num_leds: [30, 30, 30, 30]
     num_leds_per_meter: 30
-    teensy: 0
-
-block_light_beams:
-  - 
-    nodes: [[17, 42], [12, 45]]
-    centers: [0.5, 0.5]
-    num_leds: [10, 5]
+    teensy: 2
+  -
+    nodes: [[58,93], [55,92], [70,98], [76,103]]
+    centers: [0.5, 0.5, 0.5, 0.5]
+    num_leds: [30, 30, 30, 30]
     num_leds_per_meter: 30
-    teensy: 0
-  - 
-    nodes: [[18, 43]]
-    centers: [0.5]
-    num_leds: [11]
+    teensy: 3
+  -
+    nodes: [[88,107], [91,109], [92,110], [93,111]]
+    centers: [0.5, 0.5, 0.5, 0.5]
+    num_leds: [30, 30, 30, 30]
     num_leds_per_meter: 30
-    teensy: 0
-    
-# Which nodes have light strips wrapped around
-# [0, 2, 5] corresponds to light nodes at node 0, 2, and 5
-# light_nodes: [8, 9, 11, 15, 16, 17, 21, 22, 23, 29, 30, 31, 33, 34, 35, 40, 41, 42, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 65, 66, 67, 68, 72, 73, 75, 76, 77, 78, 79, 80, 84, 85, 86, 87, 88, 92]
-# light_nodes: [17, 24, 19, 15, 8, 13, 10, 3]
-light_nodes: 
+    teensy: 4
   -
-    nodes: [17, 15, 16]
-    num_leds: [21, 22, 23]
-    num_leds_per_meter: 60
-    teensy: 0
-  -
-    nodes: [23, 18]
-    num_leds: [21, 23]
-    num_leds_per_meter: 60
-    teensy: 0
-  -
-    nodes: [5, 3, 20]
-    num_leds: [21, 22, 23]
-    num_leds_per_meter: 60
-    teensy: 0
- 
-# num_leds_of_each_light_beam: [1, 2, 3, 4]
-# num_leds_of_each_light_beam: [10]
-# num_leds_of_each_light_node: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-# num_leds_of_each_light_node: [15, 16, 17, 15, 16, 15, 15, 15]
-# num_leds_of_each_light_node: [15]
-
-# This list contains the teensy id to which this 
-# light node is hooked up
-# [2, 1, 2] means
-# light node 0 is hooked up with teensy 2
-# light node 1 is hooked up with teensy 1
-# light node 2 is hooked up with teensy 2
-# Note: Each light node must be hooked up to exactly
-# one teensy. Thus, number of light_node_connections
-# must equal the number of light_nodes specified.
-# light_node_connections: [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10]
-# light_node_connections: [0, 0, 0, 0, 0, 0, 0, 0]
-# light_node_connections: [0]
-# This list contains the teensy id to which this 
-# light beam is hooked up
-# [2, 1, 2] means
-# light beam 0 is hooked up with teensy 2
-# light beam 1 is hooked up with teensy 1
-# light beam 2 is hooked up with teensy 2
-# Note: Each beam light must be hooked up to exactly
-# one teensy. Thus, number of light_beam_connections
-# must equal the number of light_beams specified.
-# light_beam_connections: [0, 1, 2, 1]
-# light_beam_connections: [0]
-# This list contains the teensy id to which this 
-# sensor is hooked up
-# [2, 1, 2] means
-# sensor 0 is hooked up with teensy 2
-# sensor 1 is hooked up with teensy 1
-# sensor 2 is hooked up with teensy 2
-# Note: Each sensor must be hooked up to exactly
-# one teensy. Thus, number of sensor_connections
-# must equal the number of sensors specified.
-# sensor_connections: [0, 0, 0, 0]
+    nodes: [[98,112], [103,116], [107,120], [109,121]]
+    centers: [0.5, 0.5, 0.5, 0.5]
+    num_leds: [30, 30, 30, 30]
+    num_leds_per_meter: 30
+    teensy: 5
 
 # Size of the nodes and color
 nodes_size:
@@ -395,25 +988,32 @@ nodes_size:
 nodes_color: [0.8, 0.8, 0.8, 1.0] # r,g,b,a
 
 # Size of the light nodes and color
-light_nodes_size:
+block_nodes_size:
   x: 0.12
   y: 0.12
   z: 0.12
-light_nodes_color: [0.6, 0.6, 0.6, 0.6] # r,g,b,a
+block_nodes_color: [0.6, 0.6, 0.6, 0.6] # r,g,b,a
 
 # Size of the beams and color
 beams_size:
   x: 0.03
   y: 0.03
   z: 1.0 # fraction of the entire beam
-beams_color: [0.4, 0.4, 0.4, 1.0] # r,g,b,a
+beams_color: [0.3, 0.3, 0.3, 0.7] # r,g,b,a
 
-# Size of the light beams and color
-light_beams_size:
+# Size of the block light beams and color
+block_beams_size:
   x: 0.08
   y: 0.08
   z: 0.8 # fraction of the entire beam
-light_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
+block_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
+
+# Size of the pixel light beams and color
+pixel_beams_size:
+  x: 0.08
+  y: 0.08
+  z: 0.8 # fraction of the entire beam
+pixel_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
 
 # Size of the sensors and color
 sensors_size:
@@ -422,3 +1022,5 @@ sensors_size:
   z: 0.9 # fraction of the entire beam
 sensors_color: [0.2, 0.2, 0.9, 0.9] # r,g,b,a
 
+panels: [10,11,13, 12,13,16, 13,14,17, 15,16,20, 17,18,22, 19,20,24, 20,21,25, 21,22,26, 22,23,27, 28,29,32, 29,30,33, 31,32,36,32,33,37, 33,34,38, 35,36,41, 36,37,42, 37,38,43, 38,39,44, 40,41,46, 41,42,47, 42,43,48, 43,44,49, 44,45,50, 46,47,51, 48,49,53, 49,50,54, 47,48,52, 37,42,73, 37,43,73, 42,43,73, 55,56,60, 56,57,61, 57,58,62, 59,60,65, 60,61,66, 61,62,67, 62,63,68, 64,65,71, 65,66,72, 66,67,73, 67,68,74, 68,69,75, 70,71,77, 71,72,78, 72,73,79, 73,74,80, 74,75,81, 75,76,82, 77,78,83, 78,79,84, 79,80,85, 80,81,86, 81,82,87, 83,84,88, 84,85,89, 85,86,90, 86,87,91, 94,95,99, 96,97,102, 100,101,104, 105,106,108, 95,99,113, 96,102,115, 105,106,119, 113,114,117, 114,115,118, 117,118,119]
+panels_color: [0.6, 0.1, 0.1, 0.4] # r,g,b,a

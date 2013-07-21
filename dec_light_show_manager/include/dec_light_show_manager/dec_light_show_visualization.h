@@ -44,34 +44,45 @@ private:
   ros::NodeHandle node_handle_;
   ros::Publisher rviz_pub_;
 
+  unsigned int static_publish_counter_;
+  unsigned int static_publish_rate_;
+
   visualization_msgs::MarkerArray node_markers_;
   visualization_msgs::MarkerArray beam_markers_;
   visualization_msgs::MarkerArray sensor_markers_;
 
-  visualization_msgs::MarkerArray light_node_markers_;
-  visualization_msgs::MarkerArray light_beam_markers_;
-  visualization_msgs::MarkerArray light_beam_led_markers_;
+  visualization_msgs::MarkerArray block_light_node_markers_;
+  visualization_msgs::MarkerArray block_light_beam_markers_;
+  visualization_msgs::MarkerArray pixel_light_beam_markers_;
 
   visualization_msgs::MarkerArray node_text_markers_;
-  visualization_msgs::MarkerArray light_node_text_markers_;
   visualization_msgs::MarkerArray beam_text_markers_;
   visualization_msgs::MarkerArray sensor_text_markers_;
-  visualization_msgs::MarkerArray light_beam_text_markers_;
+
+  visualization_msgs::MarkerArray block_light_node_text_markers_;
+  visualization_msgs::MarkerArray block_light_beam_text_markers_;
+  visualization_msgs::MarkerArray pixel_light_beam_text_markers_;
+
+  visualization_msgs::MarkerArray panel_markers_;
 
   static void setupNodeMarkers(ros::NodeHandle& node_handle,
                                const std::string& namespace_name,
                                visualization_msgs::MarkerArray& node_markers,
-                               const std::vector<geometry_msgs::Point>& node_positions);
+                               const std::vector<geometry_msgs::Point>& node_positions,
+                               const bool forever = false);
   static void setupBeamMarkers(ros::NodeHandle& node_handle,
                                const std::string& namespace_name,
                                visualization_msgs::MarkerArray& beam_markers,
-                               const std::vector<geometry_msgs::Point>& node_positions,
-                               const std::vector<std::pair<int, int> >& beams);
+                               const std::vector<geometry_msgs::Pose>& poses,
+                               const bool forever = false);
   static void setupTextMarkers(ros::NodeHandle& node_handle,
                                const std::string& namespace_name,
                                const visualization_msgs::MarkerArray& markers,
-                               visualization_msgs::MarkerArray& text_markers);
-  void setupLightBeamMarkers();
+                               visualization_msgs::MarkerArray& text_markers,
+                               const bool forever = false);
+
+  void setupPanelMarkers(ros::NodeHandle& node_handle,
+                         const std::vector<geometry_msgs::Point>& node_positions);
 
   boost::shared_ptr<DecLightShowData> light_show_data_;
 };

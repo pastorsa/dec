@@ -38,9 +38,11 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
   ROS_VERIFY(dec_utilities::read(node_handle, "beams_size", beams_size_));
   ROS_VERIFY(dec_utilities::read(node_handle, "beams_color", beams_color_));
 
-  ROS_VERIFY(dec_utilities::read(node_handle, "light_nodes_size", light_nodes_size_));
-  ROS_VERIFY(dec_utilities::read(node_handle, "light_beams_size", light_beams_size_));
-  ROS_ASSERT(light_beams_size_.z > 0.0 && !(light_beams_size_.z > 1.0));
+  ROS_VERIFY(dec_utilities::read(node_handle, "block_nodes_size", block_light_nodes_size_));
+  ROS_VERIFY(dec_utilities::read(node_handle, "block_beams_size", block_light_beams_size_));
+  ROS_ASSERT(block_light_beams_size_.z > 0.0 && !(block_light_beams_size_.z > 1.0));
+  ROS_VERIFY(dec_utilities::read(node_handle, "pixel_beams_size", pixel_light_beams_size_));
+  ROS_ASSERT(pixel_light_beams_size_.z > 0.0 && !(pixel_light_beams_size_.z > 1.0));
   ROS_VERIFY(dec_utilities::read(node_handle, "sensors_size", sensors_size_));
   ROS_ASSERT(sensors_size_.z > 0.0 && !(sensors_size_.z > 1.0));
 
@@ -48,12 +50,6 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
   ROS_VERIFY(read(node_handle, capactive_sensors_));
   ROS_INFO("Reading light node configurations.");
   ROS_VERIFY(read(node_handle, block_light_nodes_));
-  std::map<unsigned int, int> uniqueness_test_map;
-  for (unsigned int i = 0; i < block_light_nodes_.size(); ++i)
-  {
-    // uniqueness_test_map.find(block_light_nodes_)
-  }
-
   ROS_INFO("Reading block light beam configurations.");
   ROS_VERIFY(read(node_handle, block_light_beams_));
   ROS_INFO("Reading pixel light beam configurations.");
@@ -62,6 +58,70 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
   setNumberOfTeensys();
   setPins(node_handle);
   setupTeensyMap();
+  ROS_VERIFY(isUnique());
+
+  return true;
+}
+
+bool DecStructure::isUnique()
+{
+
+  std::map<unsigned int, int> uniqueness_test_map;
+  for (unsigned int i = 0; i < block_light_nodes_.size(); ++i)
+  {
+    for (unsigned int j = 0; j < block_light_nodes_[i].getNumComponents(); ++j)
+    {
+      unsigned int node_id = block_light_nodes_[i].nodes_[j];
+      if( uniqueness_test_map.find(node_id) != uniqueness_test_map.end() )
+      {
+        ROS_ERROR("Multiple block light nodes with id >%i< contained.", node_id);
+        return false;
+      }
+      uniqueness_test_map.insert(std::pair<unsigned int, int>(node_id, 0));
+    }
+  }
+
+  std::vector<std::pair<unsigned int, unsigned int> > uniqueness_test_vector;
+  for (unsigned int i = 0; i < block_light_beams_.size(); ++i)
+  {
+    for (unsigned int j = 0; j < block_light_beams_[i].getNumComponents(); ++j)
+    {
+      for (unsigned int n = 0; n < uniqueness_test_vector.size(); ++n)
+      {
+        if (((block_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].first)
+            && (block_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].second))
+            || ((block_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].second)
+                && (block_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].first)))
+        {
+          ROS_ERROR("Multiple block beams from >%i< to >%i< contained.",
+                    block_light_beams_[i].nodes_[j].first, block_light_beams_[i].nodes_[j].second);
+          return false;
+        }
+      }
+      uniqueness_test_vector.push_back(block_light_beams_[i].nodes_[j]);
+    }
+  }
+
+  uniqueness_test_vector.clear();
+  for (unsigned int i = 0; i < pixel_light_beams_.size(); ++i)
+  {
+    for (unsigned int j = 0; j < pixel_light_beams_[i].getNumComponents(); ++j)
+    {
+      for (unsigned int n = 0; n < uniqueness_test_vector.size(); ++n)
+      {
+        if (((pixel_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].first)
+            && (pixel_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].second))
+            || ((pixel_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].second)
+                && (pixel_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].first)))
+        {
+          ROS_ERROR("Multiple pixel beams from >%i< to >%i< contained.",
+                    pixel_light_beams_[i].nodes_[j].first, pixel_light_beams_[i].nodes_[j].second);
+          return false;
+        }
+      }
+      uniqueness_test_vector.push_back(pixel_light_beams_[i].nodes_[j]);
+    }
+  }
 
   return true;
 }
@@ -93,31 +153,45 @@ void DecStructure::setupTeensyMap()
     }
   }
 
+  std::vector<unsigned int> sensor_pin_counter(number_of_teensys_, 0);
+
   ROS_INFO("Setting up sensor map.");
   sensor_to_teensy_map_.clear();
   for (unsigned int i = 0; i < capactive_sensors_.size(); ++i)
   {
     std::pair<unsigned int, unsigned int> teensy_id_and_sensor_id_pair;
     const uint8_t TEENSY_ID = capactive_sensors_[i].getTeeynsyId();
+    capactive_sensors_[i].setPin(sensor_pin_counter[TEENSY_ID]);
     teensy_id_and_sensor_id_pair.first = TEENSY_ID;
     teensy_id_and_sensor_id_pair.second = setup_data_[TEENSY_ID].num_sensors;
     setup_data_[TEENSY_ID].num_sensors++;
     sensor_to_teensy_map_.push_back(teensy_id_and_sensor_id_pair);
     ROS_INFO("Sensor >%i< is connected to teensy >%u< at pin >%u<.", (int)i,
              (int)sensor_to_teensy_map_[i].first, (int)sensor_to_teensy_map_[i].second);
+    sensor_pin_counter[TEENSY_ID]++;
   }
+  for(unsigned int i = 0; i < sensor_pin_counter.size(); ++i)
+  {
+    ROS_ASSERT_MSG(sensor_pin_counter[i] < max_number_of_sensors_per_teensy_,
+                   "Number of sensors connected to teensy >%i< is >%i< and exceeds limit >%i<.",
+                   (int)i, (int)sensor_pin_counter[i], (int)max_number_of_sensors_per_teensy_);
+  }
+
+
+  std::vector<unsigned int> light_pin_counter(number_of_teensys_, 0);
 
   ROS_INFO("Setting up light node map.");
   light_node_leds_to_teensy_map_.clear();
   for (unsigned int i = 0; i < block_light_nodes_.size(); ++i)
   {
     const unsigned int TEENSY_ID = block_light_nodes_[i].getTeeynsyId();
+    block_light_nodes_[i].setPin(light_pin_counter[TEENSY_ID]);
     bool new_strip = true;
     for (unsigned int j = 0; j < block_light_nodes_[i].getNumComponents(); ++j)
     {
       std::pair<unsigned int, unsigned int> teensy_id_and_strip_id_pair;
       teensy_id_and_strip_id_pair.first = TEENSY_ID;
-      teensy_id_and_strip_id_pair.second = i;
+      teensy_id_and_strip_id_pair.second = light_pin_counter[TEENSY_ID];
       if(new_strip)
       {
         new_strip = false;
@@ -134,11 +208,12 @@ void DecStructure::setupTeensyMap()
       light_node_leds_to_teensy_map_.push_back(teensy_id_and_strip_id_pair);
       ROS_INFO("Block light node at pin >%i< connected to teensy >%i<. LED index >%i< num_leds >%i<.",
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].pin,
-               (int)light_node_leds_to_teensy_map_[i].first,
+               (int)TEENSY_ID,
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].index,
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].num_leds);
       setup_data_[TEENSY_ID].num_block_leds++;
     }
+    light_pin_counter[TEENSY_ID]++;
   }
 
   ROS_INFO("Setting up block light beam map.");
@@ -146,12 +221,13 @@ void DecStructure::setupTeensyMap()
   for (unsigned int i = 0; i < block_light_beams_.size(); ++i)
   {
     const unsigned int TEENSY_ID = block_light_beams_[i].getTeeynsyId();
+    block_light_beams_[i].setPin(light_pin_counter[TEENSY_ID]);
     bool new_strip = true;
     for (unsigned int j = 0; j < block_light_beams_[i].getNumComponents(); ++j)
     {
       std::pair<unsigned int, unsigned int> teensy_id_and_strip_id_pair;
       teensy_id_and_strip_id_pair.first = TEENSY_ID;
-      teensy_id_and_strip_id_pair.second = i + block_light_nodes_.size();
+      teensy_id_and_strip_id_pair.second = light_pin_counter[TEENSY_ID]; // i + block_light_nodes_.size();
       if(new_strip)
       {
         new_strip = false;
@@ -169,12 +245,19 @@ void DecStructure::setupTeensyMap()
       block_light_beam_leds_to_teensy_map_.push_back(teensy_id_and_strip_id_pair);
       ROS_INFO("Block light beam at pin >%i< connected to teensy >%i<. LED index >%i< num_leds >%i<.",
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].pin,
-               (int)block_light_beam_leds_to_teensy_map_[i].first,
+               (int)TEENSY_ID,
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].index,
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].num_leds);
 
       setup_data_[TEENSY_ID].num_block_leds++;
     }
+    light_pin_counter[TEENSY_ID]++;
+  }
+  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+  {
+    ROS_ASSERT_MSG((unsigned int)setup_data_[i].num_block_leds < MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP,
+                   "Too many block LEDs specified >%i<. Limit is >%i<.",
+                   (int)setup_data_[i].num_block_leds, (int)MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP);
   }
 
   ROS_INFO("Setting up pixel light beam map.");
@@ -183,6 +266,7 @@ void DecStructure::setupTeensyMap()
   for (unsigned int i = 0; i < pixel_light_beams_.size(); ++i)
   {
     const unsigned int TEENSY_ID = pixel_light_beams_[i].getTeeynsyId();
+    pixel_light_beams_[i].setPin(light_pin_counter[TEENSY_ID]);
     bool new_strip = true;
     for (unsigned int j = 0; j < pixel_light_beams_[i].getNumComponents(); ++j)
     {
@@ -191,7 +275,7 @@ void DecStructure::setupTeensyMap()
         std::pair<unsigned int, std::pair<unsigned int, unsigned int> > teensy_id_to_led_info_pair;
         teensy_id_to_led_info_pair.first = TEENSY_ID;
         std::pair<unsigned int, unsigned int> strip_id_and_led_id_pair;
-        strip_id_and_led_id_pair.first = i + block_light_nodes_.size() + block_light_beams_.size();
+        strip_id_and_led_id_pair.first = light_pin_counter[TEENSY_ID]; // i + block_light_nodes_.size() + block_light_beams_.size();
         strip_id_and_led_id_pair.second = k;
         if(new_strip)
         {
@@ -217,6 +301,13 @@ void DecStructure::setupTeensyMap()
         setup_data_[TEENSY_ID].num_pixel_leds++;
       }
     }
+    light_pin_counter[TEENSY_ID]++;
+  }
+  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+  {
+    ROS_ASSERT_MSG((unsigned int)setup_data_[i].num_pixel_leds < MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP,
+                   "Too many pixel LEDs specified >%i<. Limit is >%i<.",
+                   (int)setup_data_[i].num_pixel_leds, (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
   }
   ROS_ASSERT_MSG(led_index == total_num_pixel_beam_leds_, "LED index is >%i< and total number of pixel beam leds is >%i<.",
                  (int)led_index, (int)total_num_pixel_beam_leds_);
@@ -310,110 +401,36 @@ void DecStructure::setPins(ros::NodeHandle node_handle)
   ROS_ASSERT_MSG(max_number_of_light_strips_per_teensy_ <= 255, "Maximum number of light strips specified >%i< is invalid.", max_number_of_light_strips_per_teensy_);
 
   total_num_node_leds_ = 0;
-  std::vector<unsigned int> light_pins(number_of_teensys_, 0);
   for (unsigned int i = 0; i < block_light_nodes_.size(); ++i)
   {
     ROS_ASSERT(block_light_nodes_[i].getTotalNumLeds() <= MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP);
-    block_light_nodes_[i].setPin(light_pins[block_light_nodes_[i].getTeeynsyId()]);
-    light_pins[block_light_nodes_[i].getTeeynsyId()]++;
-    // only 1 LED for each block node is modeled
     total_num_node_leds_ += block_light_nodes_[i].getNumComponents();
   }
-  //  ROS_ASSERT_MSG(total_num_node_leds_ == block_light_nodes_.size(),
-  //                 "Total number of light node LEDs >%i< does not match number of block light nodes >%i<.",
-  //                 (int)total_num_node_leds_, (int)block_light_nodes_.size());
+  ROS_ASSERT_MSG(total_num_node_leds_ > 0, "No block light node read from configuration.");
 
   total_num_block_beam_leds_ = 0;
   for (unsigned int i = 0; i < block_light_beams_.size(); ++i)
   {
     ROS_ASSERT(block_light_beams_[i].getTotalNumLeds() <= MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP);
-    block_light_beams_[i].setPin(light_pins[block_light_beams_[i].getTeeynsyId()]);
-    light_pins[block_light_beams_[i].getTeeynsyId()]++;
-    // only 1 LED for each block beam is modeled
     total_num_block_beam_leds_ += block_light_beams_[i].getNumComponents();
   }
+  ROS_WARN_COND(total_num_block_beam_leds_ == 0, "No block light beam read from configuration.");
 
   total_num_pixel_beam_leds_ = 0;
   for (unsigned int i = 0; i < pixel_light_beams_.size(); ++i)
   {
     ROS_ASSERT(pixel_light_beams_[i].getTotalNumLeds() <= MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP);
-    pixel_light_beams_[i].setPin(light_pins[pixel_light_beams_[i].getTeeynsyId()]);
-    light_pins[pixel_light_beams_[i].getTeeynsyId()]++;
-    // each LED is modeled
     total_num_pixel_beam_leds_ += pixel_light_beams_[i].getTotalNumLeds();
   }
-  for(unsigned int i = 0; i < light_pins.size(); ++i)
-  {
-    ROS_ASSERT_MSG(light_pins[i] < max_number_of_light_strips_per_teensy_,
-                   "Number of lights connected to teensy >%i< exceeds limit >%i<.",
-                   (int)i, (int)max_number_of_light_strips_per_teensy_);
-  }
+  ROS_WARN_COND(total_num_pixel_beam_leds_ == 0, "No pixel light beam read from configuration.");
 
   total_num_sensors_ = capactive_sensors_.size();
-  std::vector<unsigned int> sensor_pins(number_of_teensys_, 0);
-  for (unsigned int i = 0; i < capactive_sensors_.size(); ++i)
-  {
-    capactive_sensors_[i].setPin(sensor_pins[capactive_sensors_[i].getTeeynsyId()]);
-    sensor_pins[capactive_sensors_[i].getTeeynsyId()]++;
-  }
-  for(unsigned int i = 0; i < sensor_pins.size(); ++i)
-  {
-    ROS_ASSERT_MSG(sensor_pins[i] < max_number_of_sensors_per_teensy_,
-                   "Number of sensors connected to teensy >%i< exceeds limit >%i<.",
-                   (int)i, (int)max_number_of_sensors_per_teensy_);
-  }
+  ROS_ASSERT_MSG(total_num_sensors_ > 0, "No sensors read from configuration.");
 
   ROS_INFO("Setup complete:");
   ROS_INFO("Structure contains >%i< node lights, >%i< beam lights, >%i< pixel lights, and >%i< sensors.",
            total_num_node_leds_, total_num_block_beam_leds_, total_num_pixel_beam_leds_, total_num_sensors_);
 }
-
-/*
-bool DecStructure::read(ros::NodeHandle& node_handle,
-                   std::vector<geometry_msgs::Point>& positions)
-{
-  const std::string KEY = "node_positions";
-  XmlRpc::XmlRpcValue rpc_values;
-  if (!node_handle.getParam(KEY, rpc_values))
-  {
-    ROS_ERROR("Could not read from >%s/%s<.", node_handle.getNamespace().c_str(), KEY.c_str());
-    return false;
-  }
-
-  positions.clear();
-  for (int i = 0; i < rpc_values.size(); ++i)
-  {
-    if (!rpc_values[i].hasMember("position"))
-    {
-      ROS_ERROR("Each arm configuration must contain a field >position<.");
-      return false;
-    }
-    XmlRpc::XmlRpcValue rpc_value = rpc_values[i]["position"];
-    if (rpc_value.size() != 3)
-    {
-      ROS_ERROR("Number of joint_configuration >%i< is wrong. It should be >3<.", rpc_value.size());
-      return false;
-    }
-    std::vector<double> values;
-    for (int j = 0; j < 3; ++j)
-    {
-      if (rpc_value[j].getType() != XmlRpc::XmlRpcValue::TypeDouble && rpc_value[j].getType() != XmlRpc::XmlRpcValue::TypeInt)
-      {
-        ROS_ERROR("Value must either be of type integer or double.");
-        return false;
-      }
-      values.push_back(static_cast<double> (rpc_value[j]));
-    }
-    geometry_msgs::Point point;
-    point.x = values[0];
-    point.y = values[1];
-    point.z = values[2];
-    positions.push_back(point);
-  }
-
-  return true;
-}
-*/
 
 XmlRpc::XmlRpcValue DecStructure::get(ros::NodeHandle& node_handle, const std::string& key)
 {
@@ -463,6 +480,14 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<Beam>& beams)
     id += beam.getNumComponents();
     beams.push_back(beam);
   }
+  beam_poses_.clear();
+  for (unsigned int i = 0; i < beams.size(); ++i)
+  {
+    for (unsigned int j = 0; j < beams[i].getNumComponents(); ++j)
+    {
+      beam_poses_.push_back(beams[i].getPose(j));
+    }
+  }
   return true;
 }
 
@@ -476,6 +501,14 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<Sensor>& senso
     ROS_VERIFY(sensor.initialize(rpc_values[i], id, node_positions_));
     id += sensor.getNumComponents();
     sensors.push_back(sensor);
+  }
+  sensor_poses_.clear();
+  for (unsigned int i = 0; i < sensors.size(); ++i)
+  {
+    for (unsigned int j = 0; j < sensors[i].getNumComponents(); ++j)
+    {
+      sensor_poses_.push_back(sensors[i].getPose(j));
+    }
   }
   return true;
 }
@@ -491,12 +524,26 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<LightNode>& li
     id += light_node.getNumComponents();
     light_nodes.push_back(light_node);
   }
+  block_light_node_positions_.clear();
+  for (unsigned int i = 0; i < light_nodes.size(); ++i)
+  {
+    for (unsigned int j = 0; j < light_nodes[i].getNumComponents(); ++j)
+    {
+      block_light_node_positions_.push_back(light_nodes[i].getPosition(j));
+    }
+  }
   return true;
 }
 
 bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<BlockLightBeam>& block_light_beams)
 {
-  XmlRpc::XmlRpcValue rpc_values = get(node_handle, "block_light_beams");
+  const std::string KEY = "block_light_beams";
+  if (!node_handle.hasParam(KEY))
+  {
+    ROS_WARN("No >%s< read from configuration.", KEY.c_str());
+    return true;
+  }
+  XmlRpc::XmlRpcValue rpc_values = get(node_handle, KEY);
   int id = 0;
   for (int i = 0; i < rpc_values.size(); ++i)
   {
@@ -505,12 +552,26 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<BlockLightBeam
     id += block_light_beam.getNumComponents();
     block_light_beams.push_back(block_light_beam);
   }
+  block_light_beam_poses_.clear();
+  for (unsigned int i = 0; i < block_light_beams.size(); ++i)
+  {
+    for (unsigned int j = 0; j < block_light_beams[i].getNumComponents(); ++j)
+    {
+      block_light_beam_poses_.push_back(block_light_beams[i].getPose(j));
+    }
+  }
   return true;
 }
 
 bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<PixelLightBeam>& pixel_light_beams)
 {
-  XmlRpc::XmlRpcValue rpc_values = get(node_handle, "pixel_light_beams");
+  const std::string KEY = "pixel_light_beams";
+  if (!node_handle.hasParam(KEY))
+  {
+    ROS_WARN("No >%s< read from configuration.", KEY.c_str());
+    return true;
+  }
+  XmlRpc::XmlRpcValue rpc_values = get(node_handle, KEY);
   int id = 0;
   for (int i = 0; i < rpc_values.size(); ++i)
   {
@@ -518,6 +579,14 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<PixelLightBeam
     ROS_VERIFY(pixel_light_beam.initialize(rpc_values[i], id, node_positions_));
     id += pixel_light_beam.getNumComponents();
     pixel_light_beams.push_back(pixel_light_beam);
+  }
+  pixel_light_beam_poses_.clear();
+  for (unsigned int i = 0; i < pixel_light_beams.size(); ++i)
+  {
+    for (unsigned int j = 0; j < pixel_light_beams[i].getNumComponents(); ++j)
+    {
+      pixel_light_beam_poses_.push_back(pixel_light_beams[i].getPose(j));
+    }
   }
   return true;
 }

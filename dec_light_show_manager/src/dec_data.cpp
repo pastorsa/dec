@@ -69,52 +69,60 @@ bool DecData::initialize(ros::NodeHandle node_handle)
     dec_interface_setup_data_[i] = dec_interface_->getSetupData(i);
   }
 
-  node_led_levels_ = Eigen::VectorXf::Zero(total_num_node_leds_);
-  block_beam_led_levels_ = Eigen::VectorXf::Zero(total_num_block_beam_leds_);
-  pixel_beam_led_levels_ = Eigen::VectorXf::Zero(total_num_pixel_beam_leds_);
   sensor_levels_ = Eigen::VectorXf::Zero(total_num_sensors_);
-
-  // ROS_ASSERT_MSG(sizeof(led_channel_t) == 1, "Size of short should be one but is >%i<.", (int)sizeof(led_channel_t));
-  node_led_values_ = MatrixX_led_channel_t::Zero(4, total_num_node_leds_);
-  block_beam_led_values_ = MatrixX_led_channel_t::Zero(4, total_num_block_beam_leds_);
-  pixel_beam_led_values_ = MatrixX_led_channel_t::Zero(4, total_num_pixel_beam_leds_);
-
   sensor_values_ = VectorX_sensor_channel_t::Zero(total_num_sensors_);
   prev_sensor_values_ = VectorX_sensor_channel_t::Zero(total_num_sensors_);
 
-  std::vector<double> light_nodes_color;
-  ROS_VERIFY(dec_utilities::read(node_handle, "light_nodes_color", light_nodes_color));
-  std::vector<double> light_beams_color;
-  ROS_VERIFY(dec_utilities::read(node_handle, "light_beams_color", light_beams_color));
+  node_led_levels_ = Eigen::VectorXf::Zero(total_num_node_leds_);
+  node_led_values_ = MatrixX_led_channel_t::Zero(4, total_num_node_leds_);
+
+  if (total_num_block_beam_leds_ > 0)
+  {
+    block_beam_led_levels_ = Eigen::VectorXf::Zero(total_num_block_beam_leds_);
+    block_beam_led_values_ = MatrixX_led_channel_t::Zero(4, total_num_block_beam_leds_);
+  }
+  if (total_num_pixel_beam_leds_ > 0)
+  {
+    pixel_beam_led_levels_ = Eigen::VectorXf::Zero(total_num_pixel_beam_leds_);
+    pixel_beam_led_values_ = MatrixX_led_channel_t::Zero(4, total_num_pixel_beam_leds_);
+  }
+
+  std::vector<double> block_light_nodes_color;
+  ROS_VERIFY(dec_utilities::read(node_handle, "block_nodes_color", block_light_nodes_color));
+  std::vector<double> block_light_beams_color;
+  ROS_VERIFY(dec_utilities::read(node_handle, "block_beams_color", block_light_beams_color));
+  std::vector<double> pixel_light_beams_color;
+  ROS_VERIFY(dec_utilities::read(node_handle, "pixel_beams_color", pixel_light_beams_color));
   std::vector<double> sensors_color;
   ROS_VERIFY(dec_utilities::read(node_handle, "sensors_color", sensors_color));
 
   for (unsigned int i = 0; i < total_num_node_leds_; ++i)
   {
-    node_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(light_nodes_color[ALPHA_OFFSET] * 255);
+    node_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(block_light_nodes_color[ALPHA_OFFSET] * 255);
   }
   for (unsigned int i = 0; i < total_num_block_beam_leds_; ++i)
   {
-    block_beam_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(light_beams_color[ALPHA_OFFSET] * 255);
+    block_beam_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(block_light_beams_color[ALPHA_OFFSET] * 255);
   }
   for (unsigned int i = 0; i < total_num_pixel_beam_leds_; ++i)
   {
-    pixel_beam_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(light_beams_color[ALPHA_OFFSET] * 255);
+    pixel_beam_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(pixel_light_beams_color[ALPHA_OFFSET] * 255);
   }
   for (unsigned int i = 0; i < total_num_sensors_; ++i)
   {
     sensor_values_(i) = static_cast<sensor_channel_t>(0.0);
   }
 
-  Eigen::MatrixXf sensor_to_node_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_node_leds_);
-  Eigen::MatrixXf sensor_to_block_beam_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_block_beam_leds_);
-  Eigen::MatrixXf sensor_to_pixel_beam_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_pixel_beam_leds_);
+  // ROS_WARN("Total number of block node leds is >%i<.", (int)total_num_node_leds_);
+  // ROS_WARN("Total number of block beam leds is >%i<.", (int)total_num_block_beam_leds_);
+  // ROS_WARN("Total number of pixel beam leds is >%i<.", (int)total_num_pixel_beam_leds_);
 
-  ROS_WARN("Total number of block node leds is >%i<.", (int)total_num_node_leds_);
-  ROS_WARN("Total number of block beam leds is >%i<.", (int)total_num_block_beam_leds_);
-  ROS_WARN("Total number of pixel beam leds is >%i<.", (int)total_num_pixel_beam_leds_);
-
+  Eigen::MatrixXf sensor_to_node_led_distances;
+  Eigen::MatrixXf sensor_to_block_beam_led_distances;
+  Eigen::MatrixXf sensor_to_pixel_beam_led_distances;
   unsigned int num_led_index = 0;
+
+  sensor_to_node_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_node_leds_);
   for (unsigned int i = 0; i < total_num_sensors_; ++i)
   {
     num_led_index = 0;
@@ -126,60 +134,86 @@ bool DecData::initialize(ros::NodeHandle node_handle)
         num_led_index++;
       }
     }
-    num_led_index = 0;
-    for (unsigned int j = 0; j < block_light_beams_.size(); ++j)
+  }
+
+  if (total_num_block_beam_leds_)
+  {
+    sensor_to_block_beam_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_block_beam_leds_);
+    for (unsigned int i = 0; i < total_num_sensors_; ++i)
     {
-      for (unsigned int k = 0; k < block_light_beams_[j].getNumComponents(); ++k)
+      num_led_index = 0;
+      for (unsigned int j = 0; j < block_light_beams_.size(); ++j)
       {
-        sensor_to_block_beam_led_distances(i, num_led_index) = computeDistance(capactive_sensors_[i].getAvgPosition(), block_light_beams_[j].getPosition(k));
-        num_led_index++;
-      }
-    }
-    num_led_index = 0;
-    for (unsigned int j = 0; j < pixel_light_beams_.size(); ++j)
-    {
-      for (unsigned int n = 0; n < pixel_light_beams_[j].pixel_poses_.size(); ++n)
-      {
-        for (unsigned int m = 0; m < pixel_light_beams_[j].pixel_poses_[n].size(); ++m)
+        for (unsigned int k = 0; k < block_light_beams_[j].getNumComponents(); ++k)
         {
-          sensor_to_pixel_beam_led_distances(i, num_led_index) = computeDistance(capactive_sensors_[i].getAvgPosition(), pixel_light_beams_[j].pixel_poses_[n][m].position);
+          sensor_to_block_beam_led_distances(i, num_led_index) = computeDistance(capactive_sensors_[i].getAvgPosition(), block_light_beams_[j].getPosition(k));
           num_led_index++;
         }
       }
     }
-    ROS_ASSERT(num_led_index == total_num_pixel_beam_leds_);
   }
 
-  ROS_INFO_STREAM("sensor_to_node_led_distances: (" << total_num_sensors_ << " x " << total_num_node_leds_ << ")\n" << sensor_to_node_led_distances);
-  ROS_INFO_STREAM("sensor_to_block_beam_led_distances: (" << total_num_sensors_ << " x " << total_num_block_beam_leds_ << ")\n" << sensor_to_block_beam_led_distances);
-  ROS_INFO_STREAM("sensor_to_pixel_beam_led_distances: (" << total_num_sensors_ << " x " << total_num_pixel_beam_leds_ << ")\n" << sensor_to_pixel_beam_led_distances);
+  if (total_num_pixel_beam_leds_)
+  {
+    sensor_to_pixel_beam_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_pixel_beam_leds_);
+    for (unsigned int i = 0; i < total_num_sensors_; ++i)
+    {
+      num_led_index = 0;
+      for (unsigned int j = 0; j < pixel_light_beams_.size(); ++j)
+      {
+        for (unsigned int n = 0; n < pixel_light_beams_[j].pixel_poses_.size(); ++n)
+        {
+          for (unsigned int m = 0; m < pixel_light_beams_[j].pixel_poses_[n].size(); ++m)
+          {
+            sensor_to_pixel_beam_led_distances(i, num_led_index) = computeDistance(capactive_sensors_[i].getAvgPosition(), pixel_light_beams_[j].pixel_poses_[n][m].position);
+            num_led_index++;
+          }
+        }
+      }
+      ROS_ASSERT(num_led_index == total_num_pixel_beam_leds_);
+    }
+  }
 
+  // ROS_INFO_STREAM("sensor_to_node_led_distances: (" << total_num_sensors_ << " x " << total_num_node_leds_ << ")\n" << sensor_to_node_led_distances);
+  // ROS_INFO_STREAM("sensor_to_block_beam_led_distances: (" << total_num_sensors_ << " x " << total_num_block_beam_leds_ << ")\n" << sensor_to_block_beam_led_distances);
+  // ROS_INFO_STREAM("sensor_to_pixel_beam_led_distances: (" << total_num_sensors_ << " x " << total_num_pixel_beam_leds_ << ")\n" << sensor_to_pixel_beam_led_distances);
+
+  Eigen::VectorXd distances = Eigen::VectorXd::Zero(3);
   node_led_distances_to_sensor_ = Eigen::MatrixXf::Zero(total_num_node_leds_, total_num_sensors_);
   node_led_distances_to_sensor_ = sensor_to_node_led_distances.transpose();
   ROS_ASSERT(!(node_led_distances_to_sensor_.minCoeff() < 0.0));
-
-  block_beam_led_distances_to_sensor_ = Eigen::MatrixXf::Zero(total_num_block_beam_leds_, total_num_sensors_);
-  block_beam_led_distances_to_sensor_ = sensor_to_block_beam_led_distances.transpose();
-  ROS_ASSERT(!(block_beam_led_distances_to_sensor_.minCoeff() < 0.0));
-
-  pixel_beam_led_distances_to_sensor_ = Eigen::MatrixXf::Zero(total_num_pixel_beam_leds_, total_num_sensors_);
-  pixel_beam_led_distances_to_sensor_ = sensor_to_pixel_beam_led_distances.transpose();
-  ROS_ASSERT(!(pixel_beam_led_distances_to_sensor_.minCoeff() < 0.0));
-
-  Eigen::VectorXd distances = Eigen::VectorXd::Zero(3);
   distances(0) = node_led_distances_to_sensor_.maxCoeff();
-  distances(1) = block_beam_led_distances_to_sensor_.maxCoeff();
-  distances(2) = pixel_beam_led_distances_to_sensor_.maxCoeff();
+
+  if (total_num_block_beam_leds_ > 0)
+  {
+    block_beam_led_distances_to_sensor_ = Eigen::MatrixXf::Zero(total_num_block_beam_leds_, total_num_sensors_);
+    block_beam_led_distances_to_sensor_ = sensor_to_block_beam_led_distances.transpose();
+    ROS_ASSERT(!(block_beam_led_distances_to_sensor_.minCoeff() < 0.0));
+    distances(1) = block_beam_led_distances_to_sensor_.maxCoeff();
+  }
+
+  if (total_num_pixel_beam_leds_ > 0)
+  {
+    pixel_beam_led_distances_to_sensor_ = Eigen::MatrixXf::Zero(total_num_pixel_beam_leds_, total_num_sensors_);
+    pixel_beam_led_distances_to_sensor_ = sensor_to_pixel_beam_led_distances.transpose();
+    ROS_ASSERT(!(pixel_beam_led_distances_to_sensor_.minCoeff() < 0.0));
+    distances(2) = pixel_beam_led_distances_to_sensor_.maxCoeff();
+  }
   double max_distance = distances.maxCoeff();
 
   // scale distances such that furthest away becomes 0.0
   node_led_distances_to_sensor_.array() = (node_led_distances_to_sensor_.array() - max_distance) * -1.0;
-  block_beam_led_distances_to_sensor_.array() = (block_beam_led_distances_to_sensor_.array() - max_distance) * -1.0;
-  pixel_beam_led_distances_to_sensor_.array() = (pixel_beam_led_distances_to_sensor_.array() - max_distance) * -1.0;
-
-  ROS_INFO_STREAM("\nnode\n" << node_led_distances_to_sensor_);
-  ROS_INFO_STREAM("\nblock beam\n" << block_beam_led_distances_to_sensor_);
-  ROS_INFO_STREAM("\npixel beam\n" << pixel_beam_led_distances_to_sensor_);
+  // ROS_INFO_STREAM("\nnode\n" << node_led_distances_to_sensor_);
+  if (total_num_block_beam_leds_ > 0)
+  {
+    block_beam_led_distances_to_sensor_.array() = (block_beam_led_distances_to_sensor_.array() - max_distance) * -1.0;
+    // ROS_INFO_STREAM("\nblock beam\n" << block_beam_led_distances_to_sensor_);
+  }
+  if (total_num_pixel_beam_leds_ > 0)
+  {
+    pixel_beam_led_distances_to_sensor_.array() = (pixel_beam_led_distances_to_sensor_.array() - max_distance) * -1.0;
+    // ROS_INFO_STREAM("\npixel beam\n" << pixel_beam_led_distances_to_sensor_);
+  }
 
   // Lastly, generate the configuration file
   bool generate_configuration_file = false;
@@ -472,23 +506,103 @@ bool DecData::generateStructureFile(const std::string& abs_file_name,
   }
   header_file << "};" << endl;
 
-  header_file << "// A value of 255 is assigned to invalidate the entry.\n";
-  const std::string NAME = "BLOCK_LEDS_START_INDEX";
-  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t " << NAME << "[" << number_of_teensys_ << "][" << MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP << "] = {";
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t BLOCK_LEDS_START_INDEX[][" << MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP << "] = {";
   for (unsigned int j = 0; j < number_of_teensys_; ++j)
   {
     header_file << "{";
-    for (unsigned int k = 0; k < MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP; ++k)
+    for (unsigned int k = 0; k < setup_data_[j].num_block_leds; ++k)
     {
-      if (k < (unsigned int)setup_data_[j].num_block_leds)
-      {
-        header_file << (unsigned int)setup_data_[j].block_leds[k].index;
-      }
-      else
-      {
-        header_file << "255";
-      }
-      if (k + 1 < MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP)
+      header_file << (unsigned int)setup_data_[j].block_leds[k].index;
+      if (k + 1 < setup_data_[j].num_block_leds)
+        header_file << ", ";
+    }
+    header_file << "}";
+    if (j + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t BLOCK_LEDS_NUMBER[][" << MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP << "] = {";
+  for (unsigned int j = 0; j < number_of_teensys_; ++j)
+  {
+    header_file << "{";
+    for (unsigned int k = 0; k < setup_data_[j].num_block_leds; ++k)
+    {
+      header_file << (unsigned int)setup_data_[j].block_leds[k].num_leds;
+      if (k + 1 < setup_data_[j].num_block_leds)
+        header_file << ", ";
+    }
+    header_file << "}";
+    if (j + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t BLOCK_LEDS_PINS[][" << MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP << "] = {";
+  for (unsigned int j = 0; j < number_of_teensys_; ++j)
+  {
+    header_file << "{";
+    for (unsigned int k = 0; k < setup_data_[j].num_block_leds; ++k)
+    {
+      header_file << (unsigned int)setup_data_[j].block_leds[k].pin;
+      if (k + 1 < setup_data_[j].num_block_leds)
+        header_file << ", ";
+    }
+    header_file << "}";
+    if (j + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl << endl;
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_PIXEL_LEDS_PER_TEENSY[" << number_of_teensys_ << "] = {";
+  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+  {
+    header_file << (unsigned int)setup_data_[i].num_pixel_leds;
+    if (i + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t PIXEL_LEDS_START_INDEX[][" << MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP << "] = {";
+  for (unsigned int j = 0; j < number_of_teensys_; ++j)
+  {
+    header_file << "{";
+    for (unsigned int k = 0; k < setup_data_[j].num_pixel_leds; ++k)
+    {
+      header_file << (unsigned int)setup_data_[j].pixel_leds[k].index;
+      if (k + 1 < setup_data_[j].num_pixel_leds)
+        header_file << ", ";
+    }
+    header_file << "}";
+    if (j + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t PIXEL_LEDS_NUMBER[][" << MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP << "] = {";
+  for (unsigned int j = 0; j < number_of_teensys_; ++j)
+  {
+    header_file << "{";
+    for (unsigned int k = 0; k < setup_data_[j].num_pixel_leds; ++k)
+    {
+      header_file << (unsigned int)setup_data_[j].pixel_leds[k].num_leds;
+      if (k + 1 < setup_data_[j].num_pixel_leds)
+        header_file << ", ";
+    }
+    header_file << "}";
+    if (j + 1 < number_of_teensys_)
+      header_file << ", ";
+  }
+  header_file << "};" << endl;
+
+  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t PIXEL_LEDS_PINS[][" << MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP << "] = {";
+  for (unsigned int j = 0; j < number_of_teensys_; ++j)
+  {
+    header_file << "{";
+    for (unsigned int k = 0; k < setup_data_[j].num_pixel_leds; ++k)
+    {
+      header_file << (unsigned int)setup_data_[j].pixel_leds[k].pin;
+      if (k + 1 < setup_data_[j].num_pixel_leds)
         header_file << ", ";
     }
     header_file << "}";
@@ -500,14 +614,6 @@ bool DecData::generateStructureFile(const std::string& abs_file_name,
 
 
 
-  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_PIXEL_LEDS_PER_TEENSY[" << number_of_teensys_ << "] = {";
-  for (unsigned int i = 0; i < number_of_teensys_; ++i)
-  {
-    header_file << (unsigned int)setup_data_[i].num_pixel_leds;
-    if (i + 1 < number_of_teensys_)
-      header_file << ", ";
-  }
-  header_file << "};" << endl << endl;
 
 //  header_file << progmem_prefix << "static const " << unit_prefix << "uint8_t NUM_LED_STRIPS_PER_ARDUINO[" << number_of_teensys_ << "] = {";
 //  for (int i = 0; i < number_of_teensys_; ++i)

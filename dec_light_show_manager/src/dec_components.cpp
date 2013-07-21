@@ -37,14 +37,11 @@ void Component::setIds(const unsigned int id)
     }
   }
   ROS_ASSERT(ids_.size() == poses_.size());
-//  ROS_INFO("Added ids:");
-//  for (unsigned int i = 0; i < poses_.size(); ++i)
-//    ROS_INFO("%i ", (int)ids_[i]);
 }
 
 bool Component::read(XmlRpc::XmlRpcValue& config,
                      const std::string& key,
-                     std::pair<int, int>& node_pair)
+                     std::pair<unsigned int, unsigned int>& node_pair)
 {
   if (config.size() != 2)
   {
@@ -66,7 +63,7 @@ bool Component::read(XmlRpc::XmlRpcValue& config,
 
 bool Component::read(XmlRpc::XmlRpcValue& rpc_values,
                      const std::string& key,
-                     std::vector<std::pair<int, int> >& nodes)
+                     std::vector<std::pair<unsigned int, unsigned int> >& nodes)
 {
   if (rpc_values.getType() != XmlRpc::XmlRpcValue::TypeStruct)
   {
@@ -96,7 +93,7 @@ bool Component::read(XmlRpc::XmlRpcValue& rpc_values,
     }
     if (rpc_value[0].getType() == XmlRpc::XmlRpcValue::TypeInt)
     {
-      std::pair<int, int> node_pair;
+      std::pair<unsigned int, unsigned int> node_pair;
       ROS_VERIFY(read(rpc_value, key, node_pair));
       nodes.push_back(node_pair);
       return true;
@@ -105,7 +102,7 @@ bool Component::read(XmlRpc::XmlRpcValue& rpc_values,
     {
       for (int i = 0; i < rpc_value.size(); ++i)
       {
-        std::pair<int, int> node_pair;
+        std::pair<unsigned int, unsigned int> node_pair;
         ROS_VERIFY(read(rpc_value[i], key, node_pair));
         nodes.push_back(node_pair);
       }
@@ -141,7 +138,6 @@ bool Node::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id)
   if (!config.hasMember("position"))
   {
     ROS_ERROR("Each configuration must contain a field >position<.");
-    ROS_INFO_STREAM(config.toXml());
     return false;
   }
   XmlRpc::XmlRpcValue rpc_value = config["position"];
@@ -159,7 +155,10 @@ bool Node::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id)
       ROS_ERROR("Value must either be of type integer or double.");
       return false;
     }
-    values.push_back(static_cast<double> (rpc_value[j]));
+    double value = rpc_value[j];
+    const double NODE_UNIT_SCALE = 1233.4479496034248;
+    value /= NODE_UNIT_SCALE;
+    values.push_back(static_cast<double> (value));
   }
   geometry_msgs::Point point;
   point.x = values[0];
@@ -172,7 +171,7 @@ bool Node::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id)
   poses_.push_back(pose);
 
   Component::setIds(id);
-  // ROS_INFO("Node: Read >%i< node positions.", (int)poses_.size());
+  ROS_DEBUG("Node: Read >%i< node positions.", (int)poses_.size());
   return true;
 }
 
@@ -185,13 +184,12 @@ bool Beam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
 {
   ROS_VERIFY(read(config, "nodes", nodes_));
   ROS_ASSERT(nodes_.size() > 0);
-  // ROS_INFO("Beam: Read >%i< beams.", (int)nodes_.size());
+  ROS_DEBUG("Beam: Read >%i< beams.", (int)nodes_.size());
   for (unsigned int i = 0; i < nodes_.size(); ++i)
   {
-    ROS_ASSERT_MSG((nodes_[i].first >= 0) && (nodes_[i].first < (int)node_positions.size())
-        && (nodes_[i].second >= 0) && (nodes_[i].second < (int)node_positions.size()),
+    ROS_ASSERT_MSG((nodes_[i].first < node_positions.size()) && (nodes_[i].second < node_positions.size()),
         "Invalid nodes index read from >%i< to >%i<. It must be within [0, %i].",
-        nodes_[i].first, nodes_[i].second, (int)(node_positions.size() - 1));
+        (int)nodes_[i].first, (int)nodes_[i].second, (int)(node_positions.size() - 1));
     ROS_ASSERT_MSG(nodes_[i].first != nodes_[i].second, "Invalid beam read. Node indices must differ.");
   }
 
@@ -301,7 +299,7 @@ bool LightNode::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
   ROS_ASSERT(nodes_.size() == num_leds_.size());
   ROS_WARN_COND(nodes_.empty(), "No light nodes read from config.");
 
-  ROS_INFO("LightNode: Read >%i< light nodes.", (int)nodes_.size());
+  ROS_DEBUG("LightNode: Read >%i< light nodes.", (int)nodes_.size());
   for (unsigned int i = 0; i < nodes_.size(); ++i)
   {
     ROS_ASSERT(nodes_[i] < node_positions.size());
@@ -314,7 +312,7 @@ bool LightNode::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
   setIds(id);
   for (unsigned int i = 0; i < nodes_.size(); ++i)
   {
-    ROS_INFO(" Node >%i< has id >%i< and has >%i< LEDs and is at (%.2f %.2f %.2f).",
+    ROS_DEBUG(" Node >%i< has id >%i< and has >%i< LEDs and is at (%.2f %.2f %.2f).",
              (int)ids_[i], (int)nodes_[i], (int)num_leds_[i], poses_[i].position.x, poses_[i].position.y, poses_[i].position.z);
   }
 
@@ -335,7 +333,7 @@ bool LightBeam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
   ROS_VERIFY(Light::initialize(config));
 
   ROS_ASSERT(nodes_.size() == num_leds_.size());
-  ROS_INFO("LightBeam: Read >%i< light beams.", (int)nodes_.size());
+  ROS_DEBUG("LightBeam: Read >%i< light beams.", (int)nodes_.size());
   ROS_VERIFY(getParam(config, "centers", centers_));
   ROS_ASSERT(nodes_.size() == centers_.size());
   for (unsigned int i = 0; i < num_leds_.size(); ++i)
@@ -360,7 +358,7 @@ bool LightBeam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
 
   for (unsigned int i = 0; i < num_leds_.size(); ++i)
   {
-    ROS_INFO(" Beam >%i< has >%i< LEDs and is at (%.2f %.2f %.2f).",
+    ROS_DEBUG(" Beam >%i< has >%i< LEDs and is at (%.2f %.2f %.2f).",
              (int)ids_[i], (int)num_leds_[i], poses_[i].position.x, poses_[i].position.y, poses_[i].position.z);
   }
 
@@ -381,7 +379,7 @@ bool PixelLightBeam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int 
     setPixelPoses(i, node_positions);
   }
 
-  ROS_INFO("PixelLightBeam: Read >%i< pixel light beams.", (int)nodes_.size());
+  ROS_DEBUG("PixelLightBeam: Read >%i< pixel light beams.", (int)nodes_.size());
   return true;
 }
 
@@ -426,7 +424,7 @@ bool BlockLightBeam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int 
 {
   ROS_VERIFY(LightBeam::initialize(config, id, node_positions));
 
-  ROS_INFO("BlockLightBeam: Read >%i< block light beams.", (int)nodes_.size());
+  ROS_DEBUG("BlockLightBeam: Read >%i< block light beams.", (int)nodes_.size());
   return true;
 }
 

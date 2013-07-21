@@ -37,7 +37,7 @@ bool DecLightShowSimulation::initialize(ros::NodeHandle node_handle)
   return true;
 }
 
-double DecLightShowSimulation::getMinimumDistance(tf::Point point, std::vector<std::pair<int, int> > beams)
+double DecLightShowSimulation::getMinimumDistance(tf::Point point, std::vector<std::pair<unsigned int, unsigned int> > beams)
 {
   double min_distance = std::numeric_limits<double>::max();
   for (unsigned int i = 0; i < beams.size(); ++i)
@@ -49,7 +49,7 @@ double DecLightShowSimulation::getMinimumDistance(tf::Point point, std::vector<s
   return min_distance;
 }
 
-double DecLightShowSimulation::getDistance(tf::Point point, std::pair<int, int> beam)
+double DecLightShowSimulation::getDistance(tf::Point point, std::pair<unsigned int, unsigned int> beam)
 {
   tf::Vector3 p0;
   convert(light_show_data_->getNodePosition(beam.first), p0);

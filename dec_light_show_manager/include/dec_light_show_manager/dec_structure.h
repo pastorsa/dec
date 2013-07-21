@@ -18,9 +18,17 @@ namespace dec_light_show_manager
 {
 
 const unsigned int MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = 255;
+const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 20;
+const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 255;
 
 class DecStructure
 {
+
+#define DEC_EXTRA 1
+#ifdef DEC_EXTRA
+  friend class DecLightShowVisualization;
+  friend class DecLightShowSimulation;
+#endif
 
 public:
   DecStructure() :
@@ -75,14 +83,6 @@ public:
 
 protected:
 
-  /*! Position of each node index by id (starting from 0)
-   */
-  // std::vector<geometry_msgs::Point> node_positions_;
-  /*! Pairs of nodes in node_positions_ (indexed from 0)
-   */
-  // std::vector<std::pair<int, int> > beams_;
-  // std::vector<geometry_msgs::Point> beam_positions_;
-
   /*!
    */
   std::vector<Node> nodes_;
@@ -104,8 +104,9 @@ protected:
 
   /*!
    */
-  geometry_msgs::Vector3 light_nodes_size_;
-  geometry_msgs::Vector3 light_beams_size_;
+  geometry_msgs::Vector3 block_light_nodes_size_;
+  geometry_msgs::Vector3 block_light_beams_size_;
+  geometry_msgs::Vector3 pixel_light_beams_size_;
   geometry_msgs::Vector3 sensors_size_;
 
   /*! Number of teensys in the structure and related info
@@ -153,11 +154,19 @@ protected:
 
 private:
 
+  /*!
+   */
   std::vector<geometry_msgs::Point> node_positions_;
+  std::vector<geometry_msgs::Pose> beam_poses_;
+  std::vector<geometry_msgs::Pose> sensor_poses_;
+  std::vector<geometry_msgs::Point> block_light_node_positions_;
+  std::vector<geometry_msgs::Pose> block_light_beam_poses_;
+  std::vector<geometry_msgs::Pose> pixel_light_beam_poses_;
 
   void setNumberOfTeensys();
   void setPins(ros::NodeHandle node_handle);
   void setupTeensyMap();
+  bool isUnique();
 
   // bool read(ros::NodeHandle& node_handle, std::vector<geometry_msgs::Point>& array);
 

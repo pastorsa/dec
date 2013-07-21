@@ -66,11 +66,11 @@ protected:
 
   bool read(XmlRpc::XmlRpcValue& rpc_values,
             const std::string& key,
-            std::vector<std::pair<int, int> >& nodes);
+            std::vector<std::pair<unsigned int, unsigned int> >& nodes);
 
   bool read(XmlRpc::XmlRpcValue& rpc_values,
             const std::string& key,
-            std::pair<int, int>& node_pair);
+            std::pair<unsigned int, unsigned int>& node_pair);
 
 private:
 
@@ -148,7 +148,7 @@ public:
   virtual bool initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
                           const std::vector<geometry_msgs::Point>& node_positions);
 
-  std::vector<std::pair<int, int> > nodes_;
+  std::vector<std::pair<unsigned int, unsigned int> > nodes_;
 
 protected:
 

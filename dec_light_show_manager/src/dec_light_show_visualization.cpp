@@ -21,6 +21,7 @@ namespace dec_light_show_manager
 {
 
 DecLightShowVisualization::DecLightShowVisualization()
+  : static_publish_counter_(0), static_publish_rate_(20)
 {
 }
 
@@ -28,32 +29,35 @@ bool DecLightShowVisualization::initialize(boost::shared_ptr<DecLightShowData> l
 {
   light_show_data_ = light_show_data;
   node_handle_ = node_handle;
+  static_publish_counter_ = 0;
 
   const int PUBLISHER_BUFFER_SIZE = 10;
   rviz_pub_ = node_handle_.advertise<visualization_msgs::MarkerArray>("visualization_marker", PUBLISHER_BUFFER_SIZE, true);
 
-  /*
-  setupNodeMarkers(node_handle_, "nodes", node_markers_, light_show_data_->node_positions_);
-  setupNodeMarkers(node_handle_, "light_nodes", light_node_markers_, light_show_data_->light_node_positions_);
+  setupNodeMarkers(node_handle_, "nodes", node_markers_, light_show_data_->node_positions_, true);
+  setupBeamMarkers(node_handle_, "beams", beam_markers_, light_show_data_->beam_poses_, true);
+  setupBeamMarkers(node_handle_, "sensors", sensor_markers_, light_show_data_->sensor_poses_, true);
 
-  setupBeamMarkers(node_handle_, "beams", beam_markers_, light_show_data_->node_positions_, light_show_data_->beams_);
-  setupBeamMarkers(node_handle_, "sensors", sensor_markers_, light_show_data_->node_positions_, light_show_data_->sensors_);
+  // setupLightBeamMarkers();
+  setupNodeMarkers(node_handle_, "block_nodes", block_light_node_markers_, light_show_data_->block_light_node_positions_);
+  setupBeamMarkers(node_handle_, "block_beams", block_light_beam_markers_, light_show_data_->block_light_beam_poses_);
+  setupBeamMarkers(node_handle_, "pixel_beams", block_light_beam_markers_, light_show_data_->pixel_light_beam_poses_);
 
-  setupLightBeamMarkers();
-  setupBeamMarkers(node_handle_, "light_beams", light_beam_markers_, light_show_data_->node_positions_, light_show_data_->light_beams_);
+  setupTextMarkers(node_handle_, "node", node_markers_, node_text_markers_, true);
+  setupTextMarkers(node_handle_, "beam", beam_markers_, beam_text_markers_, true);
+  setupTextMarkers(node_handle_, "sensor", sensor_markers_, sensor_text_markers_, true);
 
-  setupTextMarkers(node_handle_, "node", node_markers_, node_text_markers_);
-  setupTextMarkers(node_handle_, "light_node", light_node_markers_, light_node_text_markers_);
-  setupTextMarkers(node_handle_, "beam", beam_markers_, beam_text_markers_);
-  setupTextMarkers(node_handle_, "light_beam", light_beam_markers_, light_beam_text_markers_);
-  setupTextMarkers(node_handle_, "sensor", sensor_markers_, sensor_text_markers_);
-*/
+  setupTextMarkers(node_handle_, "block_node", block_light_node_markers_, block_light_node_text_markers_, true);
+  setupTextMarkers(node_handle_, "block_beam", block_light_beam_markers_, block_light_beam_text_markers_, true);
+  setupTextMarkers(node_handle_, "pixel_beam", block_light_beam_markers_, pixel_light_beam_text_markers_, true);
+
+  setupPanelMarkers(node_handle_, light_show_data_->node_positions_);
+
   return true;
 }
 
 bool DecLightShowVisualization::update()
 {
-  /*
   for (unsigned int i = 0; i < light_show_data_->total_num_sensors_; ++i)
   {
     ROS_ASSERT_MSG(!(light_show_data_->sensor_levels_(i) < 0.0) && !(light_show_data_->sensor_levels_(i) > 1.0),
@@ -66,41 +70,65 @@ bool DecLightShowVisualization::update()
   ROS_ASSERT(4 == (int)light_show_data_->node_led_values_.rows());
   for (unsigned int i = 0; i < light_show_data_->total_num_node_leds_; ++i)
   {
-    light_node_markers_.markers[i].color.r = (float)light_show_data_->node_led_values_(RED_OFFSET, i) / 255.0f;
-    light_node_markers_.markers[i].color.g = (float)light_show_data_->node_led_values_(GREEN_OFFSET, i) / 255.0f;
-    light_node_markers_.markers[i].color.b = (float)light_show_data_->node_led_values_(BLUE_OFFSET, i) / 255.0f;
-    light_node_markers_.markers[i].color.a = (float)light_show_data_->node_led_values_(ALPHA_OFFSET, i) / 255.0f;
+    block_light_node_markers_.markers[i].color.r = (float)light_show_data_->node_led_values_(RED_OFFSET, i) / 255.0f;
+    block_light_node_markers_.markers[i].color.g = (float)light_show_data_->node_led_values_(GREEN_OFFSET, i) / 255.0f;
+    block_light_node_markers_.markers[i].color.b = (float)light_show_data_->node_led_values_(BLUE_OFFSET, i) / 255.0f;
+    block_light_node_markers_.markers[i].color.a = (float)light_show_data_->node_led_values_(ALPHA_OFFSET, i) / 255.0f;
   }
 
-  ROS_ASSERT(light_show_data_->total_num_beam_leds_ == light_show_data_->beam_led_values_.cols());
-  ROS_ASSERT(4 == (int)light_show_data_->beam_led_values_.rows());
-  for (unsigned int i = 0; i < light_show_data_->total_num_beam_leds_; ++i)
+
+  ROS_ASSERT(light_show_data_->total_num_block_beam_leds_ == light_show_data_->block_beam_led_values_.cols());
+  ROS_ASSERT(4 == (int)light_show_data_->block_beam_led_values_.rows());
+  for (unsigned int i = 0; i < light_show_data_->total_num_block_beam_leds_; ++i)
   {
-    light_beam_markers_.markers[i].color.r = static_cast<float>(light_show_data_->beam_led_values_(RED_OFFSET, i)) / 255.0f;
-    light_beam_markers_.markers[i].color.g = static_cast<float>(light_show_data_->beam_led_values_(GREEN_OFFSET, i)) / 255.0f;
-    light_beam_markers_.markers[i].color.b = static_cast<float>(light_show_data_->beam_led_values_(BLUE_OFFSET, i)) / 255.0f;
-    light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->beam_led_values_(ALPHA_OFFSET, i)) / 255.0f;
+    block_light_beam_markers_.markers[i].color.r = static_cast<float>(light_show_data_->block_beam_led_values_(RED_OFFSET, i)) / 255.0f;
+    block_light_beam_markers_.markers[i].color.g = static_cast<float>(light_show_data_->block_beam_led_values_(GREEN_OFFSET, i)) / 255.0f;
+    block_light_beam_markers_.markers[i].color.b = static_cast<float>(light_show_data_->block_beam_led_values_(BLUE_OFFSET, i)) / 255.0f;
+    block_light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->block_beam_led_values_(ALPHA_OFFSET, i)) / 255.0f;
   }
 
-  rviz_pub_.publish(node_markers_);
-  rviz_pub_.publish(beam_markers_);
   rviz_pub_.publish(sensor_markers_);
-  rviz_pub_.publish(light_node_markers_);
-  rviz_pub_.publish(light_beam_markers_);
-  rviz_pub_.publish(light_beam_led_markers_);
-  rviz_pub_.publish(node_text_markers_);
-  rviz_pub_.publish(beam_text_markers_);
-  rviz_pub_.publish(sensor_text_markers_);
-  rviz_pub_.publish(light_beam_text_markers_);
-  rviz_pub_.publish(light_node_text_markers_);
-*/
+  rviz_pub_.publish(block_light_node_markers_);
+  rviz_pub_.publish(block_light_beam_markers_);
+
+  static_publish_counter_++;
+  if (static_publish_counter_ > static_publish_rate_)
+  {
+    static_publish_counter_ = 0;
+    rviz_pub_.publish(node_markers_);
+    rviz_pub_.publish(beam_markers_);
+    rviz_pub_.publish(sensor_markers_);
+    rviz_pub_.publish(node_text_markers_);
+    rviz_pub_.publish(beam_text_markers_);
+    rviz_pub_.publish(sensor_text_markers_);
+    rviz_pub_.publish(block_light_node_text_markers_);
+    rviz_pub_.publish(block_light_beam_text_markers_);
+    rviz_pub_.publish(pixel_light_beam_text_markers_);
+    rviz_pub_.publish(panel_markers_);
+  }
+
+
+  return true;
+
+  ROS_ASSERT(light_show_data_->total_num_pixel_beam_leds_ == light_show_data_->pixel_beam_led_values_.cols());
+  ROS_ASSERT(4 == (int)light_show_data_->pixel_beam_led_values_.rows());
+  for (unsigned int i = 0; i < light_show_data_->total_num_pixel_beam_leds_; ++i)
+  {
+    pixel_light_beam_markers_.markers[i].color.r = static_cast<float>(light_show_data_->pixel_beam_led_values_(RED_OFFSET, i)) / 255.0f;
+    pixel_light_beam_markers_.markers[i].color.g = static_cast<float>(light_show_data_->pixel_beam_led_values_(GREEN_OFFSET, i)) / 255.0f;
+    pixel_light_beam_markers_.markers[i].color.b = static_cast<float>(light_show_data_->pixel_beam_led_values_(BLUE_OFFSET, i)) / 255.0f;
+    pixel_light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->pixel_beam_led_values_(ALPHA_OFFSET, i)) / 255.0f;
+  }
+
+  rviz_pub_.publish(pixel_light_beam_markers_);
   return true;
 }
 
 void DecLightShowVisualization::setupTextMarkers(ros::NodeHandle& node_handle,
                                                  const std::string& namespace_name,
                                                  const visualization_msgs::MarkerArray& markers,
-                                                 visualization_msgs::MarkerArray& text_markers)
+                                                 visualization_msgs::MarkerArray& text_markers,
+                                                 const bool forever)
 {
   if(markers.markers.empty())
   {
@@ -115,7 +143,14 @@ void DecLightShowVisualization::setupTextMarkers(ros::NodeHandle& node_handle,
   marker.header.stamp = ros::Time::now();
   marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
   marker.action = visualization_msgs::Marker::ADD;
-  marker.lifetime = ros::Duration(1.0);
+  if (forever)
+  {
+    marker.lifetime = ros::Duration();
+  }
+  else
+  {
+    marker.lifetime = ros::Duration(1.0);
+  }
   convert(tf::Quaternion::getIdentity(), marker.pose.orientation);
 
   for (unsigned int i = 0; i < markers.markers.size(); ++i)
@@ -142,7 +177,8 @@ void DecLightShowVisualization::setupTextMarkers(ros::NodeHandle& node_handle,
 void DecLightShowVisualization::setupNodeMarkers(ros::NodeHandle& node_handle,
                                                  const std::string& namespace_name,
                                                  visualization_msgs::MarkerArray& node_markers,
-                                                 const std::vector<geometry_msgs::Point>& node_positions)
+                                                 const std::vector<geometry_msgs::Point>& node_positions,
+                                                 const bool forever)
 {
   if(node_positions.empty())
   {
@@ -157,8 +193,14 @@ void DecLightShowVisualization::setupNodeMarkers(ros::NodeHandle& node_handle,
   marker.header.stamp = ros::Time::now();
   marker.type = visualization_msgs::Marker::SPHERE;
   marker.action = visualization_msgs::Marker::ADD;
-  marker.lifetime = ros::Duration(1.0);
-
+  if (forever)
+  {
+    marker.lifetime = ros::Duration();
+  }
+  else
+  {
+    marker.lifetime = ros::Duration(1.0);
+  }
   geometry_msgs::Vector3 size;
   ROS_VERIFY(dec_utilities::read(node_handle, namespace_name + "_size", size));
   marker.scale = size;
@@ -181,13 +223,14 @@ void DecLightShowVisualization::setupNodeMarkers(ros::NodeHandle& node_handle,
     marker.pose.orientation.z = 0.0;
     node_markers.markers.push_back(marker);
   }
+  ROS_WARN("Created %i >%s< nodes.", (int)node_markers.markers.size(), namespace_name.c_str());
 }
 
 void DecLightShowVisualization::setupBeamMarkers(ros::NodeHandle& node_handle,
                                                  const std::string& namespace_name,
                                                  visualization_msgs::MarkerArray& beam_markers,
-                                                 const std::vector<geometry_msgs::Point>& node_positions,
-                                                 const std::vector<std::pair<int, int> >& beams)
+                                                 const std::vector<geometry_msgs::Pose>& poses,
+                                                 const bool forever)
 {
   beam_markers.markers.clear();
   visualization_msgs::Marker marker;
@@ -196,8 +239,14 @@ void DecLightShowVisualization::setupBeamMarkers(ros::NodeHandle& node_handle,
   marker.header.stamp = ros::Time::now();
   marker.type = visualization_msgs::Marker::CYLINDER;
   marker.action = visualization_msgs::Marker::ADD;
-  marker.lifetime = ros::Duration(1.0);
-
+  if (forever)
+  {
+    marker.lifetime = ros::Duration();
+  }
+  else
+  {
+    marker.lifetime = ros::Duration(1.0);
+  }
   geometry_msgs::Vector3 size;
   ROS_VERIFY(dec_utilities::read(node_handle, namespace_name + "_size", size));
   ROS_ASSERT(size.z > 0.0 && size.z <= 1.0);
@@ -213,62 +262,96 @@ void DecLightShowVisualization::setupBeamMarkers(ros::NodeHandle& node_handle,
   marker.color.b = color[2];
   marker.color.a = color[3];
 
-  for (unsigned int i = 0; i < beams.size(); ++i)
+  for (unsigned int i = 0; i < poses.size(); ++i)
   {
     marker.id = i;
-    tf::Vector3 p1, p2;
-    convert(node_positions[beams[i].first], p1);
-    convert(node_positions[beams[i].second], p2);
-    tf::Vector3 center = (p1 + p2) / 2.0f;
-    convert(center, marker.pose.position);
-
-    tf::Vector3 p12 = p2 - p1;
-    marker.scale.z = p12.length() * size.z;
-    p12.normalize();
-    tf::Vector3 z_world = tf::Vector3(0.0, 0.0, 1.0);
-    tf::Vector3 z_cross_p12 = z_world.cross(p12);
-    double angle = acos(p12.dot(z_world));
-    tf::Quaternion q;
-    q.setRotation(z_cross_p12, angle);
-    convert(q, marker.pose.orientation);
+    marker.pose = poses[i];
     beam_markers.markers.push_back(marker);
   }
+  ROS_WARN("Created %i >%s< beams.", (int)beam_markers.markers.size(), namespace_name.c_str());
 }
 
-void DecLightShowVisualization::setupLightBeamMarkers()
+void DecLightShowVisualization::setupPanelMarkers(ros::NodeHandle& node_handle,
+                                                  const std::vector<geometry_msgs::Point>& node_positions)
 {
-  light_beam_led_markers_.markers.clear();
-  visualization_msgs::Marker marker;
-  marker.header.frame_id.assign("/BASE");
-  marker.ns = "light_beam_leds";
-  marker.header.stamp = ros::Time::now();
-  marker.type = visualization_msgs::Marker::CYLINDER;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.lifetime = ros::Duration(1.0);
-  marker.scale = light_show_data_->light_beams_size_;
-
-  std::vector<double> color;
-  ROS_VERIFY(dec_utilities::read(node_handle_, "light_beams_color", color));
-  ROS_ASSERT(color.size() == 4);
-  marker.color.r = color[0];
-  marker.color.g = color[1];
-  marker.color.b = color[2];
-  marker.color.a = color[3];
-
-  /*
-  int num_led_index = 0;
-  for (unsigned int i = 0; i < light_show_data_->num_leds_of_each_light_beam_.size(); ++i)
+  panel_markers_.markers.clear();
+  std::vector<unsigned int> panel_indices;
+  const std::string KEY = "panels";
+  if (node_handle.hasParam(KEY))
   {
-    for (int led = 0; led < light_show_data_->num_leds_of_each_light_beam_[i]; ++led)
+    ROS_VERIFY(dec_utilities::read(node_handle, KEY, panel_indices));
+    ROS_ASSERT(panel_indices.size() > 0 && ((panel_indices.size() % 3) == 0));
+
+    visualization_msgs::Marker panel_marker;
+    panel_marker.header.frame_id.assign("/BASE");
+    panel_marker.ns = KEY;
+    panel_marker.header.stamp = ros::Time::now();
+    panel_marker.type = visualization_msgs::Marker::TRIANGLE_LIST;
+    panel_marker.action = visualization_msgs::Marker::ADD;
+    panel_marker.lifetime = ros::Duration();
+
+    std::vector<double> color;
+    ROS_VERIFY(dec_utilities::read(node_handle, KEY + "_color", color));
+    ROS_ASSERT(color.size() == 4);
+    panel_marker.color.r = color[0];
+    panel_marker.color.g = color[1];
+    panel_marker.color.b = color[2];
+    panel_marker.color.a = color[3];
+
+    panel_marker.scale.x = 1.0;
+    panel_marker.scale.y = 1.0;
+    panel_marker.scale.z = 1.0;
+
+    panel_marker.id = 0;
+    panel_marker.points.resize(panel_indices.size());
+    for (unsigned int i = 0; i < panel_indices.size(); ++i)
     {
-      geometry_msgs::Pose led_pose = light_show_data_->getBeamLedPose(i, led, light_show_data_->num_leds_of_each_light_beam_[i]);
-      marker.id = num_led_index++;
-      marker.scale.z = light_show_data_->light_beams_size_.z / (float)light_show_data_->num_leds_of_each_light_beam_[i];
-      marker.pose = led_pose;
-      light_beam_led_markers_.markers.push_back(marker);
+      ROS_ASSERT(panel_indices[i] < node_positions.size());
+      panel_marker.points[i] = node_positions[panel_indices[i]];
     }
+    panel_markers_.markers.push_back(panel_marker);
+    ROS_WARN("Created %i panels.",(int)(panel_indices.size() / 3));
   }
-  */
+  else
+  {
+    ROS_WARN("No panels read from configuration. Not displaying.");
+  }
 }
+
+//void DecLightShowVisualization::setupLightBeamMarkers()
+//{
+//  pixel_light_beam_markers_.markers.clear();
+//  visualization_msgs::Marker marker;
+//  marker.header.frame_id.assign("/BASE");
+//  marker.ns = "light_beam_leds";
+//  marker.header.stamp = ros::Time::now();
+//  marker.type = visualization_msgs::Marker::CYLINDER;
+//  marker.action = visualization_msgs::Marker::ADD;
+//  marker.lifetime = ros::Duration(1.0);
+//  marker.scale = light_show_data_->light_beams_size_;
+//
+//  std::vector<double> color;
+//  ROS_VERIFY(dec_utilities::read(node_handle_, "light_beams_color", color));
+//  ROS_ASSERT(color.size() == 4);
+//  marker.color.r = color[0];
+//  marker.color.g = color[1];
+//  marker.color.b = color[2];
+//  marker.color.a = color[3];
+//
+//  /*
+//  int num_led_index = 0;
+//  for (unsigned int i = 0; i < light_show_data_->num_leds_of_each_light_beam_.size(); ++i)
+//  {
+//    for (int led = 0; led < light_show_data_->num_leds_of_each_light_beam_[i]; ++led)
+//    {
+//      geometry_msgs::Pose led_pose = light_show_data_->getBeamLedPose(i, led, light_show_data_->num_leds_of_each_light_beam_[i]);
+//      marker.id = num_led_index++;
+//      marker.scale.z = light_show_data_->light_beams_size_.z / (float)light_show_data_->num_leds_of_each_light_beam_[i];
+//      marker.pose = led_pose;
+//      light_beam_led_markers_.markers.push_back(marker);
+//    }
+//  }
+//  */
+//}
 
 }

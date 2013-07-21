@@ -29,9 +29,6 @@
 namespace dec_light_show_manager
 {
 
-const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 10;
-const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 255;
-
 //typedef uint8_t led_channel_t;
 //typedef uint8_t sensor_channel_t;
 typedef int led_channel_t;
@@ -45,7 +42,6 @@ class DecData : public DecStructure
 
 public:
 
-#define DEC_EXTRA 1
 #ifdef DEC_EXTRA
   friend class DecLightShowVisualization;
   friend class DecLightShowSimulation;
