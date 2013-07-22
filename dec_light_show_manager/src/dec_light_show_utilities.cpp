@@ -36,6 +36,20 @@ bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
 
 bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
                                    const std::string& key,
+                                   float& f)
+{
+  if (!config.hasMember(key))
+    return false;
+  XmlRpc::XmlRpcValue param = config[key];
+  if (param.getType() != XmlRpc::XmlRpcValue::TypeDouble)
+    return false;
+  double d = param;
+  f = static_cast<float>(d);
+  return true;
+}
+
+bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
+                                   const std::string& key,
                                    std::string& str)
 {
   if (!config.hasMember(key))

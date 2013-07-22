@@ -27,12 +27,12 @@ public:
 
 private:
 
-//  static const unsigned int NUM_COLOR_VALUES = 4;
-//
-//  std::vector<float> low_level_color_;
-//  std::vector<float> high_level_color_;
-//  std::vector<float> colors_;
-//  std::vector<float> color_multiplier_;
+  static const unsigned int NUM_COLOR_VALUES = 4;
+
+  std::vector<float> low_level_color_;
+  std::vector<float> high_level_color_;
+  std::vector<float> colors_;
+  std::vector<float> color_multiplier_;
 
 };
 

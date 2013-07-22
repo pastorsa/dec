@@ -103,7 +103,7 @@ public:
    */
   Eigen::VectorXf sensor_levels_;
 
-  /*! These matrices are of size num_sensor x {num_node_leds,num_beam_leds}
+  /*! These matrices are of size {num_node_leds,num_block_beam_leds,num_pixel_beam_leds} x num_sensor
    * Each entry corresponds to the distance of that sensor-led pair in meters
    */
   Eigen::MatrixXf node_led_distances_to_sensor_;

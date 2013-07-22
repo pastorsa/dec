@@ -252,10 +252,10 @@ public:
   virtual bool initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
                           const std::vector<geometry_msgs::Point>& node_positions);
 
-protected:
-  // std::vector<std::pair<int, int> > nodes_;
   std::vector<float> centers_;
   std::vector<float> length_;
+
+protected:
 
 private:
   void setLightBeamPoses(const unsigned int local_index,

@@ -87,9 +87,9 @@ bool DecLightShowSimulation::copySimulatedSensorInformation()
     std::string object_name = simulated_object_name_ + "_" + boost::lexical_cast<std::string>(object_index);
     if (world_state_.getObjectPose(object_name, object_pose, false))
     {
-      for (unsigned int i = 0; i < light_show_data_->capactive_sensors_.size(); ++i)
+      for (unsigned int i = 0; i < light_show_data_->sensors_.size(); ++i)
       {
-        double distance = getMinimumDistance(object_pose.getOrigin(), light_show_data_->capactive_sensors_[i].nodes_);
+        double distance = getMinimumDistance(object_pose.getOrigin(), light_show_data_->sensors_[i].nodes_);
         if (distance < simulation_sensor_object_threshold_)
         {
           // ROS_DEBUG("Distance between object >%s< and sensor beam >%i< between node >%i< and >%i< is >%.2f< m.",

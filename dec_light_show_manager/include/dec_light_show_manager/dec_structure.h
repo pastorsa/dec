@@ -56,14 +56,6 @@ public:
   }
 
   /*!
-   * @return
-   */
-  inline unsigned int getNumTeensys() const
-  {
-    return number_of_teensys_;
-  }
-
-  /*!
    * @param id
    * @return Position of node
    */
@@ -90,10 +82,10 @@ protected:
 
   /*!
    */
-  std::vector<Sensor> capactive_sensors_;
+  std::vector<Sensor> sensors_;
   std::vector<LightNode> block_light_nodes_;
-  std::vector<PixelLightBeam> pixel_light_beams_;
   std::vector<BlockLightBeam> block_light_beams_;
+  std::vector<PixelLightBeam> pixel_light_beams_;
 
   /*!
    */
@@ -162,6 +154,7 @@ private:
   std::vector<geometry_msgs::Point> block_light_node_positions_;
   std::vector<geometry_msgs::Pose> block_light_beam_poses_;
   std::vector<geometry_msgs::Pose> pixel_light_beam_poses_;
+  std::vector<geometry_msgs::Pose> pixel_light_beam_led_poses_;
 
   void setNumberOfTeensys();
   void setPins(ros::NodeHandle node_handle);

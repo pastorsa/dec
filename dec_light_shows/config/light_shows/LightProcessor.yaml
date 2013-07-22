@@ -1,5 +1,4 @@
 LightProcessor:
   type: "dec_light_shows/DecLightProcessor"
-  size_circular_sensor_buffer: 20
-  num_cycles_per_buffer_shifts: 1
-  distance_dividor: 10.0
+  wave_travel_speed: 5.7 # in m/s
+  wave_length: 3.0 # in m

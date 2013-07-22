@@ -34,9 +34,9 @@ public:
 
 private:
 
-//  filters::MultiChannelTransferFunctionFilter<float> filter_;
-//  std::vector<float> unfiltered_data_;
-//  std::vector<float> filtered_data_;
+  filters::MultiChannelTransferFunctionFilter<float> filter_;
+  std::vector<float> unfiltered_data_;
+  std::vector<float> filtered_data_;
 
 //   int num_cycles_to_load_;
 //   int num_cycles_to_unload_;

@@ -31,14 +31,46 @@ public:
 
 private:
 
-//  boost::shared_ptr<boost::circular_buffer<Eigen::VectorXf> > circular_sensor_buffer_;
-//  Eigen::MatrixXf node_led_distances_to_sensor_weight_;
-//
-//  Eigen::VectorXf activations_;
-//
-//  int num_cycles_per_buffer_shifts_;
-//  int cycles_counter_;
+  /*!
+   */
+  Eigen::MatrixXf normalized_node_led_distances_to_sensor_;
+  Eigen::MatrixXf normalized_block_beam_led_distances_to_sensor_;
+  Eigen::MatrixXf normalized_pixel_beam_led_distances_to_sensor_;
 
+  /*!
+   */
+  unsigned int filter_ring_index_;
+
+  /*!
+   */
+  unsigned int filter_size_;
+
+  /*! This buffer is of size >total_num_node_leds_ x filter_size_<
+   */
+  Eigen::MatrixXf block_node_buffer_;
+  /*! This buffer is of size >total_num_block_beam_leds_ x filter_size_<
+   */
+  Eigen::MatrixXf block_beam_buffer_;
+  /*! This buffer is of size >total_num_pixel_beam_leds_ x filter_size_<
+   */
+  Eigen::MatrixXf pixel_beam_buffer_;
+
+  /*! This filter is of size >filter_size_ x fitler_size_<
+   */
+  Eigen::MatrixXf filter_;
+
+  float max_distance_;
+  float wave_travel_speed_;
+  float wave_length_;
+
+  unsigned int wave_activation_size_;
+  unsigned int half_wave_activation_size_;
+
+  inline float getFilter(const float normalized_distance, const unsigned int index)
+  {
+    unsigned int wave_index = static_cast<unsigned int>(normalized_distance * static_cast<float>(filter_size_ - 1));
+    return static_cast<float>(filter_(wave_index, index));
+  }
 };
 
 }

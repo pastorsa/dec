@@ -81,6 +81,12 @@ private:
                                visualization_msgs::MarkerArray& text_markers,
                                const bool forever = false);
 
+  void setupPixelBeamMarkers(ros::NodeHandle& node_handle,
+                             const std::string& namespace_name,
+                             visualization_msgs::MarkerArray& beam_markers,
+                             const std::vector<PixelLightBeam>& pixel_light_beams,
+                             const std::vector<geometry_msgs::Pose>& poses);
+
   void setupPanelMarkers(ros::NodeHandle& node_handle,
                          const std::vector<geometry_msgs::Point>& node_positions);
 

@@ -230,35 +230,35 @@ void loadSetupData(const uint8_t node_id)
 {
   uint8_t i = 0;
 
-  printf("Loading setup data for node >%i<.\n", (int)node_id);
+  // printf("Loading setup data for node >%i<.\n", (int)node_id);
   _setup_data.num_block_leds = NUM_BLOCK_LEDS_PER_TEENSY[node_id];
-  printf("Number of block LEDS is >%i<.\n", (int)_setup_data.num_block_leds);
+  // printf("Number of block LEDS is >%i<.\n", (int)_setup_data.num_block_leds);
   for (i = 0; i < _setup_data.num_block_leds; ++i)
   {
     _setup_data.block_leds[i].index = BLOCK_LEDS_START_INDEX[node_id][i];
     _setup_data.block_leds[i].num_leds = BLOCK_LEDS_NUMBER[node_id][i];
     _setup_data.block_leds[i].pin = LIGHT_PIN_ORDERING[BLOCK_LEDS_PINS[node_id][i]];
-    printf(" block LEDS data index >%i< num_leds >%i< pin >%i<.\n",
-           (int)_setup_data.block_leds[i].index, (int)_setup_data.block_leds[i].num_leds, (int)_setup_data.block_leds[i].pin);
+    // printf(" block LEDS data index >%i< num_leds >%i< pin >%i<.\n",
+          // (int)_setup_data.block_leds[i].index, (int)_setup_data.block_leds[i].num_leds, (int)_setup_data.block_leds[i].pin);
   }
 
   _setup_data.num_pixel_leds = NUM_PIXEL_LEDS_PER_TEENSY[node_id];
-  printf("Number of pixel LEDS is >%i<.\n", (int)_setup_data.num_pixel_leds);
+  // printf("Number of pixel LEDS is >%i<.\n", (int)_setup_data.num_pixel_leds);
   for (i = 0; i < _setup_data.num_pixel_leds; ++i)
   {
     _setup_data.pixel_leds[i].index = PIXEL_LEDS_START_INDEX[node_id][i];
     _setup_data.pixel_leds[i].num_leds = PIXEL_LEDS_NUMBER[node_id][i];
     _setup_data.pixel_leds[i].pin = LIGHT_PIN_ORDERING[PIXEL_LEDS_PINS[node_id][i]];
-    printf(" pixel LEDS data index >%i< num_leds >%i< pin >%i<.\n",
-           (int)_setup_data.pixel_leds[i].index, (int)_setup_data.pixel_leds[i].num_leds, (int)_setup_data.pixel_leds[i].pin);
+    // printf(" pixel LEDS data index >%i< num_leds >%i< pin >%i<.\n",
+          // (int)_setup_data.pixel_leds[i].index, (int)_setup_data.pixel_leds[i].num_leds, (int)_setup_data.pixel_leds[i].pin);
   }
 
   _setup_data.num_sensors = NUM_SENSORS_PER_TEENSY[node_id];
-  printf("Number of sensors is >%i<.\n", (int)_setup_data.num_sensors);
+  // printf("Number of sensors is >%i<.\n", (int)_setup_data.num_sensors);
   for (i = 0; i < _setup_data.num_sensors; ++i)
   {
     _setup_data.sensors[i].pin = SENSOR_PIN_ORDERING[i];
-    printf(" sensor pin >%i<.\n", (int)_setup_data.sensors[i].pin);
+    // printf(" sensor pin >%i<.\n", (int)_setup_data.sensors[i].pin);
   }
 }
 
