@@ -191,8 +191,11 @@ private:
   std::vector<light_data_t> dec_interface_light_data_;
   std::vector<setup_data_t> dec_interface_setup_data_;
 
-  // geometry_msgs::Pose getBeamLedPose(const int beam_id, const int led, const int num_leds);
+  /*!
+   */
   float computeDistance(const geometry_msgs::Point& sensor, const geometry_msgs::Point& thing);
+
+  std::vector<unsigned int> list_of_teensys_to_exclude_from_communication_;
 
 };
 

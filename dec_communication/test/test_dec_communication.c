@@ -32,10 +32,10 @@ void printSetupData()
 
 void printData()
 {
-  printf("====================================================================\nData: %u bytes : ", _rx_buffer_length);
-  for (uint8_t i = 0; i < _rx_buffer_length; ++i)
+  printf("====================================================================\nData: %u bytes : ", (int)_rx_buffer_length);
+  for (int i = 0; i < (int)_rx_buffer_length; ++i)
   {
-    printf("%u ", _rx_buffer[i]);
+    printf("%i ", (int)_rx_buffer[i]);
   }
   printf("\n");
 }
@@ -48,21 +48,26 @@ int main()
   uint8_t node_id = 0;
   loadSetupData(node_id);
 
-  generateSetupData(_rx_buffer);
-  printSetupData();
+  for (unsigned int i = 0; i < 100; ++i)
+  {
 
-  resetData();
-  printSetupData();
+    generateSetupData(_rx_buffer);
+    printSetupData();
 
-  parseSetupData(_rx_buffer);
-  printSetupData();
+    // resetData();
+    // printSetupData();
 
-  node_id = 1;
-  loadSetupData(node_id);
-  generateSetupData(_rx_buffer);
+    parseSetupData(_rx_buffer);
+    printSetupData();
 
-  parseSetupData(_rx_buffer);
-  printSetupData();
+  }
+
+//  node_id = 1;
+//  loadSetupData(node_id);
+//  generateSetupData(_rx_buffer);
+//
+//  parseSetupData(_rx_buffer);
+//  printSetupData();
 
   return 0;
 }

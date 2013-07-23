@@ -156,7 +156,7 @@ bool Node::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id)
       return false;
     }
     double value = rpc_value[j];
-    const double NODE_UNIT_SCALE = 1233.4479496034248;
+    const double NODE_UNIT_SCALE = 1000.0;
     value /= NODE_UNIT_SCALE;
     values.push_back(static_cast<double> (value));
   }

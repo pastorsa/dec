@@ -41,6 +41,9 @@
 
 // DEC includes
 #include "dec_communication.h"
+//uint16_t _rx_buffer_length;
+//#define BUFFER_SIZE (uint16_t)1600
+//uint8_t _rx_buffer[BUFFER_SIZE];
 
 // =======================================================================================
 // NOTE: Change both, NODE_ID and NODE_ID_HEX !!
@@ -67,11 +70,19 @@ Adafruit_NeoPixel light_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
 void setupPins(const setup_data_t* setup_data)
 {
   // Serial.println("test");
+  uint8_t num_leds[60];
+
+  for (uint8_t i = 0; i < 60; ++i)
+    num_leds[i] = 0;
+  for (uint8_t i = 0; i < setup_data->num_block_leds; ++i)
+  {
+    num_leds[setup_data->block_leds[i].pin] += setup_data->block_leds[i].num_leds;
+  }
 
   uint8_t strip_index = 0;
-  for (uint8_t i = 0; i < setup_data->num_led_nodes; ++i)
+  for (uint8_t i = 0; i < setup_data->num_block_leds; ++i)
   {
-    light_strips[strip_index].setup((uint16_t)setup_data->led_nodes[i].num_leds, (uint8_t)setup_data->led_nodes[i].pin, NEO_PIXEL_TYPE);
+    light_strips[strip_index].setup((uint16_t)num_leds[setup_data->block_leds[i].pin], (uint8_t)setup_data->block_leds[i].pin, NEO_PIXEL_TYPE);
     // Initialize all pixels to 'off'
     for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
     {
@@ -80,9 +91,16 @@ void setupPins(const setup_data_t* setup_data)
     strip_index++;
   }
 
-  for (uint8_t i = 0; i < setup_data->num_led_beams; ++i)
+  for (uint8_t i = 0; i < 60; ++i)
+    num_leds[i] = 0;
+  for (uint8_t i = 0; i < setup_data->num_pixel_leds; ++i)
   {
-    light_strips[strip_index].setup((uint16_t)setup_data->led_beams[i].num_leds, (uint8_t)setup_data->led_beams[i].pin, NEO_PIXEL_TYPE);
+    num_leds[setup_data->pixel_leds[i].pin] += setup_data->pixel_leds[i].num_leds;
+  }
+
+  for (uint8_t i = 0; i < setup_data->num_pixel_leds; ++i)
+  {
+    light_strips[strip_index].setup((uint16_t)num_leds[setup_data->pixel_leds[i].pin], (uint8_t)setup_data->pixel_leds[i].pin, NEO_PIXEL_TYPE);
     // Initialize all pixels to 'off
     for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
     {
@@ -201,44 +219,46 @@ void loop()
                 }
                 else if (is_setup && isLightData(buffer_ptr))
                 {
-                  // quickly store received light data to immediately send out sensor data
-                  memcpy(light_buffer, buffer_ptr, sizeof(light_buffer));
-                  // get sensor data and send it out
-                  for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
-                  {
-                    if (digitalRead(_setup_data.sensors[i].pin))
-                    {
-                      _sensor_data.sensor_value[i] = (uint8_t)1;
-                    }
-                    else
-                    {
-                      _sensor_data.sensor_value[i] = (uint8_t)0;
-                    }
-                  }
-                  generateSensorData(buffer_ptr, &_sensor_data);
+//                  // quickly store received light data to immediately send out sensor data
+//                  memcpy(light_buffer, buffer_ptr, sizeof(light_buffer));
+//                  // get sensor data and send it out
+//                  for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
+//                  {
+//                    if (digitalRead(_setup_data.sensors[i].pin))
+//                    {
+//                      _sensor_data.sensor_value[i] = (uint8_t)1;
+//                    }
+//                    else
+//                    {
+//                      _sensor_data.sensor_value[i] = (uint8_t)0;
+//                    }
+//                  }
+//                  generateSensorData(buffer_ptr, &_sensor_data);
                   UDP_Send(_rx_buffer, ip_header_length, _rx_buffer_length, ModeReply);
 
                   // overwrite the rx_buffer again and parse light data and set it
                   memcpy(buffer_ptr, light_buffer, sizeof(light_buffer));
                   parseLightData(buffer_ptr);
 
-
                   uint8_t strip_index = 0;
-                  for (uint8_t i = 0; i < _setup_data.num_led_nodes; ++i)
+                  // for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
+                  for (uint8_t i = 0; i < 5; ++i)
                   {
-                    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+                    // for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+                    // for (uint8_t j = _setup_data.block_leds[i].index; j < _setup_data.block_leds[i].num_leds; ++j)
                     {
-                      light_strips[strip_index].setPixelColor(j, _light_data.led_nodes[i].red, _light_data.led_nodes[i].green, _light_data.led_nodes[i].blue);
+                      // light_strips[strip_index].setPixelColor((uint16_t)j, _light_data.block_leds[i].red[j], _light_data.block_leds[i].green[j], _light_data.block_leds[i].blue[j]);
+                      light_strips[strip_index].setPixelColor((uint16_t)i, (uint8_t)250, (uint8_t)0, (uint8_t)0);
                     }
-                    strip_index++;
+                    // strip_index++;
                   }
 
-                  for (uint8_t i = 0; i < _setup_data.num_led_beams; ++i)
+                  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
                   {
-                    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+                    // for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+                    for (uint8_t j = _setup_data.pixel_leds[i].index; j < _setup_data.pixel_leds[i].num_leds; ++j)
                     {
-                      uint8_t index = (uint8_t)j;
-                      light_strips[strip_index].setPixelColor(j, _light_data.led_beams[i].red[index], _light_data.led_beams[i].green[index], _light_data.led_beams[i].blue[index]);
+                      light_strips[strip_index].setPixelColor((uint16_t)j, _light_data.pixel_leds[i].red[j], _light_data.pixel_leds[i].green[j], _light_data.pixel_leds[i].blue[j]);
                     }
                     strip_index++;
                   }

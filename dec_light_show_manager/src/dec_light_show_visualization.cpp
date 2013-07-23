@@ -245,10 +245,10 @@ void DecLightShowVisualization::setupBeamMarkers(ros::NodeHandle& node_handle,
   }
   geometry_msgs::Vector3 size;
   ROS_VERIFY(dec_utilities::read(node_handle, namespace_name + "_size", size));
-  ROS_ASSERT(size.z > 0.0 && size.z <= 1.0);
+  // ROS_ASSERT(size.z > 0.0 && size.z <= 1.0);
   marker.scale = size;
-  marker.scale.x *= 0.8;
-  marker.scale.y *= 0.8;
+  // marker.scale.x *= 0.8;
+  // marker.scale.y *= 0.8;
 
   std::vector<double> color;
   ROS_VERIFY(dec_utilities::read(node_handle, namespace_name + "_color", color));

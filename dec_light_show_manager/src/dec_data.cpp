@@ -43,6 +43,7 @@ bool DecData::initialize(ros::NodeHandle node_handle)
   for (unsigned int i = 0; i < dec_interface_setup_data_.size(); ++i)
   {
     dec_interface_setup_data_[i] = dec_interface_->getSetupData(i);
+    allocatePixelData(&(dec_interface_setup_data_[i]), &(dec_interface_light_data_[i]));
   }
 
   sensor_levels_ = Eigen::VectorXf::Zero(total_num_sensors_);
@@ -189,21 +190,44 @@ bool DecData::initialize(ros::NodeHandle node_handle)
 
   // Lastly, generate the configuration file
   bool generate_configuration_file = false;
-  ROS_VERIFY(dec_utilities::read(node_handle, "generate_configuration_file", generate_configuration_file));
-  if (generate_configuration_file)
+  if(dec_utilities::read(node_handle, "generate_configuration_file", generate_configuration_file, false))
   {
-    std::string path = ros::package::getPath("dec_communication");
-    dec_utilities::appendTrailingSlash(path);
-    generateConfigurationFile(path + "include/dec_communication/DEC_config.h");
+    if (generate_configuration_file)
+    {
+      std::string path = ros::package::getPath("dec_communication");
+      dec_utilities::appendTrailingSlash(path);
+      generateConfigurationFile(path + "include/dec_communication/DEC_config.h");
+    }
   }
   bool generate_structure_file = false;
-  ROS_VERIFY(dec_utilities::read(node_handle, "generate_structure_file", generate_structure_file));
-  if (generate_structure_file)
+  if(dec_utilities::read(node_handle, "generate_structure_file", generate_structure_file, false))
   {
-    std::string path = ros::package::getPath("dec_communication");
-    dec_utilities::appendTrailingSlash(path);
-    // generateStructureFile(path + "DEC_structure_teensy.h", "PROGMEM ", "prog_");
-    generateStructureFile(path + "include/dec_communication/DEC_structure.h");
+    if (generate_structure_file)
+    {
+      std::string path = ros::package::getPath("dec_communication");
+      dec_utilities::appendTrailingSlash(path);
+      // generateStructureFile(path + "DEC_structure_teensy.h", "PROGMEM ", "prog_");
+      generateStructureFile(path + "include/dec_communication/DEC_structure.h");
+    }
+  }
+
+  // if the task was generating the files... we are done
+  if (generate_configuration_file || generate_structure_file)
+  {
+    return false;
+  }
+
+  list_of_teensys_to_exclude_from_communication_.clear();
+  ROS_VERIFY(dec_utilities::read(node_handle, "list_of_teensys_to_exclude_from_communication", list_of_teensys_to_exclude_from_communication_));
+  ROS_INFO_COND(list_of_teensys_to_exclude_from_communication_.empty() && number_of_teensys_ > 1, "Communicating to all >%i< Teensys.", (int)number_of_teensys_);
+  ROS_INFO_COND(list_of_teensys_to_exclude_from_communication_.empty() && number_of_teensys_ == 1, "Communicating to the single Teensys.");
+  ROS_ASSERT(number_of_teensys_ > 0);
+  for (unsigned int i = 0; i < list_of_teensys_to_exclude_from_communication_.size(); ++i)
+  {
+    ROS_ASSERT_MSG(list_of_teensys_to_exclude_from_communication_[i] < number_of_teensys_,
+                   "Invalid teensy id >%i< specified to exclude from communication. There are only >%i< Teensys specified.",
+                   (int)list_of_teensys_to_exclude_from_communication_[i], (int)number_of_teensys_);
+    ROS_WARN("Not communicating to teensy with id >%i<.", (int)list_of_teensys_to_exclude_from_communication_[i]);
   }
 
   return (initialized_ = true);
@@ -390,7 +414,7 @@ int DecData::getNumTeensys() const
 
 bool DecData::generateConfigurationFile(const std::string& abs_file_name)
 {
-  ROS_DEBUG("Writing >%s<.", abs_file_name.c_str());
+  ROS_INFO("Writing >%s<.", abs_file_name.c_str());
   std::ofstream header_file;
   header_file.open(abs_file_name.c_str(), std::ios::out);
   ROS_ASSERT_MSG(header_file.is_open(), "Problem when opening header file >%s<.", abs_file_name.c_str());
@@ -405,16 +429,20 @@ bool DecData::generateConfigurationFile(const std::string& abs_file_name)
   header_file << "// Number of teensys in the structure.\n";
   header_file << "#define DEC_NUMBER_OF_TEENSYS (uint8_t)" << number_of_teensys_ << "\n\n";
   header_file << "// Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)\n";
+  header_file << endl;
   header_file << "#define DEC_MAX_NUMBER_OF_SENSORS_PER_NODE (uint8_t)" << max_number_of_sensors_per_teensy_ << "\n";
   header_file << "#define DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE (uint8_t)" << max_number_of_light_strips_per_teensy_ << "\n";
-  // header_file << "#define DEC_MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP (uint8_t)" << max_number_of_leds_per_light_strip_ << "\n";
+  header_file << endl;
+  header_file << "#define DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY (uint8_t)" << MAX_NUMBER_OF_BLOCKS_PER_TEENSY << endl;
+  header_file << "#define DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY (uint8_t)" << MAX_NUMBER_OF_PIXELS_PER_TEENSY << endl;
+  header_file << endl;
   header_file << "#define DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP (uint8_t)" << MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP << endl;
   header_file << "#define DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP (uint8_t)" << MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP << endl;
 
   header_file << "\n#endif // _DEC_CONFIG_H" << endl;
   header_file.close();
 
-  ROS_DEBUG("Done.");
+  ROS_INFO("Done.");
   return true;
 }
 
@@ -422,7 +450,7 @@ bool DecData::generateStructureFile(const std::string& abs_file_name,
                                     const std::string progmem_prefix,
                                     const std::string unit_prefix)
 {
-  ROS_DEBUG("Writing >%s<.", abs_file_name.c_str());
+  ROS_INFO("Writing >%s<.", abs_file_name.c_str());
   std::ofstream header_file;
   header_file.open(abs_file_name.c_str(), std::ios::out);
   ROS_ASSERT_MSG(header_file.is_open(), "Problem when opening header file >%s<.", abs_file_name.c_str());
@@ -684,17 +712,23 @@ bool DecData::generateStructureFile(const std::string& abs_file_name,
   header_file << "\n#endif // _DEC_STRUCTURE_H" << endl;
   header_file.close();
 
-  ROS_DEBUG("Done.");
+  ROS_INFO("Done.");
   return true;
 }
 
-/*
 bool DecData::sendSetupData()
 {
   unsigned int setup_count = 0;
   std::vector<bool> is_setup(number_of_teensys_, false);
   for (unsigned int i = 0; i < number_of_teensys_; ++i)
   {
+    for (unsigned int j = 0; j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
+    {
+      if (i == list_of_teensys_to_exclude_from_communication_[j])
+      {
+        is_setup[i] = true;
+      }
+    }
     if (!is_setup[i] && dec_interface_->sendSetupData(i))
     {
       ROS_INFO("Setup of node >%i< complete.", i);
@@ -710,7 +744,6 @@ bool DecData::sendSetupData()
   }
   return true;
 }
-*/
 
 bool DecData::copySensorInformationToStructure()
 {
@@ -728,7 +761,22 @@ bool DecData::copySensorInformationFromStructure()
 
 bool DecData::copyLightDataToStructure()
 {
-  // TODO: check this again...
+  // TODO: check this again... and make it more efficient
+//  for (unsigned int i = 0; i < setup_data_.size(); ++i)
+//  {
+//    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_block_leds; ++j)
+//    {
+//      const uint8_t BLOCK_INDEX = (uint8_t)j;
+//      // for (unsigned int n = 0; n < setup_data_[i].block_leds[j].num_leds; ++n)
+//      {
+//        const uint8_t COLOR_INDEX = (uint8_t)j;
+//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].red[COLOR_INDEX] = (uint8_t) node_led_values_(RED_OFFSET, j);
+//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].green[COLOR_INDEX] = (uint8_t) node_led_values_(GREEN_OFFSET, j);
+//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].blue[COLOR_INDEX] = (uint8_t) node_led_values_(BLUE_OFFSET, j);
+//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].brightness[COLOR_INDEX] = (uint8_t) node_led_values_(ALPHA_OFFSET, j);
+//      }
+//    }
+//  }
 
   for (unsigned int i = 0; i < light_node_leds_to_teensy_map_.size(); ++i)
   {
@@ -766,12 +814,24 @@ bool DecData::copyLightDataToStructure()
     dec_interface_light_data_[TEENSY_ID].pixel_leds[STRIP_INDEX].blue[PIXEL_INDEX] = (uint8_t) pixel_beam_led_values_(BLUE_OFFSET, i);
     dec_interface_light_data_[TEENSY_ID].pixel_leds[STRIP_INDEX].brightness[PIXEL_INDEX] = (uint8_t) pixel_beam_led_values_(ALPHA_OFFSET, i);
   }
+
   // send/receive light/sensor data
   for (unsigned int i = 0; i < number_of_teensys_; ++i)
   {
-    if (!dec_interface_->sendLightData(i, dec_interface_light_data_[i]))
+    bool send = true;
+    for (unsigned int j = 0; send && j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
     {
-      ROS_WARN("Missed send/receive cycle for node >%i<.", i);
+      if (i == list_of_teensys_to_exclude_from_communication_[j])
+      {
+        send = false;
+      }
+    }
+    if (send)
+    {
+      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i]))
+      {
+        ROS_WARN("Missed send/receive cycle for node >%i<.", i);
+      }
     }
   }
   return true;

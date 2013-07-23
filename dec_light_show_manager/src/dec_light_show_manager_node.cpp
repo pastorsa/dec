@@ -14,9 +14,13 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "");
   dec_light_show_manager::DecLightShowManager dec_light_show_manager;
-  ROS_VERIFY(dec_light_show_manager.initialize());
+  if(!dec_light_show_manager.initialize())
+  {
+    return 0;
+  }
   ros::AsyncSpinner spinner(0); // number of processor cores
   spinner.start();
   dec_light_show_manager.run();
   spinner.stop();
+  return 0;
 }

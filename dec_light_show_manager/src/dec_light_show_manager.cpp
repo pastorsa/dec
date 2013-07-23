@@ -23,7 +23,8 @@ DecLightShowManager::DecLightShowManager() :
     initialized_(false),
     num_light_show_stacks_(0), num_light_shows_(0), light_shows_running_(false),
     switching_light_shows_(false), switching_light_shows_success_(false),
-    local_node_handle_("~"), start_ros_time_in_sec_(0.0), simulation_mode_(false)
+    local_node_handle_("~"), start_ros_time_in_sec_(0.0),
+    simulation_mode_(false), visualization_mode_(false)
 {
   dec_mutex_init(&switching_light_shows_mutex_);
   dec_cond_init(&switching_light_shows_cond_);
@@ -63,14 +64,18 @@ bool DecLightShowManager::initialize()
   start_ros_time_in_sec_ = start_ros_time_.toSec();
 
   ROS_VERIFY(dec_utilities::read(local_node_handle_, "simulation_mode", simulation_mode_));
-  if(simulation_mode_)
+  if (simulation_mode_)
   {
     dec_light_show_simulation_.reset(new DecLightShowSimulation(light_show_data_));
     ROS_VERIFY(dec_light_show_simulation_->initialize(local_node_handle_));
   }
 
-  dec_light_show_visualization_.reset(new DecLightShowVisualization());
-  ROS_VERIFY(dec_light_show_visualization_->initialize(light_show_data_, local_node_handle_));
+  ROS_VERIFY(dec_utilities::read(local_node_handle_, "visualization_mode", visualization_mode_));
+  if (visualization_mode_)
+  {
+    dec_light_show_visualization_.reset(new DecLightShowVisualization());
+    ROS_VERIFY(dec_light_show_visualization_->initialize(light_show_data_, local_node_handle_));
+  }
 
   return (initialized_ = true);
 }
@@ -132,6 +137,11 @@ bool DecLightShowManager::loadLightShows()
   light_show_active_list_.clear();
   light_show_next_active_list_.clear();
 
+  ROS_INFO("Sending setup data...");
+  if(!light_show_data_->sendSetupData())
+    return false;
+
+  ROS_INFO("Starting default light show stack...");
   // get the default light_show stack running:
   boost::thread(boost::bind(&DecLightShowManager::setDefaultStacks, this));
 
@@ -439,8 +449,13 @@ bool DecLightShowManager::update()
     return false;
   }
 
-  if (!dec_light_show_visualization_->update())
-    ROS_ERROR("Problem when visualization data.");
+  if (visualization_mode_)
+  {
+    if (!dec_light_show_visualization_->update())
+    {
+      ROS_ERROR("Problem when visualization data.");
+    }
+  }
 
   return ret;
 }
@@ -622,14 +637,19 @@ bool DecLightShowManager::copySensorInformationFromStructure()
     return dec_light_show_simulation_->copySimulatedSensorInformation();
   }
   return light_show_data_->copySensorInformationFromStructure();
+//  if(!dec_light_show_simulation_->copySimulatedSensorInformation())
+//    ROS_ERROR("Problem when simulating light info.");
+//  if(!light_show_data_->copySensorInformationFromStructure())
+//    ROS_ERROR("Problem when sending light info.");
+//  return true;
 }
 
 bool DecLightShowManager::copyLightDataToStructure()
 {
-  if(simulation_mode_)
-  {
-    return true;
-  }
+//  if(simulation_mode_)
+//  {
+//    return true;
+//  }
   return light_show_data_->copyLightDataToStructure();
 }
 

@@ -59,6 +59,8 @@ void parseSetupData(uint8_t* buffer)
     _setup_data.sensors[i].pin = (uint8_t)buffer[_rx_buffer_length];
     _rx_buffer_length++;
   }
+
+  allocatePixelData(&_setup_data, &_light_data);
 }
 
 void generateSetupData(uint8_t* buffer)
@@ -292,7 +294,7 @@ void resetSetupData(setup_data_t* setup_data)
 {
   uint8_t i = 0;
   setup_data->num_block_leds = (uint8_t)0;
-  for (i = 0; i < DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE; ++i)
+  for (i = 0; i < DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY; ++i)
   {
     setup_data->block_leds[i].index = (uint16_t)0;
     setup_data->block_leds[i].num_leds = (uint16_t)0;
@@ -300,7 +302,7 @@ void resetSetupData(setup_data_t* setup_data)
   }
 
   setup_data->num_pixel_leds = (uint8_t)0;
-  for (i = 0; i < DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE; ++i)
+  for (i = 0; i < DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY; ++i)
   {
     setup_data->pixel_leds[i].index = (uint16_t)0;
     setup_data->pixel_leds[i].num_leds = (uint16_t)0;
@@ -337,17 +339,47 @@ void resetLightData(light_data_t* light_data)
       light_data->block_leds[i].brightness[j] = (uint8_t)0;
     }
   }
+  _light_data.pixel_memory_allocated = (uint8_t)0;
 
-  for (i = 0; i < DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE; ++i)
+  //  for (i = 0; i < DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP; ++i)
+  //  {
+  //    for (j = 0; j < DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP; ++j)
+  //    {
+  //      light_data->pixel_leds[i].red[j] = (uint8_t)0;
+  //      light_data->pixel_leds[i].blue[j] = (uint8_t)0;
+  //      light_data->pixel_leds[i].green[j] = (uint8_t)0;
+  //      light_data->pixel_leds[i].brightness[j] = (uint8_t)0;
+  //    }
+  //  }
+}
+
+void allocatePixelData(setup_data_t* setup_data, light_data_t* light_data)
+{
+  uint8_t i = 0;
+  if (light_data->pixel_memory_allocated)
   {
-    for (j = 0; j < DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP; ++j)
+    for (i = 0; i < setup_data->num_pixel_leds; ++i)
     {
-      light_data->pixel_leds[i].red[j] = (uint8_t)0;
-      light_data->pixel_leds[i].blue[j] = (uint8_t)0;
-      light_data->pixel_leds[i].green[j] = (uint8_t)0;
-      light_data->pixel_leds[i].brightness[j] = (uint8_t)0;
+      free(light_data->pixel_leds[i].red);
+      free(light_data->pixel_leds[i].green);
+      free(light_data->pixel_leds[i].blue);
+      free(light_data->pixel_leds[i].brightness);
     }
   }
+  // printf("Allocating %i bytes.\n", (int)sizeof(uint8_t)* DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+  for (i = 0; i < setup_data->num_pixel_leds; ++i)
+  {
+    //printf("0 %i.\n", (int)i);
+    light_data->pixel_leds[i].red = (uint8_t*) malloc(sizeof(uint8_t) * DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+    //printf("1 %i.\n", (int)i);
+    light_data->pixel_leds[i].green = (uint8_t*) malloc(sizeof(uint8_t) * DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+    //printf("2 %i.\n", (int)i);
+    light_data->pixel_leds[i].blue = (uint8_t*) malloc(sizeof(uint8_t) * DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+    //printf("3 %i.\n", (int)i);
+    light_data->pixel_leds[i].brightness = (uint8_t*) malloc(sizeof(uint8_t) * DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+  }
+  //printf("Done.. allocating.\n");
+  light_data->pixel_memory_allocated = (uint8_t)1;
 }
 
 void printData(void)

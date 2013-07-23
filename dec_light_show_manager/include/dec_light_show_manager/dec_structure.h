@@ -17,9 +17,11 @@
 namespace dec_light_show_manager
 {
 
-const unsigned int MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP = 255;
+const unsigned int MAX_NUMBER_OF_BLOCKS_PER_TEENSY = 40;
+const unsigned int MAX_NUMBER_OF_PIXELS_PER_TEENSY = 255;
+
 const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 20;
-const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 255;
+const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 150;
 
 class DecStructure
 {

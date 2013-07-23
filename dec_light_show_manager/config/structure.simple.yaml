@@ -33,7 +33,7 @@ sensors:
 light_nodes: 
   -
     nodes: [0, 1, 2, 3, 4]
-    num_leds: [1, 1, 1, 1, 1]
+    num_leds: [2, 2, 2, 2, 2]
     num_leds_per_meter: 60
     teensy: 0
 
@@ -47,13 +47,13 @@ light_nodes:
 
 # Which beams have light strips
 # nodes: [0, 1] constructs a light strip from node 0 to node 1
-#pixel_light_beams:
-#  -
-#    nodes: [[0, 1], [1, 2]]
-#    centers: [0.5, 0.5]
-#    num_leds: [1, 1]
-#    num_leds_per_meter: 30
-#    teensy: 0
+pixel_light_beams:
+  -
+    nodes: [[0, 1], [1, 2]]
+    centers: [0.5, 0.5]
+    num_leds: [30, 30]
+    num_leds_per_meter: 30
+    teensy: 0
 
 # Size of the nodes and color
 nodes_size:

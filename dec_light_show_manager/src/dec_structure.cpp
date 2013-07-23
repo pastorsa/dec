@@ -40,11 +40,11 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
 
   ROS_VERIFY(dec_utilities::read(node_handle, "block_nodes_size", block_light_nodes_size_));
   ROS_VERIFY(dec_utilities::read(node_handle, "block_beams_size", block_light_beams_size_));
-  ROS_ASSERT(block_light_beams_size_.z > 0.0 && !(block_light_beams_size_.z > 1.0));
+  // ROS_ASSERT(block_light_beams_size_.z > 0.0 && !(block_light_beams_size_.z > 1.0));
   ROS_VERIFY(dec_utilities::read(node_handle, "pixel_beams_size", pixel_light_beams_size_));
-  ROS_ASSERT(pixel_light_beams_size_.z > 0.0 && !(pixel_light_beams_size_.z > 1.0));
+  // ROS_ASSERT(pixel_light_beams_size_.z > 0.0 && !(pixel_light_beams_size_.z > 1.0));
   ROS_VERIFY(dec_utilities::read(node_handle, "sensors_size", sensors_size_));
-  ROS_ASSERT(sensors_size_.z > 0.0 && !(sensors_size_.z > 1.0));
+  // ROS_ASSERT(sensors_size_.z > 0.0 && !(sensors_size_.z > 1.0));
 
   ROS_DEBUG("Reading sensor configurations.");
   ROS_VERIFY(read(node_handle, sensors_));
@@ -59,6 +59,10 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
   setPins(node_handle);
   setupTeensyMap();
   ROS_VERIFY(isUnique());
+
+  ROS_WARN("Allocated >%i< bytes for setup data.", (int)sizeof(_setup_data));
+  ROS_WARN("Allocated >%i< bytes for sensor data.", (int)sizeof(_sensor_data));
+  ROS_WARN("Allocated >%i< bytes for light data.", (int)sizeof(_light_data));
 
   return true;
 }
@@ -132,25 +136,7 @@ void DecStructure::setupTeensyMap()
   setup_data_.resize(number_of_teensys_);
   for (unsigned int i = 0; i < setup_data_.size(); ++i)
   {
-    setup_data_[i].num_sensors = (uint8_t)0;
-    setup_data_[i].num_block_leds = (uint8_t)0;
-    setup_data_[i].num_pixel_leds = (uint8_t)0;
-    for (unsigned int j = 0; j < DEC_MAX_NUMBER_OF_SENSORS_PER_NODE; ++j)
-    {
-      setup_data_[i].sensors[j].pin = (uint8_t)0;
-    }
-    for (unsigned int j = 0; j < DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP; ++j)
-    {
-      setup_data_[i].block_leds[j].index = (uint8_t)0;
-      setup_data_[i].block_leds[j].num_leds = (uint8_t)0;
-      setup_data_[i].block_leds[j].pin = (uint8_t)0;
-    }
-    for (unsigned int j = 0; j < DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP; ++j)
-    {
-      setup_data_[i].pixel_leds[j].index = (uint8_t)0;
-      setup_data_[i].pixel_leds[j].num_leds = (uint8_t)0;
-      setup_data_[i].pixel_leds[j].pin = (uint8_t)0;
-    }
+    resetSetupData(&(setup_data_[i]));
   }
 
   std::vector<unsigned int> sensor_pin_counter(number_of_teensys_, 0);
@@ -243,7 +229,7 @@ void DecStructure::setupTeensyMap()
       setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].pin = (uint8_t)(teensy_id_and_strip_id_pair.second);
 
       block_light_beam_leds_to_teensy_map_.push_back(teensy_id_and_strip_id_pair);
-      ROS_DEBUG("Block light beam at pin >%i< connected to teensy >%i<. LED index >%i< num_leds >%i<.",
+      ROS_INFO("Block light beam at pin >%i< connected to teensy >%i<. LED index >%i< num_leds >%i<.",
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].pin,
                (int)TEENSY_ID,
                (int)setup_data_[TEENSY_ID].block_leds[setup_data_[TEENSY_ID].num_block_leds].index,
@@ -256,8 +242,19 @@ void DecStructure::setupTeensyMap()
   for (unsigned int i = 0; i < number_of_teensys_; ++i)
   {
     ROS_ASSERT_MSG((unsigned int)setup_data_[i].num_block_leds < MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP,
-                   "Too many block LEDs specified >%i<. Limit is >%i<.",
-                   (int)setup_data_[i].num_block_leds, (int)MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP);
+                   "Max number of allowed blocks is >%i<, however, >%i< are specified.",
+                   (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP, (int)setup_data_[i].num_pixel_leds);
+    //    std::vector<unsigned int> total_num_block_leds(sensor_pins_.size(), 0);
+    //    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_block_leds; ++j)
+    //    {
+    //      total_num_block_leds[(unsigned int)setup_data_[i].block_leds[j].pin] += 1; // only 1 block
+    //    }
+    //    for (unsigned int j = 0; j < total_num_block_leds.size(); ++j)
+    //    {
+    //      ROS_ASSERT_MSG(total_num_block_leds[j] < MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP,
+    //                     "Too many block LEDs specified >%i< at pin >%i<. Limit is >%i<.",
+    //                     (int)total_num_block_leds[j], (int)j, (int)MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP);
+    //    }
   }
 
   ROS_DEBUG("Setting up pixel light beam map.");
@@ -277,37 +274,49 @@ void DecStructure::setupTeensyMap()
         std::pair<unsigned int, unsigned int> strip_id_and_led_id_pair;
         strip_id_and_led_id_pair.first = light_pin_counter[TEENSY_ID]; // i + block_light_nodes_.size() + block_light_beams_.size();
         strip_id_and_led_id_pair.second = k;
-        if(new_strip)
-        {
-          new_strip = false;
-          setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].index = (uint8_t)0;
-        }
-        else
-        {
-          setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].index =
-              setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds - 1].index +
-              setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds - 1].num_leds;
-        }
-        setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].num_leds = (uint8_t)1;
-        setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].pin = (uint8_t)strip_id_and_led_id_pair.first;
         teensy_id_to_led_info_pair.second = strip_id_and_led_id_pair;
         pixel_light_beam_leds_to_teensy_map_.push_back(teensy_id_to_led_info_pair);
-        ROS_DEBUG("Pixel light beam at pin >%i< connected to teensy >%i< with index >%i< num_leds >%i<.",
-                 (int)setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].pin,
-                 (int)pixel_light_beam_leds_to_teensy_map_[led_index].first,
-                 (int)setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].index,
-                 (int)setup_data_[TEENSY_ID].pixel_leds[setup_data_[TEENSY_ID].num_pixel_leds].num_leds);
         led_index++;
-        setup_data_[TEENSY_ID].num_pixel_leds++;
       }
+      ROS_ASSERT(j < MAX_NUMBER_OF_PIXELS_PER_TEENSY);
+      if(new_strip)
+      {
+        new_strip = false;
+        setup_data_[TEENSY_ID].pixel_leds[j].index = (uint8_t)0;
+      }
+      else
+      {
+        setup_data_[TEENSY_ID].pixel_leds[j].index =
+            setup_data_[TEENSY_ID].pixel_leds[j - 1].index +
+            setup_data_[TEENSY_ID].pixel_leds[j - 1].num_leds;
+      }
+      setup_data_[TEENSY_ID].pixel_leds[j].num_leds = (uint8_t)pixel_light_beams_[i].getNumLeds(j);
+      setup_data_[TEENSY_ID].pixel_leds[j].pin = light_pin_counter[TEENSY_ID];
+      ROS_DEBUG("Pixel light beam at pin >%i< connected to teensy >%i< with index >%i< num_leds >%i<.",
+               (int)setup_data_[TEENSY_ID].pixel_leds[j].pin,
+               (int)pixel_light_beam_leds_to_teensy_map_[led_index].first,
+               (int)setup_data_[TEENSY_ID].pixel_leds[j].index,
+               (int)setup_data_[TEENSY_ID].pixel_leds[j].num_leds);
+      setup_data_[TEENSY_ID].num_pixel_leds++;
     }
     light_pin_counter[TEENSY_ID]++;
   }
   for (unsigned int i = 0; i < number_of_teensys_; ++i)
   {
     ROS_ASSERT_MSG((unsigned int)setup_data_[i].num_pixel_leds < MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP,
-                   "Too many pixel LEDs specified >%i<. Limit is >%i<.",
-                   (int)setup_data_[i].num_pixel_leds, (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+                   "Max number of allowed pixels is >%i<, however, >%i< are specified.",
+                   (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP, (int)setup_data_[i].num_pixel_leds);
+    //    std::vector<unsigned int> total_num_pixel_leds(sensor_pins_.size(), 0);
+    //    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_pixel_leds; ++j)
+    //    {
+    //      total_num_pixel_leds[(unsigned int)setup_data_[i].pixel_leds[j].pin] += (unsigned int)setup_data_[i].pixel_leds[j].num_leds;
+    //    }
+    //    for (unsigned int j = 0; j < total_num_pixel_leds.size(); ++j)
+    //    {
+    //      ROS_ASSERT_MSG(total_num_pixel_leds[j] < MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP,
+    //                     "Too many pixel LEDs specified >%i< at pin >%i<. Limit is >%i<.",
+    //                     (int)total_num_pixel_leds[j], (int)j, (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+    //    }
   }
   ROS_ASSERT_MSG(led_index == total_num_pixel_beam_leds_, "LED index is >%i< and total number of pixel beam leds is >%i<.",
                  (int)led_index, (int)total_num_pixel_beam_leds_);
@@ -403,7 +412,7 @@ void DecStructure::setPins(ros::NodeHandle node_handle)
   total_num_node_leds_ = 0;
   for (unsigned int i = 0; i < block_light_nodes_.size(); ++i)
   {
-    ROS_ASSERT(block_light_nodes_[i].getTotalNumLeds() <= MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP);
+    ROS_ASSERT(block_light_nodes_[i].getTotalNumLeds() <= MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
     total_num_node_leds_ += block_light_nodes_[i].getNumComponents();
   }
   ROS_ASSERT_MSG(total_num_node_leds_ > 0, "No block light node read from configuration.");
@@ -411,7 +420,7 @@ void DecStructure::setPins(ros::NodeHandle node_handle)
   total_num_block_beam_leds_ = 0;
   for (unsigned int i = 0; i < block_light_beams_.size(); ++i)
   {
-    ROS_ASSERT(block_light_beams_[i].getTotalNumLeds() <= MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP);
+    ROS_ASSERT(block_light_beams_[i].getTotalNumLeds() <= MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
     total_num_block_beam_leds_ += block_light_beams_[i].getNumComponents();
   }
   ROS_WARN_COND(total_num_block_beam_leds_ == 0, "No block light beam read from configuration.");
@@ -419,7 +428,7 @@ void DecStructure::setPins(ros::NodeHandle node_handle)
   total_num_pixel_beam_leds_ = 0;
   for (unsigned int i = 0; i < pixel_light_beams_.size(); ++i)
   {
-    ROS_ASSERT(pixel_light_beams_[i].getTotalNumLeds() <= MAX_NUMBER_OF_LEDS_PER_LIGHT_STRIP);
+    ROS_ASSERT(pixel_light_beams_[i].getTotalNumLeds() <= MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
     total_num_pixel_beam_leds_ += pixel_light_beams_[i].getTotalNumLeds();
   }
   ROS_WARN_COND(total_num_pixel_beam_leds_ == 0, "No pixel light beam read from configuration.");
@@ -428,8 +437,8 @@ void DecStructure::setPins(ros::NodeHandle node_handle)
   total_num_sensors_ = sensors_.size();
   ROS_ASSERT_MSG(total_num_sensors_ > 0, "No sensors read from configuration.");
 
-  ROS_INFO("Structure contains >%i< node lights, >%i< beam lights, >%i< pixel lights, and >%i< sensors.",
-           total_num_node_leds_, total_num_block_beam_leds_, total_num_pixel_beam_leds_, total_num_sensors_);
+  ROS_INFO("Structure contains >%i< teensys, >%i< node lights, >%i< beam lights, >%i< pixel lights, and >%i< sensors.",
+           (int)number_of_teensys_, (int)total_num_node_leds_, (int)total_num_block_beam_leds_, (int)total_num_pixel_beam_leds_, (int)total_num_sensors_);
 }
 
 XmlRpc::XmlRpcValue DecStructure::get(ros::NodeHandle& node_handle, const std::string& key)

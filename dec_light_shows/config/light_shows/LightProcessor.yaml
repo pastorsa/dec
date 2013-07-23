@@ -1,4 +1,4 @@
 LightProcessor:
   type: "dec_light_shows/DecLightProcessor"
-  wave_travel_speed: 5.7 # in m/s
-  wave_length: 3.0 # in m
+  wave_travel_speed: 3.0 # in m/s
+  wave_length: 2.0 # in m
