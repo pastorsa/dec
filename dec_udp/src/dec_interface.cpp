@@ -38,12 +38,16 @@ void DecInterface::print(const setup_data_t& setup_data)
   printf("Setup Data:\n");
   printf(" Number of block LEDs is >%u<.\n", setup_data.num_block_leds);
   for (uint8_t i = 0; i < setup_data.num_block_leds; ++i)
-    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
-           setup_data.block_leds[i].pin, setup_data.block_leds[i].index, setup_data.block_leds[i].num_leds);
+    printf("  Node >%u< : Block LED >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+           setup_data.block_leds[i].pin, setup_data.block_leds[i].index, setup_data.block_leds[i].num_blocks);
   printf(" Number of pixel LEDs is >%u<.\n", setup_data.num_pixel_leds);
   for (uint8_t i = 0; i < setup_data.num_pixel_leds; ++i)
-    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
-           setup_data.pixel_leds[i].pin, setup_data.pixel_leds[i].index, setup_data.pixel_leds[i].num_leds);
+    printf("  Beam >%u< : Pixel LED >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+           setup_data.pixel_leds[i].pin, setup_data.pixel_leds[i].index, setup_data.pixel_leds[i].num_pixels);
+  printf(" Number of light strips used is >%u<.\n", setup_data.num_strips_used);
+  for (uint8_t i = 0; i < setup_data.num_strips_used; ++i)
+    printf("  Strip >%u< has >%u< LEDs.\n", i, setup_data.strip_setup[i].total_num_leds_at_strip);
+
   printf(" Number of sensors is >%u<.\n", setup_data.num_sensors);
   for (uint8_t i = 0; i < setup_data.num_sensors; ++i)
     printf("  Sensor >%u< is at pin >%u<.\n", i, setup_data.sensors[i].pin);
@@ -117,8 +121,10 @@ bool DecInterface::sendSetupData(const uint8_t node_id)
 
 bool DecInterface::sendLightData(const int node_id, const light_data_t& light_data)
 {
-  // printf("Generating light data for node >%i<.\n", node_id);
+  printf("Generating light data for node >%i<.\n", node_id);
+  loadSetupData(node_id);
   generateLightData(_rx_buffer, &light_data);
+  printData();
   // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
 
   const int IP_FROM_NODE = node_id + 1;

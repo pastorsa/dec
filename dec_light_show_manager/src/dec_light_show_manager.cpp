@@ -20,11 +20,9 @@ namespace dec_light_show_manager
 static const int ROS_TIME_OFFSET = 1340100000;
 
 DecLightShowManager::DecLightShowManager() :
-    initialized_(false),
-    num_light_show_stacks_(0), num_light_shows_(0), light_shows_running_(false),
-    switching_light_shows_(false), switching_light_shows_success_(false),
-    local_node_handle_("~"), start_ros_time_in_sec_(0.0),
-    simulation_mode_(false), visualization_mode_(false)
+    initialized_(false), num_light_show_stacks_(0), num_light_shows_(0), light_shows_running_(false), switching_light_shows_(
+        false), switching_light_shows_success_(false), local_node_handle_("~"), start_ros_time_in_sec_(0.0), simulation_mode_(
+        false), visualization_mode_(false)
 {
   dec_mutex_init(&switching_light_shows_mutex_);
   dec_cond_init(&switching_light_shows_cond_);
@@ -40,7 +38,7 @@ bool DecLightShowManager::initialize()
 {
   light_show_factory_.reset(new DecLightShowFactory());
   light_show_data_.reset(new DecLightShowData());
-  if(!light_show_data_->initialize(local_node_handle_))
+  if (!light_show_data_->initialize(local_node_handle_))
   {
     return false;
   }
@@ -138,7 +136,7 @@ bool DecLightShowManager::loadLightShows()
   light_show_next_active_list_.clear();
 
   ROS_INFO("Sending setup data...");
-  if(!light_show_data_->sendSetupData())
+  if (!light_show_data_->sendSetupData())
     return false;
 
   ROS_INFO("Starting default light show stack...");
@@ -168,7 +166,7 @@ bool DecLightShowManager::switchLightShowStackService(dec_light_show_msgs::Switc
 {
 
   // only return list of stacks
-  if(request.light_show_stacks.empty())
+  if (request.light_show_stacks.empty())
   {
     response.light_show_stacks = light_show_stack_names_;
     response.result = dec_light_show_msgs::SwitchLightShowStack::Response::SUCCEEDED;
@@ -226,7 +224,8 @@ bool DecLightShowManager::switchLightShowStack(const std::vector<std::string>& l
   switching_light_shows_ = true;
 
   bool ret = false;
-  if (abs(dec_cond_timedwait_relative(&switching_light_shows_cond_, &switching_light_shows_mutex_, 3000000000))==ETIMEDOUT)
+  if (abs(
+      dec_cond_timedwait_relative(&switching_light_shows_cond_, &switching_light_shows_mutex_, 3000000000))==ETIMEDOUT)
   {
     ret = false;
     ROS_ERROR("Time out reached when switching light show stack.");
@@ -632,7 +631,7 @@ bool DecLightShowManager::getLightShowByName(const std::string& name, boost::sha
 
 bool DecLightShowManager::copySensorInformationFromStructure()
 {
-  if(simulation_mode_)
+  if (simulation_mode_)
   {
     return dec_light_show_simulation_->copySimulatedSensorInformation();
   }

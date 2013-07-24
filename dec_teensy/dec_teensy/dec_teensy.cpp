@@ -54,6 +54,7 @@
 
 static const uint8_t IPAddr[4] = {10, 0, 0, NODE_ID};
 static uint8_t MACAddr[6] = {0x0, 0x0, 0x0, 0x0, 0x0, NODE_ID_HEX};
+static const uint8_t node_id = (uint8_t)NODE_ID - 1;
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 #define ADC_Prescaler (_BV(ADPS2) | _BV(ADPS1))
@@ -70,46 +71,18 @@ Adafruit_NeoPixel light_strips[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
 void setupPins(const setup_data_t* setup_data)
 {
   // Serial.println("test");
-  uint8_t num_leds[60];
-
-  for (uint8_t i = 0; i < 60; ++i)
-    num_leds[i] = 0;
-  for (uint8_t i = 0; i < setup_data->num_block_leds; ++i)
+  for (uint8_t i = 0; i < setup_data->num_strips_used; ++i)
   {
-    num_leds[setup_data->block_leds[i].pin] += setup_data->block_leds[i].num_leds;
-  }
-
-  uint8_t strip_index = 0;
-  for (uint8_t i = 0; i < setup_data->num_block_leds; ++i)
-  {
-    light_strips[strip_index].setup((uint16_t)num_leds[setup_data->block_leds[i].pin], (uint8_t)setup_data->block_leds[i].pin, NEO_PIXEL_TYPE);
+    light_strips[i].setup((uint16_t)setup_data->strip_setup[i].total_num_leds_at_strip,
+                                    (uint8_t)LIGHT_PIN_ORDERING[i], NEO_PIXEL_TYPE);
     // Initialize all pixels to 'off'
-    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
+    for (uint16_t j = 0; j < light_strips[i].numPixels(); ++j)
     {
-      light_strips[strip_index].setPixelColor(j, (uint8_t)0, (uint8_t)0, (uint8_t)0);
+      light_strips[i].setPixelColor(j, (uint8_t)255, (uint8_t)0, (uint8_t)0);
     }
-    strip_index++;
   }
 
-  for (uint8_t i = 0; i < 60; ++i)
-    num_leds[i] = 0;
-  for (uint8_t i = 0; i < setup_data->num_pixel_leds; ++i)
-  {
-    num_leds[setup_data->pixel_leds[i].pin] += setup_data->pixel_leds[i].num_leds;
-  }
-
-  for (uint8_t i = 0; i < setup_data->num_pixel_leds; ++i)
-  {
-    light_strips[strip_index].setup((uint16_t)num_leds[setup_data->pixel_leds[i].pin], (uint8_t)setup_data->pixel_leds[i].pin, NEO_PIXEL_TYPE);
-    // Initialize all pixels to 'off
-    for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
-    {
-      light_strips[strip_index].setPixelColor(j, (uint8_t)0, (uint8_t)0, (uint8_t)0);
-    }
-    strip_index++;
-  }
-
-  for (uint8_t i = 0; i < strip_index; ++i)
+  for (uint8_t i = 0; i < setup_data->num_strips_used; ++i)
   {
     light_strips[i].begin();
     light_strips[i].show(); // Initialize all pixels to 'off'
@@ -219,51 +192,53 @@ void loop()
                 }
                 else if (is_setup && isLightData(buffer_ptr))
                 {
-//                  // quickly store received light data to immediately send out sensor data
-//                  memcpy(light_buffer, buffer_ptr, sizeof(light_buffer));
-//                  // get sensor data and send it out
-//                  for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
-//                  {
-//                    if (digitalRead(_setup_data.sensors[i].pin))
-//                    {
-//                      _sensor_data.sensor_value[i] = (uint8_t)1;
-//                    }
-//                    else
-//                    {
-//                      _sensor_data.sensor_value[i] = (uint8_t)0;
-//                    }
-//                  }
-//                  generateSensorData(buffer_ptr, &_sensor_data);
+                  // quickly store received light data to immediately send out sensor data
+                  memcpy(light_buffer, buffer_ptr, sizeof(light_buffer));
+                  // get sensor data and send it out
+                  for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
+                  {
+                    if (digitalRead(_setup_data.sensors[i].pin))
+                    {
+                      _sensor_data.sensor_value[i] = (uint8_t)0;
+                    }
+                    else
+                    {
+                      _sensor_data.sensor_value[i] = (uint8_t)1;
+                    }
+                  }
+                  generateSensorData(buffer_ptr, &_sensor_data);
                   UDP_Send(_rx_buffer, ip_header_length, _rx_buffer_length, ModeReply);
 
                   // overwrite the rx_buffer again and parse light data and set it
                   memcpy(buffer_ptr, light_buffer, sizeof(light_buffer));
                   parseLightData(buffer_ptr);
 
-                  uint8_t strip_index = 0;
-                  // for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
-                  for (uint8_t i = 0; i < 5; ++i)
+                  for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
                   {
-                    // for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
-                    // for (uint8_t j = _setup_data.block_leds[i].index; j < _setup_data.block_leds[i].num_leds; ++j)
+                    uint8_t num = _setup_data.block_leds[i].index + _setup_data.block_leds[i].num_blocks;
+                    for (uint8_t j = _setup_data.block_leds[i].index; j < num; ++j)
                     {
-                      // light_strips[strip_index].setPixelColor((uint16_t)j, _light_data.block_leds[i].red[j], _light_data.block_leds[i].green[j], _light_data.block_leds[i].blue[j]);
-                      light_strips[strip_index].setPixelColor((uint16_t)i, (uint8_t)250, (uint8_t)0, (uint8_t)0);
+                      uint8_t index = _setup_data.block_leds[i].index;
+                      light_strips[BLOCK_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
+                                                                     _light_data.block_leds[i].red[index],
+                                                                     _light_data.block_leds[i].green[index],
+                                                                     _light_data.block_leds[i].blue[index]);
                     }
-                    // strip_index++;
                   }
 
                   for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
                   {
-                    // for (uint16_t j = 0; j < light_strips[strip_index].numPixels(); ++j)
-                    for (uint8_t j = _setup_data.pixel_leds[i].index; j < _setup_data.pixel_leds[i].num_leds; ++j)
+                    uint8_t num = _setup_data.pixel_leds[i].index + _setup_data.pixel_leds[i].num_pixels;
+                    for (uint8_t j = _setup_data.pixel_leds[i].index; j < num; ++j)
                     {
-                      light_strips[strip_index].setPixelColor((uint16_t)j, _light_data.pixel_leds[i].red[j], _light_data.pixel_leds[i].green[j], _light_data.pixel_leds[i].blue[j]);
+                      light_strips[PIXEL_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
+                                                              _light_data.pixel_leds[i].red[j],
+                                                              _light_data.pixel_leds[i].green[j],
+                                                              _light_data.pixel_leds[i].blue[j]);
                     }
-                    strip_index++;
                   }
                   // let there be light
-                  for (uint8_t i = 0; i < strip_index; ++i)
+                  for (uint8_t i = 0; i < _setup_data.num_strips_used; ++i)
                   {
                     light_strips[i].show();
                   }

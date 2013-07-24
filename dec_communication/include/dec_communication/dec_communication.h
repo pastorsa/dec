@@ -71,17 +71,29 @@ typedef struct
 typedef struct
 {
   uint8_t index;
-  uint8_t num_leds;
+  uint8_t num_blocks;
   uint8_t pin;
-} led_strip_setup_t;
+} block_strip_setup_t;
+typedef struct
+{
+  uint8_t index;
+  uint8_t num_pixels;
+  uint8_t pin;
+} pixel_strip_setup_t;
+typedef struct
+{
+  uint8_t total_num_leds_at_strip;
+} strip_setup_t;
 /*! Setup data.
  */
 typedef struct
 {
   uint8_t num_block_leds;
-  led_strip_setup_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
+  block_strip_setup_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
   uint8_t num_pixel_leds;
-  led_strip_setup_t pixel_leds[DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY];
+  pixel_strip_setup_t pixel_leds[DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY];
+  uint8_t num_strips_used;
+  strip_setup_t strip_setup[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
   uint8_t num_sensors;
   sensor_setup_t sensors[DEC_MAX_NUMBER_OF_SENSORS_PER_NODE];
 } setup_data_t;
@@ -153,10 +165,6 @@ typedef struct
   // uint8_t green[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
   // uint8_t blue[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
   // uint8_t brightness[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
-//  uint8_t* red;
-//  uint8_t* green;
-//  uint8_t* blue;
-//  uint8_t* brightness;
   uint8_t* red;
   uint8_t* green;
   uint8_t* blue;

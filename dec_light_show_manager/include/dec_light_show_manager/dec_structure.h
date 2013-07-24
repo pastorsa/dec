@@ -146,6 +146,12 @@ protected:
    */
   std::vector<setup_data_t> setup_data_;
 
+  /*! size is number of teensys and content are vectors of size DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE
+   * The content is the total number of leds at this strip
+   * A number of 0 indicates that this strip is unused
+   */
+  std::vector<std::vector<unsigned int> > num_leds_at_each_strip_;
+
 private:
 
   /*!

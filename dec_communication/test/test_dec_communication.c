@@ -18,12 +18,12 @@ void printSetupData()
   printf("Setup Data:\n");
   printf(" Number of block LEDs is >%u<.\n", _setup_data.num_block_leds);
   for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
-    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
-           _setup_data.block_leds[i].pin, _setup_data.block_leds[i].index, _setup_data.block_leds[i].num_leds);
+    printf("  Node >%u< : Block LED at pin >%u< starts at index >%u< and has >%u< blocks.\n", i,
+           _setup_data.block_leds[i].pin, _setup_data.block_leds[i].index, _setup_data.block_leds[i].num_blocks);
   printf(" Number of pixel LEDs is >%u<.\n", _setup_data.num_pixel_leds);
   for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
-    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
-           _setup_data.pixel_leds[i].pin, _setup_data.pixel_leds[i].index, _setup_data.pixel_leds[i].num_leds);
+    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and has >%u< pixels.\n", i,
+           _setup_data.pixel_leds[i].pin, _setup_data.pixel_leds[i].index, _setup_data.pixel_leds[i].num_pixels);
   printf(" Number of sensors is >%u<.\n", _setup_data.num_sensors);
   for (uint8_t i = 0; i < _setup_data.num_sensors; ++i)
     printf("  Sensor >%u< is at pin >%u<.\n", i, _setup_data.sensors[i].pin);

@@ -332,7 +332,8 @@ bool LightBeam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
   ROS_VERIFY(Beam::initialize(config, id, node_positions));
   ROS_VERIFY(Light::initialize(config));
 
-  ROS_ASSERT(nodes_.size() == num_leds_.size());
+  ROS_ASSERT_MSG(nodes_.size() == num_leds_.size(), "Number of nodes >%i< must correspond to number of LEDs >%i< in light beam.",
+                 (int)nodes_.size(), (int)num_leds_.size());
   ROS_DEBUG("LightBeam: Read >%i< light beams.", (int)nodes_.size());
   ROS_VERIFY(getParam(config, "centers", centers_));
   ROS_ASSERT(nodes_.size() == centers_.size());

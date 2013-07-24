@@ -187,9 +187,8 @@ private:
   /*! To send/receive data over udp
    */
   boost::shared_ptr<dec_udp::DecInterface> dec_interface_;
-  std::vector<sensor_data_t> dec_interface_sensor_data_;
-  std::vector<light_data_t> dec_interface_light_data_;
   std::vector<setup_data_t> dec_interface_setup_data_;
+  std::vector<light_data_t> dec_interface_light_data_;
 
   /*!
    */
