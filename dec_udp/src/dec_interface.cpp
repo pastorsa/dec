@@ -38,7 +38,7 @@ void DecInterface::print(const setup_data_t& setup_data)
   printf("Setup Data:\n");
   printf(" Number of block LEDs is >%u<.\n", setup_data.num_block_leds);
   for (uint8_t i = 0; i < setup_data.num_block_leds; ++i)
-    printf("  Node >%u< : Block LED >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+    printf("  Block >%u< : Block LED >%u< starts at index >%u< and has >%u< LEDs.\n", i,
            setup_data.block_leds[i].pin, setup_data.block_leds[i].index, setup_data.block_leds[i].num_blocks);
   printf(" Number of pixel LEDs is >%u<.\n", setup_data.num_pixel_leds);
   for (uint8_t i = 0; i < setup_data.num_pixel_leds; ++i)
@@ -78,8 +78,6 @@ bool DecInterface::sendSetupData(const uint8_t node_id)
   printf("Generating setup data for node >%i<.\n", node_id);
   generateSetupData(_rx_buffer);
   printData();
-
-  return true;
 
   const int IP_FROM_NODE = node_id + 1;
   std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
@@ -127,8 +125,6 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   loadSetupData(node_id);
   generateLightData(_rx_buffer, &light_data);
   printData();
-
-  return true;
 
   // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
 

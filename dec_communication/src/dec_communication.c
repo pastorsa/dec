@@ -206,30 +206,54 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
   _rx_buffer_length++;
 
   // first set blocks
+  printf("Light: %u blocks.\n", _setup_data.num_block_leds);
   for (i = 0; i < _setup_data.num_block_leds; ++i)
   {
-    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].red[_setup_data.block_leds[i].index];
+
+    // uint8_t index = _setup_data.block_leds[i].index;
+    uint8_t index = (uint8_t)0;
+
+    printf("  >%u< index >%u< >%u< >%u< >%u<\n", index,
+           (uint8_t)light_data->block_leds[i].red[index],
+           (uint8_t)light_data->block_leds[i].green[index],
+           (uint8_t)light_data->block_leds[i].blue[index],
+           (uint8_t)light_data->block_leds[i].brightness[index]);
+
+    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].red[index];
     _rx_buffer_length++;
-    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].green[_setup_data.block_leds[i].index];
+    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].green[index];
     _rx_buffer_length++;
-    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].blue[_setup_data.block_leds[i].index];
+    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].blue[index];
     _rx_buffer_length++;
-    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].brightness[_setup_data.block_leds[i].index];
+    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].brightness[index];
     _rx_buffer_length++;
   }
 
   // second set pixels
+  printf("Light: %u pixels.\n", _setup_data.num_pixel_leds);
   for (i = 0; i < _setup_data.num_pixel_leds; ++i)
   {
+    printf("Pixel %i has index %i num_pixels %i and pin %i.\n",
+           i, _setup_data.pixel_leds[i].index, _setup_data.pixel_leds[i].num_pixels, _setup_data.pixel_leds[i].pin);
+
     for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
     {
-      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[_setup_data.pixel_leds[i].index + j];
+      // uint8_t index = _setup_data.pixel_leds[i].index + j;
+      uint8_t index = (uint8_t)0;
+      printf("   >%u< of >%u< num pixels\n", j, _setup_data.pixel_leds[i].num_pixels);
+      printf("   >%u< index >%u< >%u< >%u< >%u<\n", index,
+             (uint8_t)light_data->pixel_leds[i].red[j],
+             (uint8_t)light_data->pixel_leds[i].green[j],
+             (uint8_t)light_data->pixel_leds[i].blue[j],
+             (uint8_t)light_data->pixel_leds[i].brightness[j]);
+
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[j];
       _rx_buffer_length++;
-      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].green[_setup_data.pixel_leds[i].index + j];
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].green[j];
       _rx_buffer_length++;
-      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].blue[_setup_data.pixel_leds[i].index + j];
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].blue[j];
       _rx_buffer_length++;
-      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].brightness[_setup_data.pixel_leds[i].index + j];
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].brightness[j];
       _rx_buffer_length++;
     }
   }
@@ -347,7 +371,7 @@ void resetLightData(light_data_t* light_data)
 {
   uint8_t i = 0;
   uint8_t j = 0;
-  for (i = 0; i < DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE; ++i)
+  for (i = 0; i < DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY; ++i)
   {
     for (j = 0; j < DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP; ++j)
     {
@@ -384,7 +408,7 @@ void allocatePixelData(setup_data_t* setup_data, light_data_t* light_data)
       free(light_data->pixel_leds[i].brightness);
     }
   }
-  // printf("Allocating %i bytes.\n", (int)sizeof(uint8_t)* DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
+  // printf("Allocating %i bytes.\n", (int)4 * (int)sizeof(uint8_t)* DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
   for (i = 0; i < setup_data->num_pixel_leds; ++i)
   {
     //printf("0 %i.\n", (int)i);

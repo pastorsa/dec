@@ -173,8 +173,10 @@ typedef struct
 
 typedef struct
 {
-  led_block_data_t block_leds[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
-  led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE];
+  // led_block_data_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
+  // led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY];
+  led_block_data_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
+  led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
   uint8_t pixel_memory_allocated;
 } light_data_t;
 
