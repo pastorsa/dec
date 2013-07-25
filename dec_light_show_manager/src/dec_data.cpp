@@ -802,48 +802,58 @@ bool DecData::copySensorInformationFromStructure()
 bool DecData::copyLightDataToStructure()
 {
   // TODO: check this again... and make it more efficient
-//  for (unsigned int i = 0; i < setup_data_.size(); ++i)
-//  {
-//    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_block_leds; ++j)
-//    {
-//      const uint8_t BLOCK_INDEX = (uint8_t)j;
-//      // for (unsigned int n = 0; n < setup_data_[i].block_leds[j].num_leds; ++n)
-//      {
-//        const uint8_t COLOR_INDEX = (uint8_t)j;
-//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].red[COLOR_INDEX] = (uint8_t) node_led_values_(RED_OFFSET, j);
-//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].green[COLOR_INDEX] = (uint8_t) node_led_values_(GREEN_OFFSET, j);
-//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].blue[COLOR_INDEX] = (uint8_t) node_led_values_(BLUE_OFFSET, j);
-//        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].brightness[COLOR_INDEX] = (uint8_t) node_led_values_(ALPHA_OFFSET, j);
-//      }
-//    }
-//  }
+  //  for (unsigned int i = 0; i < setup_data_.size(); ++i)
+  //  {
+  //    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_block_leds; ++j)
+  //    {
+  //      const uint8_t BLOCK_INDEX = (uint8_t)j;
+  //      // for (unsigned int n = 0; n < setup_data_[i].block_leds[j].num_leds; ++n)
+  //      {
+  //        const uint8_t COLOR_INDEX = (uint8_t)j;
+  //        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].red[COLOR_INDEX] = (uint8_t) node_led_values_(RED_OFFSET, j);
+  //        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].green[COLOR_INDEX] = (uint8_t) node_led_values_(GREEN_OFFSET, j);
+  //        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].blue[COLOR_INDEX] = (uint8_t) node_led_values_(BLUE_OFFSET, j);
+  //        dec_interface_light_data_[i].block_leds[BLOCK_INDEX].brightness[COLOR_INDEX] = (uint8_t) node_led_values_(ALPHA_OFFSET, j);
+  //      }
+  //    }
+  //  }
 
-  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+  for (unsigned int j = 0; j < light_node_leds_to_teensy_map_.size(); ++j)
   {
-    for (unsigned int j = 0; j < dec_interface_setup_data_[i].num_block_leds; ++j)
-    {
-      const uint8_t INDEX = dec_interface_setup_data_[i].block_leds[j].index;
-      dec_interface_light_data_[i].block_leds[j].red[INDEX] = (uint8_t) node_led_values_(RED_OFFSET, j);
-      dec_interface_light_data_[i].block_leds[j].green[INDEX] = (uint8_t) node_led_values_(GREEN_OFFSET, j);
-      dec_interface_light_data_[i].block_leds[j].blue[INDEX] = (uint8_t) node_led_values_(BLUE_OFFSET, j);
-      dec_interface_light_data_[i].block_leds[j].brightness[INDEX] = (uint8_t) node_led_values_(ALPHA_OFFSET, j);
-    }
+    const uint8_t TEENSY_ID = light_node_leds_to_teensy_map_[j].first;
+    const uint8_t STRIP = light_node_leds_to_teensy_map_[j].second.first;
+    const uint8_t INDEX = light_node_leds_to_teensy_map_[j].second;
+    ROS_INFO("NODE: TEENSY_ID %i | INDEX %i | STRIP %i", (int)TEENSY_ID, (int)INDEX, (int)j);
 
-    for (unsigned int j = 0; j < dec_interface_setup_data_[i].num_pixel_leds; ++j)
-    {
-      const uint8_t PIXEL_INDEX = dec_interface_setup_data_[i].pixel_leds[j].index;
-      const uint8_t NUM_PIXELS = PIXEL_INDEX + dec_interface_setup_data_[i].pixel_leds[j].num_pixels;
-      for (uint8_t n = PIXEL_INDEX; n < NUM_PIXELS; ++n)
-      {
-        const unsigned int INDEX = (unsigned int)n;
-        ROS_ASSERT_MSG(INDEX < pixel_beam_led_values_.size(), "INDEX %i pixel_beam_led_values_.size() %i", (int)INDEX, (int)pixel_beam_led_values_.size());
-        ROS_INFO("INDEX %i pixel_beam_led_values_.size() %i", (int)INDEX, (int)pixel_beam_led_values_.size());
-//        dec_interface_light_data_[i].pixel_leds[j].red[0] = (uint8_t) pixel_beam_led_values_(RED_OFFSET, INDEX);
-//        dec_interface_light_data_[i].pixel_leds[j].green[0] = (uint8_t) pixel_beam_led_values_(GREEN_OFFSET, INDEX);
-//        dec_interface_light_data_[i].pixel_leds[j].blue[0] = (uint8_t) pixel_beam_led_values_(BLUE_OFFSET, INDEX);
-//        dec_interface_light_data_[i].pixel_leds[j].brightness[0] = (uint8_t) pixel_beam_led_values_(ALPHA_OFFSET, INDEX);
-      }
-    }
+    dec_interface_light_data_[TEENSY_ID].block_leds[j].red[INDEX] = (uint8_t) node_led_values_(RED_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].block_leds[j].green[INDEX] = (uint8_t) node_led_values_(GREEN_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].block_leds[j].blue[INDEX] = (uint8_t) node_led_values_(BLUE_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].block_leds[j].brightness[INDEX] = (uint8_t) node_led_values_(ALPHA_OFFSET, j);
+  }
+
+  for (unsigned int j = 0; j < block_light_beam_leds_to_teensy_map_.size(); ++j)
+  {
+    const uint8_t STRIP = light_node_leds_to_teensy_map_.size() + j;
+    const uint8_t INDEX = block_light_beam_leds_to_teensy_map_[j].second;
+    const uint8_t TEENSY_ID = block_light_beam_leds_to_teensy_map_[j].first;
+
+    ROS_INFO("BEAM: TEENSY_ID %i | INDEX %i | STRIP %i", (int)TEENSY_ID, (int)INDEX, (int)STRIP);
+    dec_interface_light_data_[TEENSY_ID].block_leds[STRIP].red[INDEX] = (uint8_t) block_beam_led_values_(RED_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].block_leds[STRIP].green[INDEX] = (uint8_t) block_beam_led_values_(GREEN_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].block_leds[STRIP].blue[INDEX] = (uint8_t) block_beam_led_values_(BLUE_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].block_leds[STRIP].brightness[INDEX] = (uint8_t) block_beam_led_values_(ALPHA_OFFSET, j);
+  }
+
+  for (unsigned int j = 0; j < pixel_light_beam_leds_to_teensy_map_.size(); ++j)
+  {
+    ROS_ASSERT(false);
+    const uint8_t TEENSY_ID = pixel_light_beam_leds_to_teensy_map_[j].first;
+    const uint8_t STRIP = pixel_light_beam_leds_to_teensy_map_[j].second.first;
+    const uint8_t PIXEL_INDEX = pixel_light_beam_leds_to_teensy_map_[j].second.second;
+    dec_interface_light_data_[TEENSY_ID].pixel_leds[STRIP].red[PIXEL_INDEX] = (uint8_t) pixel_beam_led_values_(RED_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].pixel_leds[STRIP].green[PIXEL_INDEX] = (uint8_t) pixel_beam_led_values_(GREEN_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].pixel_leds[STRIP].blue[PIXEL_INDEX] = (uint8_t) pixel_beam_led_values_(BLUE_OFFSET, j);
+    dec_interface_light_data_[TEENSY_ID].pixel_leds[STRIP].brightness[PIXEL_INDEX] = (uint8_t) pixel_beam_led_values_(ALPHA_OFFSET, j);
   }
 
   return true;

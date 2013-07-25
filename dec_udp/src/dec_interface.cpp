@@ -79,6 +79,8 @@ bool DecInterface::sendSetupData(const uint8_t node_id)
   generateSetupData(_rx_buffer);
   printData();
 
+  return true;
+
   const int IP_FROM_NODE = node_id + 1;
   std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
 
@@ -125,6 +127,9 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   loadSetupData(node_id);
   generateLightData(_rx_buffer, &light_data);
   printData();
+
+  return true;
+
   // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
 
   const int IP_FROM_NODE = node_id + 1;

@@ -126,15 +126,14 @@ protected:
   std::vector<std::pair<unsigned int, unsigned int> > sensor_to_teensy_map_;
   /*! This vector is of size total_num_node_leds_
    * Each entry (index by the node led id) contains a pair where
-   * the first entry is the teensy_id and the second is the strip id
+   * the first entry is the teensy_id and the second is the pair block and strip id
    */
-  std::vector<std::pair<unsigned int, unsigned int> > light_node_leds_to_teensy_map_;
+  std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int> > > light_node_leds_to_teensy_map_;
   /*! This vector is of size total_num_beam_leds_
    * Each entry (index by the beam led id) contains a pair where
-   * the first element is the teensy_id and the second is the pair
-   * strip_id and led_id
+   * the first element is the teensy_id and the second is the pair block and strip id
    */
-  std::vector<std::pair<unsigned int, unsigned int> > block_light_beam_leds_to_teensy_map_;
+  std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int> > > block_light_beam_leds_to_teensy_map_;
   /*! This vector is of size total_num_beam_leds_
    * Each entry (index by the beam led id) contains a pair where
    * the first element is the teensy_id and the second is the pair
@@ -163,6 +162,9 @@ private:
   std::vector<geometry_msgs::Pose> block_light_beam_poses_;
   std::vector<geometry_msgs::Pose> pixel_light_beam_poses_;
   std::vector<geometry_msgs::Pose> pixel_light_beam_led_poses_;
+
+  std::vector<unsigned int> num_block_node_leds_per_teensy_;
+  std::vector<unsigned int> num_block_beam_leds_per_teensy_;
 
   void setNumberOfTeensys();
   void setPins(ros::NodeHandle node_handle);
