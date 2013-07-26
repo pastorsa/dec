@@ -18,9 +18,8 @@ namespace dec_light_show_manager
 {
 
 const unsigned int MAX_NUMBER_OF_BLOCKS_PER_TEENSY = 9 * 10;
-const unsigned int MAX_NUMBER_OF_PIXELS_PER_TEENSY = 255;
+const unsigned int MAX_NUMBER_OF_PIXELS_PER_TEENSY = 9 * 10;
 
-// const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 20;
 const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 150;
 
 class DecStructure
@@ -147,12 +146,6 @@ protected:
   std::vector<light_data_t> dec_interface_light_data_;
   std::vector<setup_data_t> dec_interface_setup_data_;
 
-  /*! size is number of teensys and content are vectors of size DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE
-   * The content is the total number of leds at this strip
-   * A number of 0 indicates that this strip is unused
-   */
-  std::vector<std::vector<unsigned int> > num_leds_at_each_strip_;
-
 private:
 
   /*!
@@ -173,8 +166,6 @@ private:
   void setupTeensyMap();
   bool isUnique();
 
-  // bool read(ros::NodeHandle& node_handle, std::vector<geometry_msgs::Point>& array);
-
   bool read(ros::NodeHandle& node_handle, std::vector<Node>& nodes);
   bool read(ros::NodeHandle& node_handle, std::vector<Beam>& beams);
   bool read(ros::NodeHandle& node_handle, std::vector<Sensor>& sensors);
@@ -190,9 +181,6 @@ private:
    */
   void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions, const int node_index);
 
-  /*! Size of these vectors is number of teensy
-   * Each entry contains the neccessary setup data for that teensy
-   */
 };
 
 }

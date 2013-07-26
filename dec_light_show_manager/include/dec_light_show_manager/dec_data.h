@@ -108,47 +108,6 @@ public:
   Eigen::MatrixXf pixel_beam_led_distances_to_sensor_;
   Eigen::MatrixXf block_beam_led_distances_to_sensor_;
 
-
-//  //std::vector<std::vector<Eigen::VectorXi> > light_beam_data_;
-//  // #include<Eigen/StdVector>
-//  // \/* ... *\/
-//  // std::vector<Eigen::Vector4f,Eigen::aligned_allocator<Eigen::Vector4f> >
-//
-//  /*! Number of LEDs for each light beam and light node.
-//   * The size corresponds to the number of light beams and light nodes in the structure.
-//   */
-//   std::vector<int> num_leds_of_each_light_beam_;
-//   std::vector<int> num_leds_of_each_light_node_;
-//
-//  /*! Which light_beam/light_node/sensor is connected to which teensy
-//   * The size of each vector is equal to the size of
-//   * light_beams/light_nodes/sensors. The stored number is the
-//   * id of the teensy to which this thing is connected.
-//   */
-//   std::vector<int> light_beam_connections_;
-//   std::vector<int> light_node_connections_;
-//   std::vector<int> sensor_connections_;
-//
-//  /*! These vectors are of size number_of_teensys
-//   * Each entry (index by the teensy id) contains the index
-//   * into teensy_to_*_map_ (see below) to obtain the "local" index of this
-//   * thing at this teensy.
-//   */
-//   std::vector<int> light_beam_index_counter_;
-//   std::vector<int> light_node_index_counter_;
-//   std::vector<int> sensor_index_counter_;
-//
-//  /*! Number of light beams/light nodes/sensor for each teensy
-//   * The size of these vectors is equal to the number of teensys in the network
-//   * each entry contains a list of indices into light beams/light nodes/sensors
-//   * to which this teensy is connected. Obviously, it can be empty, meaning that
-//   * this teensy does not have a light beams/light nodes/sensors attached.
-//   */
-//  std::vector<std::vector<int> > teensy_to_light_beam_map_;
-//  std::vector<std::vector<int> > teensy_to_light_node_map_;
-//  std::vector<std::vector<int> > teensy_to_sensor_map_;
-
-
   /*!
    */
   ros::Time ros_time_;
@@ -157,17 +116,6 @@ public:
 private:
   bool initialized_;
 
-//  bool read(ros::NodeHandle node_handle,
-//            const std::string& array_name,
-//            std::vector<std::pair<int, int> >& nodes);
-//
-//  bool read(ros::NodeHandle node_handle,
-//            const::std::string& array_name,
-//            std::vector<int>& values,
-//            std::vector<int>& index_values,
-//            std::vector<std::vector<int> >& map,
-//            const unsigned int& num);
-//
   /*!
    * @param teensy_id
    * @return distance of
@@ -177,14 +125,13 @@ private:
   /*!
    */
   bool generateConfigurationFile(const std::string& abs_file_name);
-//  bool generateStructureFile(const std::string& abs_file_name,
-//                             const std::string progmem_prefix = "",
-//                             const std::string unit_prefix = "");
 
   /*!
    */
   float computeDistance(const geometry_msgs::Point& sensor, const geometry_msgs::Point& thing);
 
+  /*!
+   */
   std::vector<unsigned int> list_of_teensys_to_exclude_from_communication_;
 
 };

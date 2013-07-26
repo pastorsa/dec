@@ -40,11 +40,8 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
 
   ROS_VERIFY(dec_utilities::read(node_handle, "block_nodes_size", block_light_nodes_size_));
   ROS_VERIFY(dec_utilities::read(node_handle, "block_beams_size", block_light_beams_size_));
-  // ROS_ASSERT(block_light_beams_size_.z > 0.0 && !(block_light_beams_size_.z > 1.0));
   ROS_VERIFY(dec_utilities::read(node_handle, "pixel_beams_size", pixel_light_beams_size_));
-  // ROS_ASSERT(pixel_light_beams_size_.z > 0.0 && !(pixel_light_beams_size_.z > 1.0));
   ROS_VERIFY(dec_utilities::read(node_handle, "sensors_size", sensors_size_));
-  // ROS_ASSERT(sensors_size_.z > 0.0 && !(sensors_size_.z > 1.0));
 
   ROS_DEBUG("Reading sensor configurations.");
   ROS_VERIFY(read(node_handle, sensors_));
@@ -174,7 +171,8 @@ void DecStructure::setupTeensyMap()
   }
 
   std::vector<unsigned int> total_num_leds_at_each_strip(DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE, 0);
-  num_leds_at_each_strip_.resize(number_of_teensys_, total_num_leds_at_each_strip);
+  std::vector<std::vector<unsigned int> > num_leds_at_each_strip;
+  num_leds_at_each_strip.resize(number_of_teensys_, total_num_leds_at_each_strip);
 
   std::vector<unsigned int> light_pin_counter(number_of_teensys_, 0);
 
@@ -186,7 +184,7 @@ void DecStructure::setupTeensyMap()
   {
     const unsigned int TEENSY_ID = block_light_nodes_[i].getTeeynsyId();
     block_light_nodes_[i].setPin(light_pin_counter[TEENSY_ID]);
-    num_leds_at_each_strip_[TEENSY_ID][light_pin_counter[TEENSY_ID]] += block_light_nodes_[i].getTotalNumLeds();
+    num_leds_at_each_strip[TEENSY_ID][light_pin_counter[TEENSY_ID]] += block_light_nodes_[i].getTotalNumLeds();
     bool new_strip = true;
     for (unsigned int j = 0; j < block_light_nodes_[i].getNumComponents(); ++j)
     {
@@ -233,7 +231,7 @@ void DecStructure::setupTeensyMap()
   {
     const unsigned int TEENSY_ID = block_light_beams_[i].getTeeynsyId();
     block_light_beams_[i].setPin(light_pin_counter[TEENSY_ID]);
-    num_leds_at_each_strip_[TEENSY_ID][light_pin_counter[TEENSY_ID]] += block_light_beams_[i].getTotalNumLeds();
+    num_leds_at_each_strip[TEENSY_ID][light_pin_counter[TEENSY_ID]] += block_light_beams_[i].getTotalNumLeds();
     bool new_strip = true;
     for (unsigned int j = 0; j < block_light_beams_[i].getNumComponents(); ++j)
     {
@@ -273,17 +271,6 @@ void DecStructure::setupTeensyMap()
     ROS_ASSERT_MSG((unsigned int)dec_interface_setup_data_[i].num_block_leds < MAX_NUMBER_OF_BLOCKS_PER_TEENSY,
                    "Max number of allowed blocks is >%i<, however, >%i< are specified.",
                    (int)MAX_NUMBER_OF_BLOCKS_PER_TEENSY, (int)dec_interface_setup_data_[i].num_block_leds);
-    //    std::vector<unsigned int> total_num_block_leds(sensor_pins_.size(), 0);
-    //    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_block_leds; ++j)
-    //    {
-    //      total_num_block_leds[(unsigned int)setup_data_[i].block_leds[j].pin] += 1; // only 1 block
-    //    }
-    //    for (unsigned int j = 0; j < total_num_block_leds.size(); ++j)
-    //    {
-    //      ROS_ASSERT_MSG(total_num_block_leds[j] < MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP,
-    //                     "Too many block LEDs specified >%i< at pin >%i<. Limit is >%i<.",
-    //                     (int)total_num_block_leds[j], (int)j, (int)MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP);
-    //    }
   }
   ROS_ASSERT(block_light_beam_leds_to_teensy_map_.size() == total_num_block_beam_leds_);
 
@@ -294,7 +281,7 @@ void DecStructure::setupTeensyMap()
   {
     const unsigned int TEENSY_ID = pixel_light_beams_[i].getTeeynsyId();
     pixel_light_beams_[i].setPin(light_pin_counter[TEENSY_ID]);
-    num_leds_at_each_strip_[TEENSY_ID][light_pin_counter[TEENSY_ID]] += pixel_light_beams_[i].getTotalNumLeds();
+    num_leds_at_each_strip[TEENSY_ID][light_pin_counter[TEENSY_ID]] += pixel_light_beams_[i].getTotalNumLeds();
     bool new_strip = true;
     for (unsigned int j = 0; j < pixel_light_beams_[i].getNumComponents(); ++j)
     {
@@ -303,7 +290,7 @@ void DecStructure::setupTeensyMap()
         std::pair<unsigned int, std::pair<unsigned int, unsigned int> > teensy_id_to_led_info_pair;
         teensy_id_to_led_info_pair.first = TEENSY_ID;
         std::pair<unsigned int, unsigned int> strip_id_and_led_id_pair;
-        strip_id_and_led_id_pair.first = j; //light_pin_counter[TEENSY_ID]; // i + block_light_nodes_.size() + block_light_beams_.size();
+        strip_id_and_led_id_pair.first = j;
         strip_id_and_led_id_pair.second = k;
         teensy_id_to_led_info_pair.second = strip_id_and_led_id_pair;
         pixel_light_beam_leds_to_teensy_map_.push_back(teensy_id_to_led_info_pair);
@@ -337,17 +324,6 @@ void DecStructure::setupTeensyMap()
     ROS_ASSERT_MSG((unsigned int)dec_interface_setup_data_[i].num_pixel_leds < MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP,
                    "Max number of allowed pixels is >%i<, however, >%i< are specified.",
                    (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP, (int)dec_interface_setup_data_[i].num_pixel_leds);
-    //    std::vector<unsigned int> total_num_pixel_leds(sensor_pins_.size(), 0);
-    //    for (unsigned int j = 0; j < (unsigned int)setup_data_[i].num_pixel_leds; ++j)
-    //    {
-    //      total_num_pixel_leds[(unsigned int)setup_data_[i].pixel_leds[j].pin] += (unsigned int)setup_data_[i].pixel_leds[j].num_leds;
-    //    }
-    //    for (unsigned int j = 0; j < total_num_pixel_leds.size(); ++j)
-    //    {
-    //      ROS_ASSERT_MSG(total_num_pixel_leds[j] < MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP,
-    //                     "Too many pixel LEDs specified >%i< at pin >%i<. Limit is >%i<.",
-    //                     (int)total_num_pixel_leds[j], (int)j, (int)MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP);
-    //    }
   }
   ROS_ASSERT_MSG(led_index == total_num_pixel_beam_leds_, "LED index is >%i< and total number of pixel beam leds is >%i<.",
                  (int)led_index, (int)total_num_pixel_beam_leds_);
@@ -358,9 +334,9 @@ void DecStructure::setupTeensyMap()
 
   for (unsigned int i = 0; i < number_of_teensys_; ++i)
   {
-    for (unsigned int j = 0; j < num_leds_at_each_strip_[i].size(); ++j)
+    for (unsigned int j = 0; j < num_leds_at_each_strip[i].size(); ++j)
     {
-      if (num_leds_at_each_strip_[i][j] > 0)
+      if (num_leds_at_each_strip[i][j] > 0)
       {
         total_number_of_strips[i]++;
       }
@@ -372,16 +348,11 @@ void DecStructure::setupTeensyMap()
   }
   for (unsigned int i = 0; i < number_of_teensys_; ++i)
   {
-    for (unsigned int j = 0; j < num_leds_at_each_strip_[i].size(); ++j)
+    for (unsigned int j = 0; j < num_leds_at_each_strip[i].size(); ++j)
     {
-      dec_interface_setup_data_[i].strip_setup[j].total_num_leds_at_strip = (uint8_t)num_leds_at_each_strip_[i][j];
+      dec_interface_setup_data_[i].strip_setup[j].total_num_leds_at_strip = (uint8_t)num_leds_at_each_strip[i][j];
     }
   }
-
-  //for (unsigned int i = 0; i < num_leds_at_each_strip.size(); ++i)
-  //  for (unsigned int j = 0; j < num_leds_at_each_strip[i].size(); ++j)
-  //    ROS_INFO("%i %i : %i", (int)i, (int)j, (int)num_leds_at_each_strip[i][j]);
-
 }
 
 void DecStructure::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
