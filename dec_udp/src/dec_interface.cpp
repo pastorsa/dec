@@ -63,16 +63,9 @@ void DecInterface::print(const light_data_t& light_data)
   printf("Light Data:\n");
 }
 
-//setup_data_t DecInterface::getSetupData(const uint8_t node_id)
-//{
-//  loadSetupData(node_id);
-//  return _setup_data;
-//}
-
 bool DecInterface::sendSetupData(const uint8_t node_id, const setup_data_t& setup_data)
 {
   printf("Loading setup data for node >%i<.\n", node_id);
-  // loadSetupData(node_id);
   _setup_data = setup_data;
   print(_setup_data);
 
@@ -122,13 +115,11 @@ bool DecInterface::sendSetupData(const uint8_t node_id, const setup_data_t& setu
 
 bool DecInterface::sendLightData(const int node_id, const light_data_t& light_data)
 {
-  printf("Generating light data for node >%i<.\n", node_id);
-  // loadSetupData(node_id);
+  // printf("Generating light data for node >%i<.\n", node_id);
   generateLightData(_rx_buffer, &light_data);
-  printData();
+  // printData();
 
   // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
-
   const int IP_FROM_NODE = node_id + 1;
   std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
 
@@ -157,7 +148,7 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
       _rx_buffer_length = (uint16_t)return_code;
       parseSensorData(_rx_buffer);
       received_sensor_data_[node_id] = _sensor_data;
-      printf("Received data for node %i.\n", node_id);
+      printf("Received data for node %i : ", node_id);
       printData();
     }
     else

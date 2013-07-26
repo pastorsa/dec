@@ -206,14 +206,14 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
   _rx_buffer_length++;
 
   // first set blocks
-  printf("Block Light: %u blocks.\n", _setup_data.num_block_leds);
+//  printf("Block Light: %u blocks.\n", _setup_data.num_block_leds);
   for (i = 0; i < _setup_data.num_block_leds; ++i)
   {
-    printf("  >%u< - >%u< >%u< >%u< >%u<\n", i,
-           (uint8_t)light_data->block_leds[i].red,
-           (uint8_t)light_data->block_leds[i].green,
-           (uint8_t)light_data->block_leds[i].blue,
-           (uint8_t)light_data->block_leds[i].brightness);
+//    printf("  >%u< - >%u< >%u< >%u< >%u<\n", i,
+//           (uint8_t)light_data->block_leds[i].red,
+//           (uint8_t)light_data->block_leds[i].green,
+//           (uint8_t)light_data->block_leds[i].blue,
+//           (uint8_t)light_data->block_leds[i].brightness);
 
     buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].red;
     _rx_buffer_length++;
@@ -226,20 +226,20 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
   }
 
   // second set pixels
-  printf("Pixel Light: %u pixels.\n", _setup_data.num_pixel_leds);
+//  printf("Pixel Light: %u pixels.\n", _setup_data.num_pixel_leds);
   for (i = 0; i < _setup_data.num_pixel_leds; ++i)
   {
-    printf("Pixel %i has index %i num_pixels %i and pin %i.\n", i, _setup_data.pixel_leds[i].index,
-           _setup_data.pixel_leds[i].num_pixels, _setup_data.pixel_leds[i].pin);
+//    printf("Pixel %i has index %i num_pixels %i and pin %i.\n", i, _setup_data.pixel_leds[i].index,
+//           _setup_data.pixel_leds[i].num_pixels, _setup_data.pixel_leds[i].pin);
 
     for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
     {
       // uint8_t index = _setup_data.pixel_leds[i].index + j;
       uint8_t index = (uint8_t)0;
-      printf("   >%u< of >%u< num pixels\n", j, _setup_data.pixel_leds[i].num_pixels);
-      printf("   >%u< index >%u< >%u< >%u< >%u<\n", index, (uint8_t)light_data->pixel_leds[i].red[j],
-             (uint8_t)light_data->pixel_leds[i].green[j], (uint8_t)light_data->pixel_leds[i].blue[j],
-             (uint8_t)light_data->pixel_leds[i].brightness[j]);
+//      printf("   >%u< of >%u< num pixels\n", j, _setup_data.pixel_leds[i].num_pixels);
+//      printf("   >%u< index >%u< >%u< >%u< >%u<\n", index, (uint8_t)light_data->pixel_leds[i].red[j],
+//             (uint8_t)light_data->pixel_leds[i].green[j], (uint8_t)light_data->pixel_leds[i].blue[j],
+//             (uint8_t)light_data->pixel_leds[i].brightness[j]);
 
       buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[j];
       _rx_buffer_length++;
