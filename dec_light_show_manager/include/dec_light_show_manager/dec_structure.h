@@ -127,12 +127,12 @@ protected:
    * Each entry (index by the node led id) contains a pair where
    * the first entry is the teensy_id and the second is the pair block and strip id
    */
-  std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int> > > light_node_leds_to_teensy_map_;
+  std::vector<std::pair<unsigned int, unsigned int> > light_node_leds_to_teensy_map_;
   /*! This vector is of size total_num_beam_leds_
    * Each entry (index by the beam led id) contains a pair where
    * the first element is the teensy_id and the second is the pair block and strip id
    */
-  std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int> > > block_light_beam_leds_to_teensy_map_;
+  std::vector<std::pair<unsigned int, unsigned int> > block_light_beam_leds_to_teensy_map_;
   /*! This vector is of size total_num_beam_leds_
    * Each entry (index by the beam led id) contains a pair where
    * the first element is the teensy_id and the second is the pair

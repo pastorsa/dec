@@ -170,14 +170,6 @@ void parseLightData(uint8_t* buffer)
   // first set light nodes
   for (i = 0; i < _setup_data.num_block_leds; ++i)
   {
-//    _light_data.block_leds[i].red[_setup_data.block_leds[i].index] = (uint8_t)buffer[_rx_buffer_length];
-//    _rx_buffer_length++;
-//    _light_data.block_leds[i].green[_setup_data.block_leds[i].index] = (uint8_t)buffer[_rx_buffer_length];
-//    _rx_buffer_length++;
-//    _light_data.block_leds[i].blue[_setup_data.block_leds[i].index] = (uint8_t)buffer[_rx_buffer_length];
-//    _rx_buffer_length++;
-//    _light_data.block_leds[i].brightness[_setup_data.block_leds[i].index] = (uint8_t)buffer[_rx_buffer_length];
-//    _rx_buffer_length++;
     _light_data.block_leds[i].red = (uint8_t)buffer[_rx_buffer_length];
     _rx_buffer_length++;
     _light_data.block_leds[i].green = (uint8_t)buffer[_rx_buffer_length];
@@ -189,36 +181,34 @@ void parseLightData(uint8_t* buffer)
   }
 
   // second set light beams
-//  for (i = 0; i < _setup_data.num_pixel_leds; ++i)
-//  {
-//    for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
-//    {
-//      _light_data.pixel_leds[i].red[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
-//      _rx_buffer_length++;
-//      _light_data.pixel_leds[i].green[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
-//      _rx_buffer_length++;
-//      _light_data.pixel_leds[i].blue[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
-//      _rx_buffer_length++;
-//      _light_data.pixel_leds[i].brightness[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
-//      _rx_buffer_length++;
-//    }
-//  }
+  for (i = 0; i < _setup_data.num_pixel_leds; ++i)
+  {
+    for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
+    {
+      _light_data.pixel_leds[i].red[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
+      _rx_buffer_length++;
+      _light_data.pixel_leds[i].green[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
+      _rx_buffer_length++;
+      _light_data.pixel_leds[i].blue[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
+      _rx_buffer_length++;
+      _light_data.pixel_leds[i].brightness[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
+      _rx_buffer_length++;
+    }
+  }
 }
 
 void generateLightData(uint8_t* buffer, const light_data_t* light_data)
 {
   uint8_t i = 0;
-  // uint8_t j = 0;
+  uint8_t j = 0;
   _rx_buffer_length = (uint16_t)0;
   buffer[_rx_buffer_length] = DEC_LIGHT_DATA;
   _rx_buffer_length++;
 
   // first set blocks
-  printf("Light: %u blocks.\n", _setup_data.num_block_leds);
+  printf("Block Light: %u blocks.\n", _setup_data.num_block_leds);
   for (i = 0; i < _setup_data.num_block_leds; ++i)
   {
-
-    // uint8_t index = _setup_data.block_leds[i].index;
     printf("  >%u< - >%u< >%u< >%u< >%u<\n", i,
            (uint8_t)light_data->block_leds[i].red,
            (uint8_t)light_data->block_leds[i].green,
@@ -235,84 +225,36 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
     _rx_buffer_length++;
   }
 
-//  // second set pixels
-//  printf("Light: %u pixels.\n", _setup_data.num_pixel_leds);
-//  for (i = 0; i < _setup_data.num_pixel_leds; ++i)
-//  {
-//    printf("Pixel %i has index %i num_pixels %i and pin %i.\n",
-//           i, _setup_data.pixel_leds[i].index, _setup_data.pixel_leds[i].num_pixels, _setup_data.pixel_leds[i].pin);
-//
-//    for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
-//    {
-//      // uint8_t index = _setup_data.pixel_leds[i].index + j;
-//      uint8_t index = (uint8_t)0;
-//      printf("   >%u< of >%u< num pixels\n", j, _setup_data.pixel_leds[i].num_pixels);
-//      printf("   >%u< index >%u< >%u< >%u< >%u<\n", index,
-//             (uint8_t)light_data->pixel_leds[i].red[j],
-//             (uint8_t)light_data->pixel_leds[i].green[j],
-//             (uint8_t)light_data->pixel_leds[i].blue[j],
-//             (uint8_t)light_data->pixel_leds[i].brightness[j]);
-//
-//      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[j];
-//      _rx_buffer_length++;
-//      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].green[j];
-//      _rx_buffer_length++;
-//      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].blue[j];
-//      _rx_buffer_length++;
-//      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].brightness[j];
-//      _rx_buffer_length++;
-//    }
-//  }
+  // second set pixels
+  printf("Pixel Light: %u pixels.\n", _setup_data.num_pixel_leds);
+  for (i = 0; i < _setup_data.num_pixel_leds; ++i)
+  {
+    printf("Pixel %i has index %i num_pixels %i and pin %i.\n", i, _setup_data.pixel_leds[i].index,
+           _setup_data.pixel_leds[i].num_pixels, _setup_data.pixel_leds[i].pin);
+
+    for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
+    {
+      // uint8_t index = _setup_data.pixel_leds[i].index + j;
+      uint8_t index = (uint8_t)0;
+      printf("   >%u< of >%u< num pixels\n", j, _setup_data.pixel_leds[i].num_pixels);
+      printf("   >%u< index >%u< >%u< >%u< >%u<\n", index, (uint8_t)light_data->pixel_leds[i].red[j],
+             (uint8_t)light_data->pixel_leds[i].green[j], (uint8_t)light_data->pixel_leds[i].blue[j],
+             (uint8_t)light_data->pixel_leds[i].brightness[j]);
+
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[j];
+      _rx_buffer_length++;
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].green[j];
+      _rx_buffer_length++;
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].blue[j];
+      _rx_buffer_length++;
+      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].brightness[j];
+      _rx_buffer_length++;
+    }
+  }
 }
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEC_LIGHT_DATA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-/*
-void loadSetupData(const uint8_t node_id)
-{
-  uint8_t i = 0;
-
-  // printf("Loading setup data for node >%i<.\n", (int)node_id);
-  _setup_data.num_block_leds = NUM_BLOCK_LEDS_PER_TEENSY[node_id];
-  // printf("Number of block LEDS is >%i<.\n", (int)_setup_data.num_block_leds);
-  for (i = 0; i < _setup_data.num_block_leds; ++i)
-  {
-    _setup_data.block_leds[i].index = BLOCK_LEDS_START_INDEX[node_id][i];
-    _setup_data.block_leds[i].num_blocks = BLOCK_LEDS_NUMBER[node_id][i];
-    // _setup_data.block_leds[i].pin = LIGHT_PIN_ORDERING[BLOCK_LEDS_PINS[node_id][i]];
-    _setup_data.block_leds[i].pin = i;
-    // printf(" block LEDS data index >%i< num_leds >%i< pin >%i<.\n",
-          // (int)_setup_data.block_leds[i].index, (int)_setup_data.block_leds[i].num_leds, (int)_setup_data.block_leds[i].pin);
-  }
-
-  _setup_data.num_pixel_leds = NUM_PIXEL_LEDS_PER_TEENSY[node_id];
-  // printf("Number of pixel LEDS is >%i<.\n", (int)_setup_data.num_pixel_leds);
-  for (i = 0; i < _setup_data.num_pixel_leds; ++i)
-  {
-    _setup_data.pixel_leds[i].index = PIXEL_LEDS_START_INDEX[node_id][i];
-    _setup_data.pixel_leds[i].num_pixels = PIXEL_LEDS_NUMBER[node_id][i];
-    // _setup_data.pixel_leds[i].pin = LIGHT_PIN_ORDERING[PIXEL_LEDS_PINS[node_id][i]];
-    _setup_data.pixel_leds[i].pin = i;
-    // printf(" pixel LEDS data index >%i< num_leds >%i< pin >%i<.\n",
-          // (int)_setup_data.pixel_leds[i].index, (int)_setup_data.pixel_leds[i].num_leds, (int)_setup_data.pixel_leds[i].pin);
-  }
-
-  _setup_data.num_strips_used = NUM_STRIPS_USED[node_id];
-  for (i = 0; i < _setup_data.num_strips_used; ++i)
-  {
-    _setup_data.strip_setup[i].total_num_leds_at_strip = TOTAL_NUM_LEDS_AT_STRIP[node_id][i];
-  }
-
-  _setup_data.num_sensors = NUM_SENSORS_PER_TEENSY[node_id];
-  // printf("Number of sensors is >%i<.\n", (int)_setup_data.num_sensors);
-  for (i = 0; i < _setup_data.num_sensors; ++i)
-  {
-    _setup_data.sensors[i].pin = SENSOR_PIN_ORDERING[i];
-    // printf(" sensor pin >%i<.\n", (int)_setup_data.sensors[i].pin);
-  }
-}
-*/
 
 uint8_t isSetupData(uint8_t* buffer)
 {

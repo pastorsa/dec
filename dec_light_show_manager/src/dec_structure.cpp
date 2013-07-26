@@ -188,12 +188,9 @@ void DecStructure::setupTeensyMap()
     bool new_strip = true;
     for (unsigned int j = 0; j < block_light_nodes_[i].getNumComponents(); ++j)
     {
-      std::pair<unsigned int, unsigned int> block_and_strip_pair;
-      block_and_strip_pair.first = j; // block index
-      block_and_strip_pair.second = light_pin_counter[TEENSY_ID];
-      std::pair<unsigned int, std::pair<unsigned int, unsigned int> > teensy_id_to_led_info_pair;
+      std::pair<unsigned int, unsigned int> teensy_id_to_led_info_pair;
       teensy_id_to_led_info_pair.first = TEENSY_ID;
-      teensy_id_to_led_info_pair.second = block_and_strip_pair;
+      teensy_id_to_led_info_pair.second = light_pin_counter[TEENSY_ID];
       light_node_leds_to_teensy_map_.push_back(teensy_id_to_led_info_pair);
 
       if(new_strip)
@@ -208,7 +205,7 @@ void DecStructure::setupTeensyMap()
             dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds - 1].num_blocks;
       }
       dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].num_blocks = (uint8_t)block_light_nodes_[i].getNumLeds(j);
-      dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].pin = (uint8_t)block_and_strip_pair.second;
+      dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].pin = (uint8_t)teensy_id_to_led_info_pair.second;
       ROS_INFO("Block light node >%i< at pin >%i< connected to teensy >%i<. LED index >%i< num_leds >%i<.",
                (int)dec_interface_setup_data_[TEENSY_ID].num_block_leds,
                (int)dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].pin,
@@ -235,12 +232,9 @@ void DecStructure::setupTeensyMap()
     bool new_strip = true;
     for (unsigned int j = 0; j < block_light_beams_[i].getNumComponents(); ++j)
     {
-      std::pair<unsigned int, unsigned int> block_and_strip_pair;
-      block_and_strip_pair.first = j; // block index
-      block_and_strip_pair.second = light_pin_counter[TEENSY_ID]; // i + block_light_nodes_.size();
-      std::pair<unsigned int, std::pair<unsigned int, unsigned int> > teensy_id_to_led_info_pair;
+      std::pair<unsigned int, unsigned int> teensy_id_to_led_info_pair;
       teensy_id_to_led_info_pair.first = TEENSY_ID;
-      teensy_id_to_led_info_pair.second = block_and_strip_pair;
+      teensy_id_to_led_info_pair.second = light_pin_counter[TEENSY_ID];
       block_light_beam_leds_to_teensy_map_.push_back(teensy_id_to_led_info_pair);
 
       if(new_strip)
@@ -255,7 +249,7 @@ void DecStructure::setupTeensyMap()
             dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds - 1].num_blocks;
       }
       dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].num_blocks = (uint8_t)block_light_beams_[i].getNumLeds(j);
-      dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].pin = (uint8_t)(teensy_id_to_led_info_pair.second.second);
+      dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].pin = (uint8_t)(teensy_id_to_led_info_pair.second);
       ROS_INFO("Block light beam at pin >%i< connected to teensy >%i<. LED index >%i< num_leds >%i<.",
                (int)dec_interface_setup_data_[TEENSY_ID].block_leds[dec_interface_setup_data_[TEENSY_ID].num_block_leds].pin,
                (int)TEENSY_ID,
