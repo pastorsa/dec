@@ -215,28 +215,45 @@ void loop()
 
                   for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
                   {
-                    uint8_t num = _setup_data.block_leds[i].index + _setup_data.block_leds[i].num_blocks;
-                    for (uint8_t j = _setup_data.block_leds[i].index; j < num; ++j)
+                    uint8_t index = _setup_data.block_leds[i].index;
+                    uint8_t num = index + _setup_data.block_leds[i].num_blocks;
+                    for (uint8_t j = index; j < num; ++j)
                     {
-                      uint8_t index = _setup_data.block_leds[i].index;
-                      light_strips[BLOCK_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
-                                                                     _light_data.block_leds[i].red[index],
-                                                                     _light_data.block_leds[i].green[index],
-                                                                     _light_data.block_leds[i].blue[index]);
+                      uint8_t pin = _setup_data.block_leds[i].pin;
+                      // light_strips[BLOCK_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
+                      light_strips[pin].setPixelColor((uint16_t)j,
+                                                      _light_data.block_leds[i].red,
+                                                      _light_data.block_leds[i].green,
+                                                      _light_data.block_leds[i].blue);
                     }
                   }
 
-                  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
-                  {
-                    uint8_t num = _setup_data.pixel_leds[i].index + _setup_data.pixel_leds[i].num_pixels;
-                    for (uint8_t j = _setup_data.pixel_leds[i].index; j < num; ++j)
-                    {
-                      light_strips[PIXEL_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
-                                                              _light_data.pixel_leds[i].red[j],
-                                                              _light_data.pixel_leds[i].green[j],
-                                                              _light_data.pixel_leds[i].blue[j]);
-                    }
-                  }
+//                  for (uint8_t i = 0; i < _setup_data.num_block_leds; ++i)
+//                  {
+//                    uint8_t num = _setup_data.block_leds[i].index + _setup_data.block_leds[i].num_blocks;
+//                    for (uint8_t j = _setup_data.block_leds[i].index; j < num; ++j)
+//                    {
+//                      uint8_t index = _setup_data.block_leds[i].index;
+//                      light_strips[BLOCK_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
+//                                                                     _light_data.block_leds[i].red[index],
+//                                                                     _light_data.block_leds[i].green[index],
+//                                                                     _light_data.block_leds[i].blue[index]);
+//
+//                      light_strips[BLOCK_LEDS_PINS[node_id][i]].show();
+//                    }
+//                  }
+
+//                  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
+//                  {
+//                    uint8_t num = _setup_data.pixel_leds[i].index + _setup_data.pixel_leds[i].num_pixels;
+//                    for (uint8_t j = _setup_data.pixel_leds[i].index; j < num; ++j)
+//                    {
+//                      light_strips[PIXEL_LEDS_PINS[node_id][i]].setPixelColor((uint16_t)j,
+//                                                              _light_data.pixel_leds[i].red[j],
+//                                                              _light_data.pixel_leds[i].green[j],
+//                                                              _light_data.pixel_leds[i].blue[j]);
+//                    }
+//                  }
                   // let there be light
                   for (uint8_t i = 0; i < _setup_data.num_strips_used; ++i)
                   {

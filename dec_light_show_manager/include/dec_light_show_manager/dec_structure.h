@@ -17,10 +17,10 @@
 namespace dec_light_show_manager
 {
 
-const unsigned int MAX_NUMBER_OF_BLOCKS_PER_TEENSY = 40;
+const unsigned int MAX_NUMBER_OF_BLOCKS_PER_TEENSY = 9 * 10;
 const unsigned int MAX_NUMBER_OF_PIXELS_PER_TEENSY = 255;
 
-const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 20;
+// const unsigned int MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP = 20;
 const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 150;
 
 class DecStructure
@@ -141,9 +141,11 @@ protected:
    */
   std::vector<std::pair<unsigned int, std::pair<unsigned int, unsigned int> > > pixel_light_beam_leds_to_teensy_map_;
 
-  /*!
+  /*! To send/receive data over udp
    */
-  std::vector<setup_data_t> setup_data_;
+  boost::shared_ptr<dec_udp::DecInterface> dec_interface_;
+  std::vector<light_data_t> dec_interface_light_data_;
+  std::vector<setup_data_t> dec_interface_setup_data_;
 
   /*! size is number of teensys and content are vectors of size DEC_MAX_NUMBER_OF_LED_STRIPS_PER_NODE
    * The content is the total number of leds at this strip

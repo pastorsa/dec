@@ -63,16 +63,17 @@ void DecInterface::print(const light_data_t& light_data)
   printf("Light Data:\n");
 }
 
-setup_data_t DecInterface::getSetupData(const uint8_t node_id)
-{
-  loadSetupData(node_id);
-  return _setup_data;
-}
+//setup_data_t DecInterface::getSetupData(const uint8_t node_id)
+//{
+//  loadSetupData(node_id);
+//  return _setup_data;
+//}
 
-bool DecInterface::sendSetupData(const uint8_t node_id)
+bool DecInterface::sendSetupData(const uint8_t node_id, const setup_data_t& setup_data)
 {
   printf("Loading setup data for node >%i<.\n", node_id);
-  loadSetupData(node_id);
+  // loadSetupData(node_id);
+  _setup_data = setup_data;
   print(_setup_data);
 
   printf("Generating setup data for node >%i<.\n", node_id);
@@ -122,7 +123,7 @@ bool DecInterface::sendSetupData(const uint8_t node_id)
 bool DecInterface::sendLightData(const int node_id, const light_data_t& light_data)
 {
   printf("Generating light data for node >%i<.\n", node_id);
-  loadSetupData(node_id);
+  // loadSetupData(node_id);
   generateLightData(_rx_buffer, &light_data);
   printData();
 

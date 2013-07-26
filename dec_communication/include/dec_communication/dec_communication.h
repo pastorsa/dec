@@ -12,7 +12,7 @@
 
 // generated files
 #include "DEC_config.h"
-#include "DEC_structure.h"
+// #include "DEC_structure.h"
 
 // Fixed constants
 // #define DEC_CONTROLLER_ID 50
@@ -153,18 +153,14 @@ void generateSensorData(uint8_t* buffer, const sensor_data_t* sensor_data);
  */
 typedef struct
 {
-  uint8_t red[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
-  uint8_t green[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
-  uint8_t blue[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
-  uint8_t brightness[DEC_MAX_NUMBER_OF_BLOCKS_PER_LIGHT_STRIP];
+  uint8_t red;
+  uint8_t green;
+  uint8_t blue;
+  uint8_t brightness;
 } led_block_data_t;
 
 typedef struct
 {
-  // uint8_t red[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
-  // uint8_t green[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
-  // uint8_t blue[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
-  // uint8_t brightness[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
   uint8_t* red;
   uint8_t* green;
   uint8_t* blue;
@@ -173,8 +169,6 @@ typedef struct
 
 typedef struct
 {
-  // led_block_data_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
-  // led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY];
   led_block_data_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
   led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
   uint8_t pixel_memory_allocated;
@@ -203,7 +197,7 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data);
 /*!
  * @param node_id
  */
-void loadSetupData(const uint8_t node_id);
+// void loadSetupData(const uint8_t node_id);
 
 /*!
  * @param buffer

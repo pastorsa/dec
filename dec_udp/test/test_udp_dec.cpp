@@ -24,8 +24,7 @@ int main(int argc, char** argv)
 
   dec_udp::DecInterface dec_interface(NUM_NODES);
 
-
-  if(!dec_interface.sendSetupData(node_id))
+  // if(!dec_interface.sendSetupData(node_id))
   {
     return -1;
   }

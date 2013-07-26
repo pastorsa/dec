@@ -50,13 +50,13 @@ public:
    * @param node_id
    * @return the setup data
    */
-  setup_data_t getSetupData(const uint8_t node_id);
+  // setup_data_t getSetupData(const uint8_t node_id);
 
   /*!
    * @param node_id
    * @return True on success, otherwise False
    */
-  bool sendSetupData(const uint8_t node_id);
+  bool sendSetupData(const uint8_t node_id, const setup_data_t& setup_data);
 
   /*!
    * @param node_id

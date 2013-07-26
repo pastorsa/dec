@@ -23,8 +23,6 @@
 #define GREEN_OFFSET 1
 #define BLUE_OFFSET  2
 #define ALPHA_OFFSET 3
-// static const double COLOR_RESOLUTION = 255.0;
-// static const int SENSOR_RESOLUTION = 255;
 
 namespace dec_light_show_manager
 {
@@ -179,16 +177,9 @@ private:
   /*!
    */
   bool generateConfigurationFile(const std::string& abs_file_name);
-  bool generateStructureFile(const std::string& abs_file_name,
-                             const std::string progmem_prefix = "",
-                             const std::string unit_prefix = "");
-
-
-  /*! To send/receive data over udp
-   */
-  boost::shared_ptr<dec_udp::DecInterface> dec_interface_;
-  std::vector<setup_data_t> dec_interface_setup_data_;
-  std::vector<light_data_t> dec_interface_light_data_;
+//  bool generateStructureFile(const std::string& abs_file_name,
+//                             const std::string progmem_prefix = "",
+//                             const std::string unit_prefix = "");
 
   /*!
    */
