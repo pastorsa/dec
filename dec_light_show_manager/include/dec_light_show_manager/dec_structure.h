@@ -18,7 +18,7 @@ namespace dec_light_show_manager
 {
 
 const unsigned int MAX_NUMBER_OF_BLOCKS_PER_TEENSY = 9 * 10;
-const unsigned int MAX_NUMBER_OF_PIXELS_PER_TEENSY = 5;
+const unsigned int MAX_NUMBER_OF_PIXELS_PER_TEENSY = 6;
 
 const unsigned int MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP = 150;
 

@@ -61,6 +61,11 @@ light_nodes:
     num_leds: [2, 2, 2]
     num_leds_per_meter: 60
     teensy: 0
+  -
+    nodes:    [7, 8, 9]
+    num_leds: [2, 2, 2]
+    num_leds_per_meter: 60
+    teensy: 0
 #  -
 #    nodes:    [3, 4, 5, 6, 7]
 #    num_leds: [2, 2, 2, 2, 2]
@@ -108,7 +113,7 @@ pixel_light_beams:
     nodes: [[9, 10], [10, 11]]
     centers: [0.5, 0.5]
     num_leds: [6, 6]
-    num_leds_per_meter: 1
+    num_leds_per_meter: 30
     teensy: 0
   -
     nodes: [[11, 12]]

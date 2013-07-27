@@ -273,7 +273,7 @@ void DecStructure::setupTeensyMap()
   ROS_DEBUG("Setting up pixel light beam map.");
   unsigned int led_index = 0;
   pixel_light_beam_leds_to_teensy_map_.clear();
-  unsigned int num_pixel_segments = 0;
+  // std::vector<unsigned int> num_pixel_segments(number_of_teensys_, 0);
   std::vector<unsigned int> pixel_block_counter(number_of_teensys_, 0);
   for (unsigned int i = 0; i < pixel_light_beams_.size(); ++i)
   {
@@ -295,9 +295,12 @@ void DecStructure::setupTeensyMap()
         pixel_light_beam_leds_to_teensy_map_.push_back(teensy_id_to_led_info_pair);
         led_index++;
       }
-      ROS_ASSERT_MSG(num_pixel_segments < MAX_NUMBER_OF_PIXELS_PER_TEENSY,
+//      ROS_ASSERT_MSG(num_pixel_segments[TEENSY_ID] < MAX_NUMBER_OF_PIXELS_PER_TEENSY,
+//                     "Maximum number of pixel segments is >%i< and >%i< segments have been specified.",
+//                     (int)MAX_NUMBER_OF_PIXELS_PER_TEENSY, (int)num_pixel_segments[TEENSY_ID]);
+      ROS_ASSERT_MSG(pixel_block_counter[TEENSY_ID] < MAX_NUMBER_OF_PIXELS_PER_TEENSY,
                      "Maximum number of pixel segments is >%i< and >%i< segments have been specified.",
-                     (int)MAX_NUMBER_OF_PIXELS_PER_TEENSY, (int)num_pixel_segments);
+                     (int)MAX_NUMBER_OF_PIXELS_PER_TEENSY, (int)pixel_block_counter[TEENSY_ID]);
       if(new_strip)
       {
         new_strip = false;
@@ -312,14 +315,15 @@ void DecStructure::setupTeensyMap()
       dec_interface_setup_data_[TEENSY_ID].pixel_leds[pixel_block_counter[TEENSY_ID]].num_pixels = (uint8_t)pixel_light_beams_[i].getNumLeds(j);
       dec_interface_setup_data_[TEENSY_ID].pixel_leds[pixel_block_counter[TEENSY_ID]].pin = light_pin_counter[TEENSY_ID];
       ROS_INFO("Pixel light beam >%i< at pin >%i< connected to teensy >%i< with index >%i< num_leds >%i<.",
-               (int)num_pixel_segments,
+               // (int)num_pixel_segments[TEENSY_ID],
+               (int)pixel_block_counter[TEENSY_ID],
                (int)dec_interface_setup_data_[TEENSY_ID].pixel_leds[j].pin,
                // (int)pixel_light_beam_leds_to_teensy_map_[led_index].first,
                (int)TEENSY_ID,
                (int)dec_interface_setup_data_[TEENSY_ID].pixel_leds[j].index,
                (int)dec_interface_setup_data_[TEENSY_ID].pixel_leds[j].num_pixels);
       dec_interface_setup_data_[TEENSY_ID].num_pixel_leds++;
-      num_pixel_segments++;
+      // num_pixel_segments[TEENSY_ID]++;
       pixel_block_counter[TEENSY_ID]++;
     }
     light_pin_counter[TEENSY_ID]++;
