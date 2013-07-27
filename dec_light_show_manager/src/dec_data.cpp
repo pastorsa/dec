@@ -384,16 +384,16 @@ bool DecData::copyLightDataToStructure()
     ROS_ASSERT_MSG(STRIP_INDEX < DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP,
                    "Number of beam strips is >%i< and STRIP_INDEX is >%i<.",
                    (int)DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP, (int)STRIP_INDEX);
-    ROS_DEBUG("PIXEL BEAM >%i<: TEENSY_ID %i | PIXEL_STRIP %i | STRIP_INDEX %i |", (int)i, (int)TEENSY_ID, (int)PIXEL_INDEX, (int)STRIP_INDEX);
-    ROS_DEBUG(">%i< - >%i< >%i< >%i< >%i<", (int)i,
-             pixel_beam_led_values_(RED_OFFSET, i),
-             pixel_beam_led_values_(GREEN_OFFSET, i),
-             pixel_beam_led_values_(BLUE_OFFSET, i),
-             pixel_beam_led_values_(ALPHA_OFFSET, i));
+    ROS_INFO("PIXEL BEAM >%i<: TEENSY_ID %i | PIXEL_STRIP %i | STRIP_INDEX %i |", (int)i, (int)TEENSY_ID, (int)PIXEL_INDEX, (int)STRIP_INDEX);
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].red[STRIP_INDEX] = (uint8_t) pixel_beam_led_values_(RED_OFFSET, i);
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].green[STRIP_INDEX] = (uint8_t) pixel_beam_led_values_(GREEN_OFFSET, i);
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].blue[STRIP_INDEX] = (uint8_t) pixel_beam_led_values_(BLUE_OFFSET, i);
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].brightness[STRIP_INDEX] = (uint8_t) pixel_beam_led_values_(ALPHA_OFFSET, i);
+    ROS_INFO(">%i< - >%i< >%i< >%i< >%i<", (int)i,
+             pixel_beam_led_values_(RED_OFFSET, i),
+             pixel_beam_led_values_(GREEN_OFFSET, i),
+             pixel_beam_led_values_(BLUE_OFFSET, i),
+             pixel_beam_led_values_(ALPHA_OFFSET, i));
   }
 
   // send/receive light/sensor data

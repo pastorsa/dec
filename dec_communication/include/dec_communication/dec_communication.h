@@ -161,17 +161,17 @@ typedef struct
 
 typedef struct
 {
-  uint8_t* red;
-  uint8_t* green;
-  uint8_t* blue;
-  uint8_t* brightness;
+  uint8_t red[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+  uint8_t green[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+  uint8_t blue[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
+  uint8_t brightness[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
 } led_pixel_data_t;
 
 typedef struct
 {
   led_block_data_t block_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
-  led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY];
-  uint8_t pixel_memory_allocated;
+  led_pixel_data_t pixel_leds[DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY];
+  // uint8_t pixel_memory_allocated;
 } light_data_t;
 
 /*! Data type to which the "data" gets parsed and which gets generated
@@ -228,7 +228,7 @@ void resetLightData(light_data_t* light_data);
 /*!
  * @param setup_data
  */
-void allocatePixelData(setup_data_t* setup_data, light_data_t* light_data);
+// void allocatePixelData(setup_data_t* setup_data, light_data_t* light_data);
 
 /*! Prints internal data
  */

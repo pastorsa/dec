@@ -52,6 +52,14 @@ bool DecLightShowVisualization::initialize(boost::shared_ptr<DecLightShowData> l
 
   setupPanelMarkers(node_handle_, light_show_data_->node_positions_);
 
+  std::vector<geometry_msgs::Point> avg_sensor_positions;
+  for (unsigned int i = 0; i < light_show_data_->sensors_.size(); ++i)
+  {
+    avg_sensor_positions.push_back(light_show_data_->sensors_[i].getAvgPosition());
+  }
+  setupNodeMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_positions, true);
+  setupTextMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_text_markers_, true);
+
   return true;
 }
 
@@ -108,9 +116,11 @@ bool DecLightShowVisualization::update()
     rviz_pub_.publish(node_markers_);
     rviz_pub_.publish(beam_markers_);
     rviz_pub_.publish(sensor_markers_);
+    rviz_pub_.publish(avg_sensor_markers_);
     rviz_pub_.publish(node_text_markers_);
     rviz_pub_.publish(beam_text_markers_);
     rviz_pub_.publish(sensor_text_markers_);
+    rviz_pub_.publish(avg_sensor_text_markers_);
     rviz_pub_.publish(block_light_node_text_markers_);
     rviz_pub_.publish(block_light_beam_text_markers_);
     rviz_pub_.publish(pixel_light_beam_text_markers_);

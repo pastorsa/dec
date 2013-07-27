@@ -38,11 +38,11 @@ void DecInterface::print(const setup_data_t& setup_data)
   printf("Setup Data:\n");
   printf(" Number of block LEDs is >%u<.\n", setup_data.num_block_leds);
   for (uint8_t i = 0; i < setup_data.num_block_leds; ++i)
-    printf("  Block >%u< : Block LED >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+    printf("  Block >%u< : Block LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
            setup_data.block_leds[i].pin, setup_data.block_leds[i].index, setup_data.block_leds[i].num_blocks);
   printf(" Number of pixel LEDs is >%u<.\n", setup_data.num_pixel_leds);
   for (uint8_t i = 0; i < setup_data.num_pixel_leds; ++i)
-    printf("  Beam >%u< : Pixel LED >%u< starts at index >%u< and has >%u< LEDs.\n", i,
+    printf("  Beam >%u< : Pixel LED at pin >%u< starts at index >%u< and has >%u< LEDs.\n", i,
            setup_data.pixel_leds[i].pin, setup_data.pixel_leds[i].index, setup_data.pixel_leds[i].num_pixels);
   printf(" Number of light strips used is >%u<.\n", setup_data.num_strips_used);
   for (uint8_t i = 0; i < setup_data.num_strips_used; ++i)

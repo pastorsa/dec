@@ -50,6 +50,7 @@ private:
   visualization_msgs::MarkerArray node_markers_;
   visualization_msgs::MarkerArray beam_markers_;
   visualization_msgs::MarkerArray sensor_markers_;
+  visualization_msgs::MarkerArray avg_sensor_markers_;
 
   visualization_msgs::MarkerArray block_light_node_markers_;
   visualization_msgs::MarkerArray block_light_beam_markers_;
@@ -58,6 +59,7 @@ private:
   visualization_msgs::MarkerArray node_text_markers_;
   visualization_msgs::MarkerArray beam_text_markers_;
   visualization_msgs::MarkerArray sensor_text_markers_;
+  visualization_msgs::MarkerArray avg_sensor_text_markers_;
 
   visualization_msgs::MarkerArray block_light_node_text_markers_;
   visualization_msgs::MarkerArray block_light_beam_text_markers_;

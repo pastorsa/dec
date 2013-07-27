@@ -20,7 +20,7 @@ int main(int argc, char** argv)
   // ros::NodeHandle node_handle("~");
 
   const int NUM_NODES = 1;
-  int node_id = 1;
+  // int node_id = 1;
 
   dec_udp::DecInterface dec_interface(NUM_NODES);
 

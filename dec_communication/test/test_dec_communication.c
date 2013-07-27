@@ -47,8 +47,8 @@ int main()
   resetData();
   // printSetupData();
 
-  uint8_t node_id = 0;
-	// loadSetupData(node_id);
+  // uint8_t node_id = 0;
+  // loadSetupData(node_id);
 
   for (unsigned int i = 0; i < 100; ++i)
   {
