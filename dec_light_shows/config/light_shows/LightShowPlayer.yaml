@@ -1,0 +1,2 @@
+LightShowPlayer:
+  type: "dec_light_shows/DecLightShowPlayer"

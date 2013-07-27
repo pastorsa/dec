@@ -49,3 +49,15 @@
   light_shows:
     - "LightShowCreator"
     
+-
+  name: "LightShowRecorderStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowCreator"
+    - "LightShowRecorder"
+-
+  name: "LightShowPlayerStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowPlayer"
+        

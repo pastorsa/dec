@@ -30,4 +30,15 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecLightShowRecorder" type="dec_light_shows::DecLightShowRecorder" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Records a light pattern
+    </description>
+  </class>
+  <class name="dec_light_shows/DecLightShowPlayer" type="dec_light_shows::DecLightShowPlayer" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Plays a light pattern
+    </description>
+  </class>
+
 </library>

@@ -10,7 +10,8 @@
 
 #include <dec_light_shows/dec_light_processor.h>
 
-PLUGINLIB_DECLARE_CLASS(dec_light_shows, DecLightProcessor, dec_light_shows::DecLightProcessor, dec_light_show_manager::DecLightShow)
+PLUGINLIB_DECLARE_CLASS(dec_light_shows, DecLightProcessor, dec_light_shows::DecLightProcessor,
+                        dec_light_show_manager::DecLightShow)
 
 using namespace dec_light_show_manager;
 

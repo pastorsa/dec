@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <dec_msgs/LightShow.h>
 
 #include <dec_light_show_manager/dec_light_show.h>
 
@@ -71,6 +72,9 @@ private:
   std::vector<tf::Vector3> pixel_light_beam_positions_;
 
   std::vector<tf::Vector3> led_positions_;
+
+  dec_msgs::LightShow light_show_;
+  void addFrame();
 
 };
 

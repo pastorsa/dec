@@ -359,4 +359,9 @@ void DecLightShowCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
   virtual_sensors_.markers.push_back(marker);
 }
 
+void DecLightShowCreator::addFrame()
+{
+
+}
+
 }
