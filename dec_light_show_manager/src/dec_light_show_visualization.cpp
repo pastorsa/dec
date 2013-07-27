@@ -21,7 +21,7 @@ namespace dec_light_show_manager
 {
 
 DecLightShowVisualization::DecLightShowVisualization()
-  : static_publish_counter_(0), static_publish_rate_(20)
+  : static_publish_counter_(0), static_publish_rate_(20), initial_avg_sensor_alpha_(0), initial_sensor_alpha_(0)
 {
 }
 
@@ -37,6 +37,10 @@ bool DecLightShowVisualization::initialize(boost::shared_ptr<DecLightShowData> l
   setupNodeMarkers(node_handle_, "nodes", node_markers_, light_show_data_->node_positions_, true);
   setupBeamMarkers(node_handle_, "beams", beam_markers_, light_show_data_->beam_poses_, true);
   setupBeamMarkers(node_handle_, "sensors", sensor_markers_, light_show_data_->sensor_poses_, true);
+  if (!sensor_markers_.markers.empty())
+  {
+    initial_sensor_alpha_ = sensor_markers_.markers[0].color.a;
+  }
 
   setupNodeMarkers(node_handle_, "block_nodes", block_light_node_markers_, light_show_data_->block_light_node_positions_);
   setupBeamMarkers(node_handle_, "block_beams", block_light_beam_markers_, light_show_data_->block_light_beam_poses_);
@@ -59,6 +63,10 @@ bool DecLightShowVisualization::initialize(boost::shared_ptr<DecLightShowData> l
   }
   ROS_ASSERT(light_show_data_->total_num_sensors_ == avg_sensor_positions.size());
   setupNodeMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_positions);
+  if (!avg_sensor_markers_.markers.empty())
+  {
+    initial_avg_sensor_alpha_ = avg_sensor_markers_.markers[0].color.a;
+  }
   setupTextMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_text_markers_, true);
 
   return true;
@@ -70,8 +78,13 @@ bool DecLightShowVisualization::update()
   {
     ROS_ASSERT_MSG(!(light_show_data_->sensor_levels_(i) < 0.0) && !(light_show_data_->sensor_levels_(i) > 1.0),
                    "Invalid sensor value >%f< in sensor >%i<.", light_show_data_->sensor_levels_(i), i);
+    avg_sensor_markers_.markers[i].color.r = 1.0 - light_show_data_->sensor_levels_(i);
     avg_sensor_markers_.markers[i].color.g = light_show_data_->sensor_levels_(i);
     avg_sensor_markers_.markers[i].color.b = 1.0 - light_show_data_->sensor_levels_(i);
+    if (light_show_data_->sensor_levels_(i) > 0.5)
+      avg_sensor_markers_.markers[i].color.a = light_show_data_->sensor_levels_(i);
+    else
+      avg_sensor_markers_.markers[i].color.a = initial_avg_sensor_alpha_;
   }
 
   unsigned int sensor_index = 0;
@@ -79,8 +92,13 @@ bool DecLightShowVisualization::update()
   {
     for (unsigned int j = 0; j < light_show_data_->sensors_[i].getNumComponents(); ++j)
     {
+      sensor_markers_.markers[sensor_index].color.r = 1.0 - light_show_data_->sensor_levels_(i);
       sensor_markers_.markers[sensor_index].color.g = light_show_data_->sensor_levels_(i);
       sensor_markers_.markers[sensor_index].color.b = 1.0 - light_show_data_->sensor_levels_(i);
+      if (light_show_data_->sensor_levels_(i) > 0.5)
+        sensor_markers_.markers[sensor_index].color.a = light_show_data_->sensor_levels_(i);
+      else
+        sensor_markers_.markers[sensor_index].color.a = initial_sensor_alpha_;
       sensor_index++;
     }
   }

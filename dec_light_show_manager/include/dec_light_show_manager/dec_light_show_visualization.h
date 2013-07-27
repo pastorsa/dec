@@ -61,6 +61,9 @@ private:
   visualization_msgs::MarkerArray sensor_text_markers_;
   visualization_msgs::MarkerArray avg_sensor_text_markers_;
 
+  float initial_avg_sensor_alpha_;
+  float initial_sensor_alpha_;
+
   visualization_msgs::MarkerArray block_light_node_text_markers_;
   visualization_msgs::MarkerArray block_light_beam_text_markers_;
   visualization_msgs::MarkerArray pixel_light_beam_text_markers_;

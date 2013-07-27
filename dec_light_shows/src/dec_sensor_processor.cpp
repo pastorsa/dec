@@ -69,6 +69,13 @@ bool DecSensorProcessor::update()
 {
   for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
   {
+    data_->sensor_levels_(i) = static_cast<float>(data_->sensor_values_(i));
+  }
+  return true;
+
+
+  for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
+  {
     unfiltered_data_[i] = static_cast<float>(data_->sensor_values_(i));
   }
   ROS_VERIFY(filter_.update(unfiltered_data_, filtered_data_));
