@@ -57,7 +57,8 @@ bool DecLightShowVisualization::initialize(boost::shared_ptr<DecLightShowData> l
   {
     avg_sensor_positions.push_back(light_show_data_->sensors_[i].getAvgPosition());
   }
-  setupNodeMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_positions, true);
+  ROS_ASSERT(light_show_data_->total_num_sensors_ == avg_sensor_positions.size());
+  setupNodeMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_positions);
   setupTextMarkers(node_handle_, "avg_sensors", avg_sensor_markers_, avg_sensor_text_markers_, true);
 
   return true;
@@ -69,8 +70,19 @@ bool DecLightShowVisualization::update()
   {
     ROS_ASSERT_MSG(!(light_show_data_->sensor_levels_(i) < 0.0) && !(light_show_data_->sensor_levels_(i) > 1.0),
                    "Invalid sensor value >%f< in sensor >%i<.", light_show_data_->sensor_levels_(i), i);
-    sensor_markers_.markers[i].color.g = light_show_data_->sensor_levels_(i);
-    sensor_markers_.markers[i].color.b = 1.0 - light_show_data_->sensor_levels_(i);
+    avg_sensor_markers_.markers[i].color.g = light_show_data_->sensor_levels_(i);
+    avg_sensor_markers_.markers[i].color.b = 1.0 - light_show_data_->sensor_levels_(i);
+  }
+
+  unsigned int sensor_index = 0;
+  for (unsigned int i = 0; i < light_show_data_->sensors_.size(); ++i)
+  {
+    for (unsigned int j = 0; j < light_show_data_->sensors_[i].getNumComponents(); ++j)
+    {
+      sensor_markers_.markers[sensor_index].color.g = light_show_data_->sensor_levels_(i);
+      sensor_markers_.markers[sensor_index].color.b = 1.0 - light_show_data_->sensor_levels_(i);
+      sensor_index++;
+    }
   }
 
   ROS_ASSERT(light_show_data_->total_num_node_leds_ == light_show_data_->node_led_values_.cols());
@@ -108,6 +120,7 @@ bool DecLightShowVisualization::update()
   rviz_pub_.publish(block_light_node_markers_);
   rviz_pub_.publish(block_light_beam_markers_);
   rviz_pub_.publish(pixel_light_beam_markers_);
+  rviz_pub_.publish(avg_sensor_markers_);
 
   static_publish_counter_++;
   if (static_publish_counter_ > static_publish_rate_)
@@ -116,7 +129,6 @@ bool DecLightShowVisualization::update()
     rviz_pub_.publish(node_markers_);
     rviz_pub_.publish(beam_markers_);
     rviz_pub_.publish(sensor_markers_);
-    rviz_pub_.publish(avg_sensor_markers_);
     rviz_pub_.publish(node_text_markers_);
     rviz_pub_.publish(beam_text_markers_);
     rviz_pub_.publish(sensor_text_markers_);
