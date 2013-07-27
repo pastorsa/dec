@@ -48,12 +48,6 @@ public:
 
   /*!
    * @param node_id
-   * @return the setup data
-   */
-  // setup_data_t getSetupData(const uint8_t node_id);
-
-  /*!
-   * @param node_id
    * @return True on success, otherwise False
    */
   bool sendSetupData(const uint8_t node_id, const setup_data_t& setup_data);
@@ -63,7 +57,7 @@ public:
    * @param light_data
    * @return True on success, otherwise False
    */
-  bool sendLightData(const int node_id, const light_data_t& light_data);
+  bool sendLightData(const int node_id, const light_data_t& light_data, const setup_data_t& setup_data);
 
   /*!
    */

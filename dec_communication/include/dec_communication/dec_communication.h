@@ -134,7 +134,7 @@ extern sensor_data_t _sensor_data;
 /*! Parse the received data into the the _sensor_data structure.
  * @param buffer  : Received data being parsed
  */
-void parseSensorData(uint8_t* buffer);
+void parseSensorData(uint8_t* buffer, const setup_data_t* sensor_data);
 
 /*! Prepares the provided buffer and _length member variables from the _sensor_data structure.
  * Fill desired values into _sensor_data before calling this function

@@ -349,7 +349,31 @@ bool DecData::copyLightDataToStructure()
   for (unsigned int i = 0; i < block_light_beam_leds_to_teensy_map_.size(); ++i)
   {
     const uint8_t TEENSY_ID = static_cast<uint8_t>(block_light_beam_leds_to_teensy_map_[i].first);
-    const uint8_t BLOCK_INDEX = static_cast<uint8_t>(light_node_leds_to_teensy_map_.size() + i);
+
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+    // TODO: This needs a fix
+   const uint8_t BLOCK_INDEX = static_cast<uint8_t>(i);
+    //    const uint8_t BLOCK_INDEX = static_cast<uint8_t>(light_node_leds_to_teensy_map_.size() + i);
     // const uint8_t STRIP_INDEX = static_cast<uint8_t>(block_light_beam_leds_to_teensy_map_[i].second);
     // ROS_DEBUG("BLOCK BEAM >%i<: TEENSY_ID %i | BLOCK_STRIP %i | STRIP_INDEX %i |", (int)i, (int)TEENSY_ID, (int)BLOCK_INDEX, (int)STRIP_INDEX);
     ROS_ASSERT_MSG(dec_interface_setup_data_[TEENSY_ID].num_block_leds < DEC_MAX_NUMBER_OF_BLOCKS_PER_TEENSY,
@@ -408,7 +432,7 @@ bool DecData::copyLightDataToStructure()
     }
     if (send)
     {
-      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i]))
+      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i], dec_interface_setup_data_[i]))
       {
         ROS_WARN("Missed send/receive cycle for node >%i<.", i);
       }

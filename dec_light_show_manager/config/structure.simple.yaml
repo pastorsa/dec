@@ -62,13 +62,13 @@ light_nodes:
 #    num_leds_per_meter: 60
 #    teensy: 0
 
-#block_light_beams:
-#  -
-#    nodes: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]]
-#    centers: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-#    num_leds: [1, 2, 3, 3, 2, 1]
-#    num_leds_per_meter: 30
-#    teensy: 0
+block_light_beams:
+  -
+    nodes: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]]
+    centers: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    num_leds: [1, 2, 3, 3, 2, 1]
+    num_leds_per_meter: 30
+    teensy: 1
 
 # Which beams have light strips
 # nodes: [0, 1] constructs a light strip from node 0 to node 1
@@ -86,13 +86,19 @@ light_nodes:
 #    num_leds: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 #    num_leds_per_meter: 30
 #    teensy: 0
-pixel_light_beams:
-  -
-    nodes: [[6, 7], [7, 8]]
-    centers: [0.5, 0.5]
-    num_leds: [10, 5]
-    num_leds_per_meter: 30
-    teensy: 0
+#pixel_light_beams:
+#  -
+#    nodes: [[6, 7], [7, 8]]
+#    centers: [0.5, 0.5]
+#    num_leds: [10, 5]
+#    num_leds_per_meter: 30
+#    teensy: 0
+#  -
+#    nodes: [[8, 9], [9, 10], [10, 11], [11, 12], [12, 13], [13, 14]]
+#    centers: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+#    num_leds: [2, 2, 2, 2, 2, 2]
+#    num_leds_per_meter: 30
+#    teensy: 0
 
 # Size of the nodes and color
 nodes_size:

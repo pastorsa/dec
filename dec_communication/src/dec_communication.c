@@ -125,14 +125,14 @@ void generateSetupData(uint8_t* buffer)
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DEC_SENSOR_DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-void parseSensorData(uint8_t* buffer)
+void parseSensorData(uint8_t* buffer, const setup_data_t* setup_data)
 {
   uint8_t i = 0;
   _rx_buffer_length = (uint16_t)0;
   // skip message type
   _rx_buffer_length++;
 
-  for (i = 0; i < _setup_data.num_sensors; ++i)
+  for (i = 0; i < setup_data->num_sensors; ++i)
   {
     _sensor_data.sensor_value[i] = (uint8_t)buffer[_rx_buffer_length];
     _rx_buffer_length++;
@@ -235,10 +235,12 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
     for (j = 0; j < _setup_data.pixel_leds[i].num_pixels; ++j)
     {
       // uint8_t index = _setup_data.pixel_leds[i].index + j;
-      uint8_t index = (uint8_t)0;
+//      uint8_t index = (uint8_t)0;
 //      printf("   >%u< of >%u< num pixels\n", j, _setup_data.pixel_leds[i].num_pixels);
-//      printf("   >%u< index >%u< >%u< >%u< >%u<\n", index, (uint8_t)light_data->pixel_leds[i].red[j],
-//             (uint8_t)light_data->pixel_leds[i].green[j], (uint8_t)light_data->pixel_leds[i].blue[j],
+//      printf("   >%u< >%u< >%u< >%u<\n",
+//             (uint8_t)light_data->pixel_leds[i].red[j],
+//             (uint8_t)light_data->pixel_leds[i].green[j],
+//             (uint8_t)light_data->pixel_leds[i].blue[j],
 //             (uint8_t)light_data->pixel_leds[i].brightness[j]);
 
       buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[j];
