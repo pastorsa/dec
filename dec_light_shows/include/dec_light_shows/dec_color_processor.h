@@ -29,11 +29,14 @@ private:
 
   static const unsigned int NUM_COLOR_VALUES = 4;
 
+  void readParameters(XmlRpc::XmlRpcValue& config);
+  std::vector<std::vector<float> > colors_;
+  std::vector<std::vector<float> > color_multipliers_;
+  std::vector<float> starts_;
+
   std::vector<float> low_level_color_;
   std::vector<float> high_level_color_;
-  std::vector<float> colors_;
   std::vector<float> color_multiplier_;
-
 };
 
 }

@@ -1,2 +1,4 @@
 OpenLoopLightGenerator:
   type: "dec_light_shows/DecOpenLoopLightGenerator"
+  generate_light_show: true
+  replay_light_show: false

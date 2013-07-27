@@ -8,6 +8,7 @@
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopLightGenerator.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowCreator.yaml" />
   
   </group>
 

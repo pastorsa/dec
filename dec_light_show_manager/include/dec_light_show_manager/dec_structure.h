@@ -69,6 +69,16 @@ public:
 
   /*!
    */
+  std::vector<geometry_msgs::Point> node_positions_;
+  std::vector<geometry_msgs::Pose> beam_poses_;
+  std::vector<geometry_msgs::Pose> sensor_poses_;
+  std::vector<geometry_msgs::Point> block_light_node_positions_;
+  std::vector<geometry_msgs::Pose> block_light_beam_poses_;
+  std::vector<geometry_msgs::Pose> pixel_light_beam_poses_;
+  std::vector<geometry_msgs::Pose> pixel_light_beam_led_poses_;
+
+  /*!
+   */
   unsigned int total_num_node_leds_;
   unsigned int total_num_block_beam_leds_;
   unsigned int total_num_pixel_beam_leds_;
@@ -147,16 +157,6 @@ protected:
   std::vector<setup_data_t> dec_interface_setup_data_;
 
 private:
-
-  /*!
-   */
-  std::vector<geometry_msgs::Point> node_positions_;
-  std::vector<geometry_msgs::Pose> beam_poses_;
-  std::vector<geometry_msgs::Pose> sensor_poses_;
-  std::vector<geometry_msgs::Point> block_light_node_positions_;
-  std::vector<geometry_msgs::Pose> block_light_beam_poses_;
-  std::vector<geometry_msgs::Pose> pixel_light_beam_poses_;
-  std::vector<geometry_msgs::Pose> pixel_light_beam_led_poses_;
 
   std::vector<unsigned int> num_block_node_leds_per_teensy_;
   std::vector<unsigned int> num_block_beam_leds_per_teensy_;

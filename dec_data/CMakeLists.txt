@@ -16,18 +16,6 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-find_package(Eigen REQUIRED)
-include_directories(${EIGEN_INCLUDE_DIRS})
-add_definitions(${EIGEN_DEFINITIONS})
-
-rosbuild_add_library(${PROJECT_NAME}
-  src/dec_sensor_processor.cpp
-  src/dec_light_processor.cpp
-  src/dec_color_processor.cpp
-  src/dec_open_loop_light_generator.cpp
-  src/dec_light_show_creator.cpp
-)
-
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services

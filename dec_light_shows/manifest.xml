@@ -12,9 +12,13 @@
   <depend package="roscpp"/>
   <depend package="pluginlib"/>
   <depend package="filters"/>
+  <depend package="tf"/>
+
+  <depend package="visualization_msgs"/>
 
   <depend package="dec_utilities"/>
   <depend package="dec_light_show_manager"/>
+  <depend package="dec_msgs"/>
 
   <export>
     <dec_light_show_manager plugin="${prefix}/light_show_plugins.xml"/>

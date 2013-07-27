@@ -43,3 +43,9 @@
   groups: ["OPEN_LOOP"]
   light_shows:
     - "OpenLoopLightGenerator"
+-
+  name: "LightShowCreatorStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowCreator"
+    

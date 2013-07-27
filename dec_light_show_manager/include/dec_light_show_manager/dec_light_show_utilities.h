@@ -22,7 +22,8 @@ class DecLightShowUtilities
 {
 public:
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, int& i);
-  static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, bool& i);
+  static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, unsigned int& ui);
+  static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, bool& b);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, double& d);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, float& f);
   static bool getParam(XmlRpc::XmlRpcValue& config, const std::string& key, std::string& str);

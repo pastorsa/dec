@@ -24,4 +24,10 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecLightShowCreator" type="dec_light_shows::DecLightShowCreator" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Creates an open loop light pattern
+    </description>
+  </class>
+
 </library>

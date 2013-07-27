@@ -21,6 +21,23 @@ bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config, const std::str
   return true;
 }
 
+bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config, const std::string& key, unsigned int& ui)
+{
+  if (!config.hasMember(key))
+    return false;
+  XmlRpc::XmlRpcValue param = config[key];
+  if (param.getType() != XmlRpc::XmlRpcValue::TypeInt)
+    return false;
+  int i = param;
+  if (i < 0)
+  {
+    ROS_ERROR("Invalid parameter >%i< read from configuration. Must be positive.", key.c_str());
+    return false;
+  }
+  ui = static_cast<unsigned int>(i);
+  return true;
+}
+
 bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
                                    const std::string& key,
                                    double& d)
@@ -148,14 +165,14 @@ bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
 
 bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config,
                                    const std::string& key,
-                                   bool& i)
+                                   bool& b)
 {
   if (!config.hasMember(key))
     return false;
   XmlRpc::XmlRpcValue param = config[key];
   if (param.getType() != XmlRpc::XmlRpcValue::TypeBoolean)
     return false;
-  i = param;
+  b = param;
 
   return true;
 }

@@ -1,0 +1,14 @@
+<package>
+  <description brief="dec_data">
+
+     dec_data
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_data</url>
+
+</package>
+
+

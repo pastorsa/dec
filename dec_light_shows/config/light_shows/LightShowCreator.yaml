@@ -1,0 +1,11 @@
+LightShowCreator:
+  type: "dec_light_shows/DecLightShowCreator"
+  visualization_rate: 1 # every n-th frame
+  min_color: [1.0, 0.0, 0.0, 0.6]
+  max_color: [1.0, 0.0, 0.0, 0.4]
+  min_distance: 1.7
+  max_distance: 4.4
+  initial_position: [0.0, 0.0, 2.0]
+  initial_velocity: [0.2, 0.5, -0.4]
+  initial_acceleration: [0.6, 1.5, 2.4]  
+  virtual_cube_color: [0.0, 0.5, 0.5, 0.25]
