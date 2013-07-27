@@ -145,13 +145,13 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   {
     if(source_address.compare(foreign_address) == 0)
     {
-      printf("Return code of node %i is %i.\n", node_id, return_code);
+      // printf("Return code of node %i is %i.\n", node_id, return_code);
       _rx_buffer_length = (uint16_t)return_code;
       // print(setup_data);
       parseSensorData(_rx_buffer, &setup_data);
       received_sensor_data_[node_id] = _sensor_data;
-      printf("Received data for node >%i< \n", node_id);
-      printData();
+      // printf("Received data for node >%i< \n", node_id);
+      // printData();
     }
     else
     {

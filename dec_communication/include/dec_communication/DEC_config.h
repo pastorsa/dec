@@ -6,7 +6,7 @@
 #define _DEC_CONFIG_H
 
 // Number of teensys in the structure.
-#define DEC_NUMBER_OF_TEENSYS (uint8_t)1
+#define DEC_NUMBER_OF_TEENSYS (uint8_t)3
 
 // Maximum number of sensors, light strips, and LEDs per light strip. (To statically allocate memory)
 
