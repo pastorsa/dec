@@ -40,6 +40,6 @@
 
 -
   name: "OpenLoopLightStack"
-  groups: ["SENSOR", "LIGHT"]
+  groups: ["OPEN_LOOP"]
   light_shows:
     - "OpenLoopLightGenerator"
