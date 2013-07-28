@@ -6,6 +6,7 @@ stack_groups:
   - SENSOR
   - LIGHT
   - OPEN_LOOP
+  - IO
   - COLOR
   - POST
 
@@ -14,6 +15,7 @@ default_light_show_stacks:
   - SensorProcessorStack
   - LightProcessorStack
 #  - OpenLoopLightStack
-  - LightShowRecorderStack
+#  - LightShowBallCreatorStack
+  - LightShowPlaneCreatorStack
   - ColorProcessorStack
 #  - StaticPostLightShowStack

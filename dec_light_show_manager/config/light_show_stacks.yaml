@@ -44,20 +44,74 @@
   light_shows:
     - "OpenLoopLightGenerator"
 -
-  name: "LightShowCreatorStack"
+  name: "LightShowBallCreatorStack"
   groups: ["OPEN_LOOP"]
   light_shows:
-    - "LightShowCreator"
+    - "LightShowBallCreator"
+-
+  name: "LightShowPlaneCreatorStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowPlaneCreator"
+
+### PLANES
+
+-
+  name: "LightShowPlane1CreatorStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowPlane1Creator"
+-
+  name: "LightShowPlane2CreatorStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowPlane2Creator"
+-
+  name: "LightShowPlane3CreatorStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowPlane3Creator"
+
+### PLANES
     
 -
-  name: "LightShowRecorderStack"
-  groups: ["OPEN_LOOP"]
+  name: "LightShowBallRecorderStack"
+  groups: ["OPEN_LOOP", "IO"]
   light_shows:
-    - "LightShowCreator"
+    - "LightShowBallCreator"
     - "LightShowRecorder"
 -
+  name: "LightShowPlaneRecorderStack"
+  groups: ["OPEN_LOOP", "IO"]
+  light_shows:
+    - "LightShowPlaneCreator"
+    - "LightShowRecorder"
+
+### PLANE RECORDERS
+
+-
+  name: "LightShowPlane1RecorderStack"
+  groups: ["OPEN_LOOP", "IO"]
+  light_shows:
+    - "LightShowPlane1Creator"
+    - "LightShowRecorder"
+-
+  name: "LightShowPlane2RecorderStack"
+  groups: ["OPEN_LOOP", "IO"]
+  light_shows:
+    - "LightShowPlane2Creator"
+    - "LightShowRecorder"
+-
+  name: "LightShowPlane3RecorderStack"
+  groups: ["OPEN_LOOP", "IO"]
+  light_shows:
+    - "LightShowPlane3Creator"
+    - "LightShowRecorder"
+
+### PLAYER
+-
   name: "LightShowPlayerStack"
-  groups: ["OPEN_LOOP"]
+  groups: ["OPEN_LOOP", "IO"]
   light_shows:
     - "LightShowPlayer"
         

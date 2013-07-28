@@ -989,9 +989,9 @@ nodes_color: [0.8, 0.8, 0.8, 1.0] # r,g,b,a
 
 # Size of the light nodes and color
 block_nodes_size:
-  x: 0.13
-  y: 0.13
-  z: 0.13
+  x: 0.23
+  y: 0.23
+  z: 0.23
 block_nodes_color: [0.6, 0.6, 0.6, 1.0] # r,g,b,a
 
 # Size of the beams and color
@@ -1003,15 +1003,15 @@ beams_color: [0.9, 0.9, 0.9, 0.7] # r,g,b,a
 
 # Size of the block light beams and color
 block_beams_size:
-  x: 0.05
-  y: 0.05
+  x: 0.12
+  y: 0.12
   z: 0.9 
 block_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
 
 # Size of the pixel light beams and color
 pixel_beams_size:
-  x: 0.05
-  y: 0.05
+  x: 0.12
+  y: 0.12
   z: 0.9
 pixel_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
 

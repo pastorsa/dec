@@ -12,6 +12,7 @@
   <depend package="roscpp"/>
   <depend package="pluginlib"/>
   <depend package="filters"/>
+  <depend package="angles"/>
   <depend package="tf"/>
 
   <depend package="visualization_msgs"/>

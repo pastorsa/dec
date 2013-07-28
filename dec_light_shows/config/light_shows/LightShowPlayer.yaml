@@ -1,2 +1,3 @@
 LightShowPlayer:
   type: "dec_light_shows/DecLightShowPlayer"
+  bag_file_name: RandomBall

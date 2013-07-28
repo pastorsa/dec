@@ -1,5 +1,5 @@
-LightShowCreator:
-  type: "dec_light_shows/DecLightShowCreator"
+LightShowBallCreator:
+  type: "dec_light_shows/DecLightShowBallCreator"
   visualization_rate: 1 # every n-th frame
   min_color: [1.0, 0.0, 0.0, 0.6]
   max_color: [1.0, 0.0, 0.0, 0.4]

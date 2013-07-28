@@ -25,7 +25,8 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_light_processor.cpp
   src/dec_color_processor.cpp
   src/dec_open_loop_light_generator.cpp
-  src/dec_light_show_creator.cpp
+  src/dec_light_show_ball_creator.cpp
+  src/dec_light_show_plane_creator.cpp
   src/dec_light_show_recorder.cpp
   src/dec_light_show_player.cpp
 )

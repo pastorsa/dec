@@ -28,6 +28,7 @@ DecData::DecData() :
     control_frequency_(0.0),
     control_dt_(0.0),
     ros_time_sec_(0.0),
+    recording_(true),
     initialized_(false)
 {
 }

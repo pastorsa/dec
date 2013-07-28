@@ -1,5 +1,5 @@
 /*
- * dec_light_show_creator.cpp
+ * dec_light_show_plane_creator.cpp
  *
  *  Created on: Jul 14, 2013
  *      Author: pastor
@@ -10,10 +10,11 @@
 #include <conversions/ros_to_tf.h>
 #include <dec_light_show_manager/dec_light_show_utilities.h>
 
+#include <angles/angles.h>
 #include <dec_msgs/LightShow.h>
-#include <dec_light_shows/dec_light_show_creator.h>
+#include <dec_light_shows/dec_light_show_plane_creator.h>
 
-PLUGINLIB_DECLARE_CLASS(dec_light_shows, DecLightShowCreator, dec_light_shows::DecLightShowCreator,
+PLUGINLIB_DECLARE_CLASS(dec_light_shows, DecLightShowPlaneCreator, dec_light_shows::DecLightShowPlaneCreator,
                         dec_light_show_manager::DecLightShow)
 
 using namespace dec_light_show_manager;
@@ -22,7 +23,7 @@ using namespace conversions;
 namespace dec_light_shows
 {
 
-DecLightShowCreator::DecLightShowCreator() :
+DecLightShowPlaneCreator::DecLightShowPlaneCreator() :
     node_handle_("/DecLightShowManager"),
     visualization_rate_(0), visualization_counter_(0),
     min_distance_(0.0), max_distance_(0.0)
@@ -32,7 +33,7 @@ DecLightShowCreator::DecLightShowCreator() :
 
 }
 
-bool DecLightShowCreator::initialize(XmlRpc::XmlRpcValue& config)
+bool DecLightShowPlaneCreator::initialize(XmlRpc::XmlRpcValue& config)
 {
   block_node_buffer_ = Eigen::VectorXf::Zero(data_->total_num_node_leds_);
   if (data_->total_num_block_beam_leds_ > 0)
@@ -60,13 +61,6 @@ bool DecLightShowCreator::initialize(XmlRpc::XmlRpcValue& config)
     convert(data_->pixel_light_beam_led_poses_[i].position, pixel_light_beam_positions_[i]);
   }
 
-  led_positions_.insert(led_positions_.begin(),
-                        block_light_node_positions_.begin(), block_light_node_positions_.end());
-  led_positions_.insert(led_positions_.begin(),
-                        block_light_beam_positions_.begin(), block_light_beam_positions_.end());
-  led_positions_.insert(led_positions_.begin(),
-                        pixel_light_beam_positions_.begin(), pixel_light_beam_positions_.end());
-
   readParameters(config);
   setupSpace(config);
   setupSensorMarkers(config);
@@ -74,13 +68,13 @@ bool DecLightShowCreator::initialize(XmlRpc::XmlRpcValue& config)
   return true;
 }
 
-bool DecLightShowCreator::start()
+bool DecLightShowPlaneCreator::start()
 {
   visualization_counter_ = 0;
   return true;
 }
 
-bool DecLightShowCreator::update()
+bool DecLightShowPlaneCreator::update()
 {
   integrate();
   computeDistance();
@@ -89,56 +83,31 @@ bool DecLightShowCreator::update()
   return true;
 }
 
-bool DecLightShowCreator::stop()
+bool DecLightShowPlaneCreator::stop()
 {
 
   return true;
 }
 
-void DecLightShowCreator::computeDistance()
+float DecLightShowPlaneCreator::computeDistance(const tf::Vector3& point,
+                                                const tf::Vector3& plane_vector,
+                                                const tf::Vector3& plane_normal)
+{
+  return fabs(-plane_normal.dot(point - plane_vector));
+}
+
+void DecLightShowPlaneCreator::computeDistance()
 {
   for (unsigned int i = 0; i < positions_.size(); ++i)
   {
-    //    for (unsigned int j = 0; j < led_positions_.size(); ++j)
-    //    {
-    //      float distance = (led_positions_[j] - positions_[i]).length();
-    //      float value = 0.0;
-    //      if (distance < min_distance_)
-    //      {
-    //        value = 3.0f * static_cast<float>((min_distance_ - distance) / min_distance_);
-    //      }
-    //      else if (distance < max_distance_)
-    //      {
-    //        value = static_cast<float>((max_distance_ - distance) / max_distance_);
-    //      }
-    //      if (value > 1.0f)
-    //      {
-    //        value = 1.0f;
-    //      }
-    //
-    //      if (j < data_->total_num_node_leds_)
-    //      {
-    //        data_->node_led_levels_(j) = value;
-    //      }
-    //      else if (j < data_->total_num_node_leds_ + data_->total_num_block_beam_leds_)
-    //      {
-    //        data_->block_beam_led_levels_(j - data_->total_num_node_leds_) = value;
-    //      }
-    //      else
-    //      {
-    //        data_->pixel_beam_led_levels_(j - (data_->total_num_node_leds_ + data_->total_num_block_beam_leds_)) = value;
-    //      }
-    //    }
-
     // =====================================================
     // Block Nodes
     // =====================================================
     for (unsigned int j = 0; j < block_light_node_positions_.size(); ++j)
     {
-      float distance = (block_light_node_positions_[j] - positions_[i]).length();
+      float distance = computeDistance(block_light_node_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        // data_->node_led_levels_(j) = 0.9f;
         data_->node_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
         if (data_->node_led_levels_(j) > 1.0f)
         {
@@ -147,13 +116,12 @@ void DecLightShowCreator::computeDistance()
       }
     }
 
-
     // =====================================================
     // Block Beams
     // =====================================================
     for (unsigned int j = 0; j < block_light_beam_positions_.size(); ++j)
     {
-      float distance = (block_light_beam_positions_[j] - positions_[i]).length();
+      float distance = computeDistance(block_light_beam_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
         data_->block_beam_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
@@ -169,7 +137,7 @@ void DecLightShowCreator::computeDistance()
     // =====================================================
     for (unsigned int j = 0; j < pixel_light_beam_positions_.size(); ++j)
     {
-      float distance = (pixel_light_beam_positions_[j] - positions_[i]).length();
+      float distance = computeDistance(pixel_light_beam_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
         data_->pixel_beam_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
@@ -182,33 +150,48 @@ void DecLightShowCreator::computeDistance()
   }
 }
 
-void DecLightShowCreator::integrate()
+void DecLightShowPlaneCreator::integrate()
 {
   for (unsigned int i = 0; i < positions_.size(); ++i)
   {
-    positions_[i] += velocities_[i] * data_->control_dt_;
-    velocities_[i] += simulated_accelerations_[i] * data_->control_dt_;
+    positions_[i] += linear_velocities_[i] * data_->control_dt_;
+    // velocities_[i] += simulated_accelerations_[i] * data_->control_dt_;
+
+//    tf::Quaternion x_quat = tf::Quaternion::getIdentity();
+//    x_quat.setRotation(tf::Vector3(1.0, 0.0, 0.0), angular_velocities_[i].getX());
+//    tf::Quaternion y_quat = tf::Quaternion::getIdentity();
+//    y_quat.setRotation(tf::Vector3(0.0, 1.0, 0.0), angular_velocities_[i].getY());
+//    tf::Quaternion z_quat = tf::Quaternion::getIdentity();
+//    z_quat.setRotation(tf::Vector3(0.0, 0.0, 1.0), angular_velocities_[i].getZ());
+//    tf::Quaternion quat = x_quat * y_quat * z_quat;
+    // matrix.setRotation(quat);
+
+    tf::Matrix3x3 matrix;
+    matrix.setRPY(angular_velocities_[i].getY(),
+                  angular_velocities_[i].getX(),
+                  angular_velocities_[i].getZ());
+    normals_[i] = matrix * normals_[i];
 
     if (positions_[i].getX() > max_space_.getX()
         || positions_[i].getX() < min_space_.getX())
     {
-      velocities_[i].setX(velocities_[i].getX() * -1.0f);
-      accelerations_[i].setX(accelerations_[i].getX() * -1.0f);
+      linear_velocities_[i].setX(linear_velocities_[i].getX() * -1.0f);
+      linear_accelerations_[i].setX(linear_accelerations_[i].getX() * -1.0f);
     }
     if (positions_[i].getY() > max_space_.getY()
         || positions_[i].getY() < min_space_.getY())
     {
-      velocities_[i].setY(velocities_[i].getY() * -1.0f);
-      accelerations_[i].setY(accelerations_[i].getY() * -1.0f);
+      linear_velocities_[i].setY(linear_velocities_[i].getY() * -1.0f);
+      linear_accelerations_[i].setY(linear_accelerations_[i].getY() * -1.0f);
     }
     if (positions_[i].getZ() > max_space_.getZ()
         || positions_[i].getZ() < min_space_.getZ())
     {
-      velocities_[i].setZ(velocities_[i].getZ() * -1.0f);
-      accelerations_[i].setZ(accelerations_[i].getZ() * -1.0f);
+      linear_velocities_[i].setZ(linear_velocities_[i].getZ() * -1.0f);
+      linear_accelerations_[i].setZ(linear_accelerations_[i].getZ() * -1.0f);
     }
 
-    simulated_accelerations_[i] = accelerations_[i] * sin(data_->ros_time_sec_);
+    // simulated_accelerations_[i] = accelerations_[i] * sin(data_->ros_time_sec_);
   }
 
   // ROS_WARN("Position: %.2f %.2f %.2f", positions_[0].getX(), positions_[0].getY(), positions_[0].getZ());
@@ -217,9 +200,27 @@ void DecLightShowCreator::integrate()
 
   convert(positions_[0], virtual_sensors_.markers[0].pose.position);
   convert(positions_[0], virtual_sensors_.markers[1].pose.position);
+  virtual_sensors_.markers[0].pose.orientation = getOrientation(normals_[0]);
+  virtual_sensors_.markers[1].pose.orientation = getOrientation(normals_[0]);
+
 }
 
-void DecLightShowCreator::publish()
+geometry_msgs::Quaternion DecLightShowPlaneCreator::getOrientation(tf::Vector3& normal)
+{
+  normal.normalize();
+  tf::Vector3 z_world = tf::Vector3(0.0, 0.0, 1.0);
+  tf::Vector3 z_cross_p12 = z_world.cross(normal);
+  // ROS_WARN("%.2f %.2f %.2f", z_cross_p12.getX(), z_cross_p12.getY(), z_cross_p12.getZ());
+  float angle = acos(normal.dot(z_world));
+  tf::Quaternion quat = tf::Quaternion::getIdentity();
+  if (fabs(angle) > 1e-4 && z_cross_p12.length() > 1e-4)
+    quat.setRotation(z_cross_p12, angle);
+  geometry_msgs::Quaternion q;
+  convert(quat, q);
+  return q;
+}
+
+void DecLightShowPlaneCreator::publish()
 {
   ros::Time now = ros::Time::now();
   if(visualization_counter_ > visualization_rate_)
@@ -234,7 +235,7 @@ void DecLightShowCreator::publish()
   visualization_counter_++;
 }
 
-void DecLightShowCreator::setupSpace(XmlRpc::XmlRpcValue& config)
+void DecLightShowPlaneCreator::setupSpace(XmlRpc::XmlRpcValue& config)
 {
   Eigen::VectorXf x_values = Eigen::VectorXf::Zero(data_->getNumNodes());
   Eigen::VectorXf y_values = Eigen::VectorXf::Zero(data_->getNumNodes());
@@ -255,15 +256,14 @@ void DecLightShowCreator::setupSpace(XmlRpc::XmlRpcValue& config)
   max_space_.setY(y_values.maxCoeff());
   max_space_.setZ(z_values.maxCoeff());
 
-  max_space_ /= 2.0f;
-  min_space_ /= 2.0f;
-  tf::Vector3 scale = (max_space_ - min_space_).absolute() / 2.0f;
-
-  max_space_.setZ(max_space_.getZ() + scale.getZ());
-  min_space_.setZ(min_space_.getZ() + scale.getZ());
+  // max_space_ /= 2.0f;
+  // min_space_ /= 2.0f;
+  // tf::Vector3 scale = (max_space_ - min_space_).absolute() / 2.0f;
+  // max_space_.setZ(max_space_.getZ() + scale.getZ());
+  // min_space_.setZ(min_space_.getZ() + scale.getZ());
 }
 
-void DecLightShowCreator::readParameters(XmlRpc::XmlRpcValue& config)
+void DecLightShowPlaneCreator::readParameters(XmlRpc::XmlRpcValue& config)
 {
   ROS_VERIFY(DecLightShowUtilities::getParam(config, "visualization_rate", visualization_rate_));
 
@@ -273,24 +273,47 @@ void DecLightShowCreator::readParameters(XmlRpc::XmlRpcValue& config)
   tf::Vector3 position(initial_position[0], initial_position[1], initial_position[2]);
   positions_.push_back(position);
 
-  std::vector<float> initial_velocity;
-  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_velocity", initial_velocity));
-  ROS_ASSERT(initial_velocity.size() == 3);
-  tf::Vector3 velocity(initial_velocity[0], initial_velocity[1], initial_velocity[2]);
-  velocities_.push_back(velocity);
+  std::vector<float> initial_normal;
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_normal", initial_normal));
+  ROS_ASSERT(initial_normal.size() == 3);
+  tf::Vector3 normal(initial_normal[0], initial_normal[1], initial_normal[2]);
+  normal.normalize();
+  normals_.resize(positions_.size(), normal);
 
-  std::vector<float> initial_acceleration;
-  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_acceleration", initial_acceleration));
-  ROS_ASSERT(initial_acceleration.size() == 3);
-  tf::Vector3 acceleration(initial_acceleration[0], initial_acceleration[1], initial_acceleration[2]);
-  accelerations_.push_back(acceleration);
-  simulated_accelerations_ = accelerations_;
+  std::vector<float> initial_linear_velocity;
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_linear_velocity", initial_linear_velocity));
+  ROS_ASSERT(initial_linear_velocity.size() == 3);
+  tf::Vector3 linear_velocity(initial_linear_velocity[0], initial_linear_velocity[1], initial_linear_velocity[2]);
+  linear_velocities_.push_back(linear_velocity);
 
-  ROS_ASSERT(positions_.size() == velocities_.size());
-  ROS_ASSERT(positions_.size() == accelerations_.size());
+  std::vector<float> initial_angular_velocity;
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_angular_velocity", initial_angular_velocity));
+  ROS_ASSERT(initial_angular_velocity.size() == 3);
+  tf::Vector3 angular_velocity(initial_angular_velocity[0], initial_angular_velocity[1], initial_angular_velocity[2]);
+  angular_velocities_.push_back(angular_velocity);
+
+  std::vector<float> initial_linear_acceleration;
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_linear_acceleration", initial_linear_acceleration));
+  ROS_ASSERT(initial_linear_acceleration.size() == 3);
+  tf::Vector3 linear_acceleration(initial_linear_acceleration[0], initial_linear_acceleration[1], initial_linear_acceleration[2]);
+  linear_accelerations_.push_back(linear_acceleration);
+  simulated_linear_accelerations_ = linear_accelerations_;
+
+  std::vector<float> initial_angular_acceleration;
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_angular_acceleration", initial_angular_acceleration));
+  ROS_ASSERT(initial_angular_acceleration.size() == 3);
+  tf::Vector3 angular_acceleration(initial_angular_acceleration[0], initial_angular_acceleration[1], initial_angular_acceleration[2]);
+  angular_accelerations_.push_back(angular_acceleration);
+  simulated_angular_accelerations_ = angular_accelerations_;
+
+  ROS_ASSERT(positions_.size() == linear_velocities_.size());
+  ROS_ASSERT(positions_.size() == angular_velocities_.size());
+  ROS_ASSERT(positions_.size() == linear_accelerations_.size());
+  ROS_ASSERT(positions_.size() == angular_accelerations_.size());
+  ROS_ASSERT(positions_.size() == normals_.size());
 }
 
-void DecLightShowCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
+void DecLightShowPlaneCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
 {
   ROS_VERIFY(DecLightShowUtilities::getParam(config, "min_distance", min_distance_));
   std::vector<float> min_color;
@@ -314,21 +337,22 @@ void DecLightShowCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
 
   visualization_msgs::Marker marker;
   marker.header.frame_id.assign("/BASE");
-  marker.ns = "virtual_ball";
+  marker.ns = "virtual_cube";
   marker.header.stamp = ros::Time::now();
-  marker.type = visualization_msgs::Marker::SPHERE;
+  marker.type = visualization_msgs::Marker::CUBE;
   marker.action = visualization_msgs::Marker::ADD;
   marker.lifetime = ros::Duration(1.0);
   ROS_ASSERT(!positions_.empty());
   convert(positions_[0], marker.pose.position);
-  convert(tf::Quaternion::getIdentity(), marker.pose.orientation);
+  ROS_ASSERT(!normals_.empty());
+  marker.pose.orientation = getOrientation(normals_[0]);
 
   virtual_sensors_.markers.clear();
   for (unsigned int i = 0; i < distances.size(); ++i)
   {
     marker.id = (int)i;
-    marker.scale.x = distances[i];
-    marker.scale.y = distances[i];
+    marker.scale.x = 10.0f;
+    marker.scale.y = 10.0f;
     marker.scale.z = distances[i];
     marker.color.r = colors[i][0];
     marker.color.g = colors[i][1];
@@ -357,11 +381,6 @@ void DecLightShowCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
   marker.color.b = virtual_cube_color[2];
   marker.color.a = virtual_cube_color[3];
   virtual_sensors_.markers.push_back(marker);
-}
-
-void DecLightShowCreator::addFrame()
-{
-
 }
 
 }

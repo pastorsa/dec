@@ -24,9 +24,14 @@
     </description>
   </class>
 
-  <class name="dec_light_shows/DecLightShowCreator" type="dec_light_shows::DecLightShowCreator" base_class_type="dec_light_show_manager::DecLightShow">
+  <class name="dec_light_shows/DecLightShowBallCreator" type="dec_light_shows::DecLightShowBallCreator" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
-      Creates an open loop light pattern
+      Creates an open loop light pattern from a moving ball
+    </description>
+  </class>
+  <class name="dec_light_shows/DecLightShowPlaneCreator" type="dec_light_shows::DecLightShowPlaneCreator" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Creates an open loop light pattern from a moving plane
     </description>
   </class>
 

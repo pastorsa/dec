@@ -113,6 +113,10 @@ public:
   ros::Time ros_time_;
   double ros_time_sec_;
 
+  /*!
+   */
+  bool recording_;
+
 private:
   bool initialized_;
 

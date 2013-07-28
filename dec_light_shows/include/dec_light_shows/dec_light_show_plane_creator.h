@@ -1,29 +1,28 @@
 /*
- * dec_light_show_creator.h
+ * dec_light_show_plane_creator.h
  *
  *  Created on: Jul 14, 2013
  *      Author: pastor
  */
 
-#ifndef DEC_LIGHT_SHOW_CREATOR_H_
-#define DEC_LIGHT_SHOW_CREATOR_H_
+#ifndef DEC_LIGHT_SHOW_PLANE_CREATOR_H_
+#define DEC_LIGHT_SHOW_PLANE_CREATOR_H_
 
 #include <vector>
 
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <dec_msgs/LightShow.h>
 
 #include <dec_light_show_manager/dec_light_show.h>
 
 namespace dec_light_shows
 {
 
-class DecLightShowCreator : public dec_light_show_manager::DecLightShow
+class DecLightShowPlaneCreator : public dec_light_show_manager::DecLightShow
 {
 public:
-  DecLightShowCreator();
-  virtual ~DecLightShowCreator() {};
+  DecLightShowPlaneCreator();
+  virtual ~DecLightShowPlaneCreator() {};
 
   virtual bool initialize(XmlRpc::XmlRpcValue& config);
   virtual bool update();
@@ -45,10 +44,23 @@ private:
   unsigned int visualization_counter_;
 
   void integrate();
+  std::vector<tf::Vector3> normals_;
   std::vector<tf::Vector3> positions_;
-  std::vector<tf::Vector3> velocities_;
-  std::vector<tf::Vector3> accelerations_;
-  std::vector<tf::Vector3> simulated_accelerations_;
+
+  std::vector<tf::Vector3> linear_velocities_;
+  std::vector<tf::Vector3> angular_velocities_;
+
+  std::vector<tf::Vector3> linear_accelerations_;
+  std::vector<tf::Vector3> angular_accelerations_;
+
+  std::vector<tf::Vector3> simulated_linear_accelerations_;
+  std::vector<tf::Vector3> simulated_angular_accelerations_;
+
+  geometry_msgs::Quaternion getOrientation(tf::Vector3& normal);
+
+  float computeDistance(const tf::Vector3& point,
+                        const tf::Vector3& plane_vector,
+                        const tf::Vector3& plane_normal);
 
   void computeDistance();
   /*! This buffer is of size >total_num_node_leds_<
@@ -71,13 +83,8 @@ private:
   std::vector<tf::Vector3> block_light_beam_positions_;
   std::vector<tf::Vector3> pixel_light_beam_positions_;
 
-  std::vector<tf::Vector3> led_positions_;
-
-  dec_msgs::LightShow light_show_;
-  void addFrame();
-
 };
 
 }
 
-#endif /* DEC_LIGHT_SHOW_CREATOR_H_ */
+#endif /* DEC_LIGHT_SHOW_PLANE_CREATOR_H_ */

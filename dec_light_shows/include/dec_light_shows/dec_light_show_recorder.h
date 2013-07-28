@@ -8,6 +8,9 @@
 #ifndef DEC_LIGHT_SHOW_RECORDER_H_
 #define DEC_LIGHT_SHOW_RECORDER_H_
 
+#include <dec_msgs/LightShow.h>
+#include <dec_msgs/LightShowFrame.h>
+
 #include <dec_light_show_manager/dec_light_show.h>
 
 namespace dec_light_shows
@@ -25,6 +28,13 @@ public:
   virtual bool stop();
 
 private:
+
+  bool writeToDisc();
+
+  std::string abs_bag_file_name_;
+  dec_msgs::LightShow light_show_;
+  dec_msgs::LightShowFrame frame_;
+  void addFrame();
 
 };
 
