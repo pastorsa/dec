@@ -169,6 +169,9 @@ bool DecLightShowManager::switchLightShowStackService(dec_light_show_msgs::Switc
   if (request.light_show_stacks.empty())
   {
     response.light_show_stacks = light_show_stack_names_;
+    response.active_light_show_stacks.clear();
+    for (unsigned int i = 0; i < active_light_show_stacks_.size(); ++i)
+      response.active_light_show_stacks.push_back(active_light_show_stacks_[i]->getName());
     response.result = dec_light_show_msgs::SwitchLightShowStack::Response::SUCCEEDED;
     return true;
   }

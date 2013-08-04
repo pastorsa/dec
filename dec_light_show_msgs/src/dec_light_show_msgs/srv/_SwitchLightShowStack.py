@@ -141,10 +141,11 @@ import struct
 
 
 class SwitchLightShowStackResponse(genpy.Message):
-  _md5sum = "9089a629b78f6579ec632f786ee54188"
+  _md5sum = "d2850f12cf923c56dc5203d71b612096"
   _type = "dec_light_show_msgs/SwitchLightShowStackResponse"
   _has_header = False #flag to mark the presence of a Header object
   _full_text = """string[] light_show_stacks
+string[] active_light_show_stacks
 int8 result
 int8 SUCCEEDED = 1
 int8 FAILED = 0
@@ -154,8 +155,8 @@ int8 FAILED = 0
   SUCCEEDED = 1
   FAILED = 0
 
-  __slots__ = ['light_show_stacks','result']
-  _slot_types = ['string[]','int8']
+  __slots__ = ['light_show_stacks','active_light_show_stacks','result']
+  _slot_types = ['string[]','string[]','int8']
 
   def __init__(self, *args, **kwds):
     """
@@ -165,7 +166,7 @@ int8 FAILED = 0
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       light_show_stacks,result
+       light_show_stacks,active_light_show_stacks,result
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -176,10 +177,13 @@ int8 FAILED = 0
       #message fields cannot be None, assign default values for those that are
       if self.light_show_stacks is None:
         self.light_show_stacks = []
+      if self.active_light_show_stacks is None:
+        self.active_light_show_stacks = []
       if self.result is None:
         self.result = 0
     else:
       self.light_show_stacks = []
+      self.active_light_show_stacks = []
       self.result = 0
 
   def _get_types(self):
@@ -197,6 +201,14 @@ int8 FAILED = 0
       length = len(self.light_show_stacks)
       buff.write(_struct_I.pack(length))
       for val1 in self.light_show_stacks:
+        length = len(val1)
+        if python3 or type(val1) == unicode:
+          val1 = val1.encode('utf-8')
+          length = len(val1)
+        buff.write(struct.pack('<I%ss'%length, length, val1))
+      length = len(self.active_light_show_stacks)
+      buff.write(_struct_I.pack(length))
+      for val1 in self.active_light_show_stacks:
         length = len(val1)
         if python3 or type(val1) == unicode:
           val1 = val1.encode('utf-8')
@@ -229,6 +241,21 @@ int8 FAILED = 0
           val1 = str[start:end]
         self.light_show_stacks.append(val1)
       start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      self.active_light_show_stacks = []
+      for i in range(0, length):
+        start = end
+        end += 4
+        (length,) = _struct_I.unpack(str[start:end])
+        start = end
+        end += length
+        if python3:
+          val1 = str[start:end].decode('utf-8')
+        else:
+          val1 = str[start:end]
+        self.active_light_show_stacks.append(val1)
+      start = end
       end += 1
       (self.result,) = _struct_b.unpack(str[start:end])
       return self
@@ -246,6 +273,14 @@ int8 FAILED = 0
       length = len(self.light_show_stacks)
       buff.write(_struct_I.pack(length))
       for val1 in self.light_show_stacks:
+        length = len(val1)
+        if python3 or type(val1) == unicode:
+          val1 = val1.encode('utf-8')
+          length = len(val1)
+        buff.write(struct.pack('<I%ss'%length, length, val1))
+      length = len(self.active_light_show_stacks)
+      buff.write(_struct_I.pack(length))
+      for val1 in self.active_light_show_stacks:
         length = len(val1)
         if python3 or type(val1) == unicode:
           val1 = val1.encode('utf-8')
@@ -279,6 +314,21 @@ int8 FAILED = 0
           val1 = str[start:end]
         self.light_show_stacks.append(val1)
       start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      self.active_light_show_stacks = []
+      for i in range(0, length):
+        start = end
+        end += 4
+        (length,) = _struct_I.unpack(str[start:end])
+        start = end
+        end += length
+        if python3:
+          val1 = str[start:end].decode('utf-8')
+        else:
+          val1 = str[start:end]
+        self.active_light_show_stacks.append(val1)
+      start = end
       end += 1
       (self.result,) = _struct_b.unpack(str[start:end])
       return self
@@ -289,6 +339,6 @@ _struct_I = genpy.struct_I
 _struct_b = struct.Struct("<b")
 class SwitchLightShowStack(object):
   _type          = 'dec_light_show_msgs/SwitchLightShowStack'
-  _md5sum = 'c1fb1d6078c03de3fa5a1bd5337c007b'
+  _md5sum = 'eeef8d28f2e5facb3f50caf5aa233c9a'
   _request_class  = SwitchLightShowStackRequest
   _response_class = SwitchLightShowStackResponse

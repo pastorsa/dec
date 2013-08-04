@@ -40,6 +40,10 @@ class DecData : public DecStructure
 
 public:
 
+  static const float BASE_LIGHT_LEVEL = 0.5f;
+  static const float MAX_LIGHT_LEVEL = 1.0f;
+  static const float MIN_LIGHT_LEVEL = 0.0f;
+
 #ifdef DEC_EXTRA
   friend class DecLightShowVisualization;
   friend class DecLightShowSimulation;
@@ -116,6 +120,10 @@ public:
   /*!
    */
   bool recording_;
+
+  /*!
+   */
+  ros::NodeHandle node_handle_;
 
 private:
   bool initialized_;

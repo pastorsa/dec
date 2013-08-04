@@ -70,8 +70,6 @@ private:
   std::vector<tf::Vector3> block_light_beam_positions_;
   std::vector<tf::Vector3> pixel_light_beam_positions_;
 
-  std::vector<tf::Vector3> led_positions_;
-
 };
 
 }

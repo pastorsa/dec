@@ -46,4 +46,10 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecIdle" type="dec_light_shows::DecIdle" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Idle light show used to replace light shows
+    </description>
+  </class>
+
 </library>

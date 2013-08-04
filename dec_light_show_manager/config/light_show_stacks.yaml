@@ -13,7 +13,6 @@
     - "LightProcessor"
 
 ### SENSOR ###
-
 -
   name: "SensorProcessorStack"
   groups: ["SENSOR"]
@@ -21,7 +20,6 @@
     - "SensorProcessor"
 
 ### LIGHT ###
-
 -
   name: "LightProcessorStack"
   groups: ["LIGHT"]
@@ -29,15 +27,23 @@
     - "LightProcessor"
 
 ### COLOR ###
-
 -
   name: "ColorProcessorStack"
   groups: ["COLOR"]
   light_shows:
     - "ColorProcessor"
+-  
+  name: "ColorBlackWhiteProcessorStack"
+  groups: ["COLOR"]
+  light_shows:
+    - "ColorBlackWhiteProcessor"
+-  
+  name: "ColorBackgroundForegroundProcessorStack"
+  groups: ["COLOR"]
+  light_shows:
+    - "ColorBackgroundForegroundProcessor"
 
-### SENSOR and LIGHT ###
-
+### OPEN_LOOP
 -
   name: "OpenLoopLightStack"
   groups: ["OPEN_LOOP"]
@@ -49,13 +55,10 @@
   light_shows:
     - "LightShowBallCreator"
 -
-  name: "LightShowPlaneCreatorStack"
+  name: "LightShowPlane0CreatorStack"
   groups: ["OPEN_LOOP"]
   light_shows:
-    - "LightShowPlaneCreator"
-
-### PLANES
-
+    - "LightShowPlane0Creator"
 -
   name: "LightShowPlane1CreatorStack"
   groups: ["OPEN_LOOP"]
@@ -66,52 +69,49 @@
   groups: ["OPEN_LOOP"]
   light_shows:
     - "LightShowPlane2Creator"
+
+### IO
+### -> RECORDER    
 -
-  name: "LightShowPlane3CreatorStack"
+  name: "LightShowRecorder1Stack"
+  groups: ["IO"]
+  light_shows:
+    - "LightShowRecorder1"
+-
+  name: "LightShowRecorder2Stack"
+  groups: ["IO"]
+  light_shows:
+    - "LightShowRecorder2"
+-
+  name: "LightShowRecorder3Stack"
+  groups: ["IO"]
+  light_shows:
+    - "LightShowRecorder3"
+### -> PLAYER
+-
+  name: "LightShowPlayer1Stack"
+  groups: ["IO"]
+  light_shows:
+    - "LightShowPlayer1"
+-
+  name: "LightShowPlayer2Stack"
+  groups: ["IO"]
+  light_shows:
+    - "LightShowPlayer2"
+-
+  name: "LightShowPlayer3Stack"
+  groups: ["IO"]
+  light_shows:
+    - "LightShowPlayer3"
+
+### IDLE
+-
+  name: "IdleOpenLoopStack"
   groups: ["OPEN_LOOP"]
   light_shows:
-    - "LightShowPlane3Creator"
-
-### PLANES
-    
+    - "Idle"
 -
-  name: "LightShowBallRecorderStack"
-  groups: ["OPEN_LOOP", "IO"]
+  name: "IdleIOStack"
+  groups: ["IO"]
   light_shows:
-    - "LightShowBallCreator"
-    - "LightShowRecorder"
--
-  name: "LightShowPlaneRecorderStack"
-  groups: ["OPEN_LOOP", "IO"]
-  light_shows:
-    - "LightShowPlaneCreator"
-    - "LightShowRecorder"
-
-### PLANE RECORDERS
-
--
-  name: "LightShowPlane1RecorderStack"
-  groups: ["OPEN_LOOP", "IO"]
-  light_shows:
-    - "LightShowPlane1Creator"
-    - "LightShowRecorder"
--
-  name: "LightShowPlane2RecorderStack"
-  groups: ["OPEN_LOOP", "IO"]
-  light_shows:
-    - "LightShowPlane2Creator"
-    - "LightShowRecorder"
--
-  name: "LightShowPlane3RecorderStack"
-  groups: ["OPEN_LOOP", "IO"]
-  light_shows:
-    - "LightShowPlane3Creator"
-    - "LightShowRecorder"
-
-### PLAYER
--
-  name: "LightShowPlayerStack"
-  groups: ["OPEN_LOOP", "IO"]
-  light_shows:
-    - "LightShowPlayer"
-        
+    - "Idle"

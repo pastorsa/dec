@@ -9,6 +9,7 @@
 #define DEC_COLOR_PROCESSOR_H_
 
 #include <vector>
+#include <splines/splines.h>
 #include <dec_light_show_manager/dec_light_show.h>
 
 namespace dec_light_shows
@@ -34,9 +35,8 @@ private:
   std::vector<std::vector<float> > color_multipliers_;
   std::vector<float> starts_;
 
-  std::vector<float> low_level_color_;
-  std::vector<float> high_level_color_;
-  std::vector<float> color_multiplier_;
+  std::vector<std::vector<splines::QuinticSpline> > splines_;
+
 };
 
 }

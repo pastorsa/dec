@@ -29,6 +29,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_light_show_plane_creator.cpp
   src/dec_light_show_recorder.cpp
   src/dec_light_show_player.cpp
+  src/dec_idle.cpp
 )
 
 #uncomment if you have defined messages

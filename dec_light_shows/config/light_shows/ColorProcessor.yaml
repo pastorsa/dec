@@ -6,11 +6,17 @@ ColorProcessor:
       start: 0.0
       color: [0.0, 0.0, 1.0, 1.0] # RGBA
     -
+      start: 0.25
+      color: [1.0, 1.0, 0.0, 0.75] # RGBA
+    -
       start: 0.5
-      color: [1.0, 0.0, 0.0, 1.0] # RGBA
+      color: [0.0, 1.0, 0.0, 0.5] # RGBA
+    -
+      start: 0.75
+      color: [1.0, 0.0, 1.0, 0.75] # RGBA
     -
       start: 1.0
-      color: [0.0, 1.0, 0.0, 1.0] # RGBA
+      color: [1.0, 0.0, 0.0, 1.0] # RGBA
   
   low_level_color: [0.0, 0.0, 1.0, 0.6] # RGBA
   high_level_color: [0.2, 1.0, 0.0, 1.0] # RGBA

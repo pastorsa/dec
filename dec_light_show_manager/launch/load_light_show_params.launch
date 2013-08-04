@@ -6,19 +6,31 @@
 
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightProcessor.yaml" />
+
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBlackWhiteProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBackgroundForegroundProcessor.yaml" />
     
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopLightGenerator.yaml" />
     
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowBallCreator.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlaneCreator.yaml" />
-
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane0Creator.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane1Creator.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane2Creator.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane3Creator.yaml" />
+
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/Idle.yaml" />
     
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder1.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder2.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder3.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder4.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder5.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer1.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer2.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer3.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer4.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer5.yaml" />
   
   </group>
 

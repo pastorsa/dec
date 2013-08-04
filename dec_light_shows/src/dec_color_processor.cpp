@@ -10,7 +10,8 @@
 
 #include <dec_light_shows/dec_color_processor.h>
 
-PLUGINLIB_DECLARE_CLASS(dec_light_shows, DecColorProcessor, dec_light_shows::DecColorProcessor, dec_light_show_manager::DecLightShow)
+PLUGINLIB_DECLARE_CLASS(dec_light_shows, DecColorProcessor, dec_light_shows::DecColorProcessor,
+                        dec_light_show_manager::DecLightShow)
 
 using namespace dec_light_show_manager;
 
@@ -20,19 +21,6 @@ namespace dec_light_shows
 bool DecColorProcessor::initialize(XmlRpc::XmlRpcValue& config)
 {
   readParameters(config);
-
-  ROS_VERIFY(DecLightShowUtilities::getParam(config, "low_level_color", low_level_color_));
-  ROS_VERIFY(DecLightShowUtilities::getParam(config, "high_level_color", high_level_color_));
-  // colors_.resize(4, 0.0);
-  color_multiplier_.resize(4, 0.0);
-  ROS_ASSERT(low_level_color_.size() == 4);
-  ROS_ASSERT(high_level_color_.size() == low_level_color_.size() );
-  for (unsigned int i = 0; i < low_level_color_.size(); ++i)
-  {
-    ROS_ASSERT(!(low_level_color_[i] < 0.0) && !(low_level_color_[i] > 1.0));
-    ROS_ASSERT(!(high_level_color_[i] < 0.0) && !(high_level_color_[i] > 1.0));
-    color_multiplier_[i] = high_level_color_[i] - low_level_color_[i];
-  }
   return true;
 }
 
@@ -44,6 +32,9 @@ bool DecColorProcessor::start()
 
 bool DecColorProcessor::update()
 {
+  double x = 0.0;
+  double xd = 0.0;
+  double xdd = 0.0;
   // take node_led_levels_ and beam_led_levels_ and process them into node_led_values_ and beam_led_values_
   // colors_ = low_level_color_;
   for (unsigned int i = 0; i < data_->node_led_levels_.size(); ++i)
@@ -53,7 +44,7 @@ bool DecColorProcessor::update()
     bool found = false;
     for (unsigned int n = 1; !found && n < colors_.size(); ++n)
     {
-      if (data_->node_led_levels_[i] < starts_[n])
+      if (data_->node_led_levels_[i] - 1e-3 < starts_[n])
       {
         color_index = n - 1;
         found = true;
@@ -61,17 +52,10 @@ bool DecColorProcessor::update()
     }
     for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
     {
-      float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->node_led_levels_[i])) * 255.0f;
-      data_->node_led_values_(j, i) = static_cast<led_channel_t>(value);
+      splines_[color_index][j].sample((double)(data_->node_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+      // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->node_led_levels_[i])) * 255.0f;
+      data_->node_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
     }
-
-//    for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
-//    {
-//      float value = (low_level_color_[j] + (color_multiplier_[j] * data_->node_led_levels_[i])) * 255.0f;
-//      // ROS_ASSERT_MSG(!(value < 0.0) && !(value > 255.0), "Invalid value >%.2f< computed.", value);
-//      // ROS_INFO("Node %i color %i value >%.2f< computed.", i, j, value);
-//      data_->node_led_values_(j, i) = static_cast<led_channel_t>(value);
-//    }
   }
 
   if (data_->total_num_block_beam_leds_ > 0)
@@ -79,12 +63,21 @@ bool DecColorProcessor::update()
     for (unsigned int i = 0; i < data_->block_beam_led_levels_.size(); ++i)
     {
       ROS_ASSERT(!(data_->block_beam_led_levels_[i] < 0.0) && !(data_->block_beam_led_levels_[i] > 1.0));
+      unsigned int color_index = 0;
+      bool found = false;
+      for (unsigned int n = 1; !found && n < colors_.size(); ++n)
+      {
+        if (data_->block_beam_led_levels_[i] - 1e-3 < starts_[n])
+        {
+          color_index = n - 1;
+          found = true;
+        }
+      }
       for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
       {
-        float value = (low_level_color_[j] + (color_multiplier_[j] * data_->block_beam_led_levels_[i])) * 255.0f;
-        // ROS_ASSERT_MSG(!(value < 0.0) && !(value > 255.0), "Invalid value >%.2f< computed.", value);
-        // ROS_INFO("Node %i color %i value >%.2f< computed.", i, j, value);
-        data_->block_beam_led_values_(j, i) = static_cast<led_channel_t>(value);
+        splines_[color_index][j].sample((double)(data_->block_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+        // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->block_beam_led_levels_[i])) * 255.0f;
+        data_->block_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
       }
     }
   }
@@ -93,12 +86,22 @@ bool DecColorProcessor::update()
     for (unsigned int i = 0; i < data_->pixel_beam_led_levels_.size(); ++i)
     {
       ROS_ASSERT(!(data_->pixel_beam_led_levels_[i] < 0.0) && !(data_->pixel_beam_led_levels_[i] > 1.0));
+      unsigned int color_index = 0;
+      bool found = false;
+      for (unsigned int n = 0; !found && n < colors_.size() - 1; ++n)
+      {
+        if (data_->pixel_beam_led_levels_[i] - 1e-3 < starts_[n + 1])
+        {
+          color_index = n;
+          found = true;
+        }
+      }
+      ROS_ASSERT(found);
       for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
       {
-        float value = (low_level_color_[j] + (color_multiplier_[j] * data_->pixel_beam_led_levels_[i])) * 255.0f;
-        // ROS_ASSERT_MSG(!(value < 0.0) && !(value > 255.0), "Invalid value >%.2f< computed.", value);
-        // ROS_INFO("Node %i color %i value >%.2f< computed.", i, j, value);
-        data_->pixel_beam_led_values_(j, i) = static_cast<led_channel_t>(value);
+        splines_[color_index][j].sample((double)(data_->pixel_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+        // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->pixel_beam_led_levels_[i])) * 255.0f;
+        data_->pixel_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
       }
     }
   }
@@ -112,7 +115,6 @@ bool DecColorProcessor::stop()
   return true;
 }
 
-
 void DecColorProcessor::readParameters(XmlRpc::XmlRpcValue& config)
 {
   ROS_ASSERT(config.getType() == XmlRpc::XmlRpcValue::TypeStruct);
@@ -123,6 +125,8 @@ void DecColorProcessor::readParameters(XmlRpc::XmlRpcValue& config)
   colors_.clear();
   color_multipliers_.clear();
   starts_.clear();
+  ROS_ASSERT_MSG(color_levels.size() > 1, "Number of colors specified in >%s< is invalid >%i<. It must be greater than two.",
+                 name_.c_str(), color_levels.size());
   for (int i = 0; i < color_levels.size(); ++i)
   {
     ROS_ASSERT(color_levels[i].hasMember("start"));
@@ -140,7 +144,7 @@ void DecColorProcessor::readParameters(XmlRpc::XmlRpcValue& config)
       ROS_ASSERT(!(color[j] < 0.0) && !(color[j] > 1.0));
     }
     colors_.push_back(color);
-    ROS_DEBUG("Read: %.2f -> %.2f %.2f %.2f %.2f", start, color[0], color[1], color[2], color[3]);
+    ROS_DEBUG("Read (%s): %.2f -> %.2f %.2f %.2f %.2f", name_.c_str(), start, color[0], color[1], color[2], color[3]);
   }
 
   ROS_ASSERT(colors_.size() > 0);
@@ -152,6 +156,15 @@ void DecColorProcessor::readParameters(XmlRpc::XmlRpcValue& config)
       color_multiplier[j] = colors_[i + 1][j] - colors_[i][j];
     }
     color_multipliers_.push_back(color_multiplier);
+
+    std::vector<splines::QuinticSpline> splines;
+    for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
+    {
+      splines::QuinticSpline spline;
+      spline.setCoefficients(colors_[i][j], 0.0, 0.0, colors_[i + 1][j], 0.0, 0.0, starts_[i + 1] - starts_[i]);
+      splines.push_back(spline);
+    }
+    splines_.push_back(splines);
   }
 }
 

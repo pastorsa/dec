@@ -63,14 +63,13 @@ private:
   float wave_travel_speed_;
   float wave_length_;
 
-  unsigned int wave_activation_size_;
-  unsigned int half_wave_activation_size_;
+  float half_wave_activation_size_;
 
-  inline float getFilter(const float normalized_distance, const unsigned int index)
-  {
-    unsigned int wave_index = static_cast<unsigned int>(normalized_distance * static_cast<float>(filter_size_ - 1));
-    return static_cast<float>(filter_(wave_index, index));
-  }
+  float getFilter(const float normalized_distance, const unsigned int index);
+
+  float wave_travel_distance_;
+  float level_range_;
+  MathUtilities::Profile profile_type_;
 };
 
 }

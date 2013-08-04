@@ -35,6 +35,7 @@ DecData::DecData() :
 
 bool DecData::initialize(ros::NodeHandle node_handle)
 {
+  node_handle_ = node_handle;
   ROS_VERIFY(DecStructure::initialize(node_handle));
 
   sensor_levels_ = Eigen::VectorXf::Zero(total_num_sensors_);

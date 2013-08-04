@@ -1,0 +1,18 @@
+<package>
+  <description brief="dec_light_show_commander">
+
+     dec_light_show_commander
+
+  </description>
+  <author>Peter</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_light_show_commander</url>
+  <depend package="roscpp"/>
+  <depend package="dec_utilities"/>
+  <depend package="dec_light_show_manager"/>
+  <depend package="dec_light_shows"/>
+
+</package>
+
+

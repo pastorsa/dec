@@ -14,6 +14,7 @@
 #include <visualization_msgs/MarkerArray.h>
 
 #include <dec_light_show_manager/dec_light_show.h>
+#include <dec_light_shows/dec_light_show_math_utilities.h>
 
 namespace dec_light_shows
 {
@@ -75,6 +76,10 @@ private:
 
   float min_distance_;
   float max_distance_;
+  float distance_range_;
+
+  bool up_down_;
+  MathUtilities::Profile profile_type_;
 
   tf::Vector3 min_space_;
   tf::Vector3 max_space_;

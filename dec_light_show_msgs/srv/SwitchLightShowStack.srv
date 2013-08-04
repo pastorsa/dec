@@ -1,6 +1,7 @@
 string[] light_show_stacks
 ---
 string[] light_show_stacks
+string[] active_light_show_stacks
 int8 result
 int8 SUCCEEDED = 1
 int8 FAILED = 0

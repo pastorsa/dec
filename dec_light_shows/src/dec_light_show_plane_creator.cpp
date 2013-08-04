@@ -26,7 +26,8 @@ namespace dec_light_shows
 DecLightShowPlaneCreator::DecLightShowPlaneCreator() :
     node_handle_("/DecLightShowManager"),
     visualization_rate_(0), visualization_counter_(0),
-    min_distance_(0.0), max_distance_(0.0)
+    min_distance_(0.0), max_distance_(0.0), distance_range_(0.0),
+    up_down_(false), profile_type_(MathUtilities::eLINEAR)
 {
   const int PUBLISHER_BUFFER_SIZE = 10;
   rviz_pub_ = node_handle_.advertise<visualization_msgs::MarkerArray>("visualization_marker", PUBLISHER_BUFFER_SIZE, true);
@@ -108,11 +109,13 @@ void DecLightShowPlaneCreator::computeDistance()
       float distance = computeDistance(block_light_node_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        data_->node_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
-        if (data_->node_led_levels_(j) > 1.0f)
-        {
-          data_->node_led_levels_(j) = 1.0f;
-        }
+        // data_->node_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
+        float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
+        data_->node_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+      }
+      if (data_->node_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
+      {
+        data_->node_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
       }
     }
 
@@ -124,11 +127,13 @@ void DecLightShowPlaneCreator::computeDistance()
       float distance = computeDistance(block_light_beam_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        data_->block_beam_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
+        // data_->block_beam_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
+        float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
+        data_->block_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
       }
-      if (data_->block_beam_led_levels_(j) > 1.0f)
+      if (data_->block_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {
-        data_->block_beam_led_levels_(j) = 1.0f;
+        data_->block_beam_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
       }
     }
 
@@ -140,11 +145,13 @@ void DecLightShowPlaneCreator::computeDistance()
       float distance = computeDistance(pixel_light_beam_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        data_->pixel_beam_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
+        // data_->pixel_beam_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
+        float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
+        data_->pixel_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
       }
-      if (data_->pixel_beam_led_levels_(j) > 1.0f)
+      if (data_->pixel_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {
-        data_->pixel_beam_led_levels_(j) = 1.0f;
+        data_->pixel_beam_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
       }
     }
   }
@@ -157,38 +164,71 @@ void DecLightShowPlaneCreator::integrate()
     positions_[i] += linear_velocities_[i] * data_->control_dt_;
     // velocities_[i] += simulated_accelerations_[i] * data_->control_dt_;
 
-//    tf::Quaternion x_quat = tf::Quaternion::getIdentity();
-//    x_quat.setRotation(tf::Vector3(1.0, 0.0, 0.0), angular_velocities_[i].getX());
-//    tf::Quaternion y_quat = tf::Quaternion::getIdentity();
-//    y_quat.setRotation(tf::Vector3(0.0, 1.0, 0.0), angular_velocities_[i].getY());
-//    tf::Quaternion z_quat = tf::Quaternion::getIdentity();
-//    z_quat.setRotation(tf::Vector3(0.0, 0.0, 1.0), angular_velocities_[i].getZ());
-//    tf::Quaternion quat = x_quat * y_quat * z_quat;
-    // matrix.setRotation(quat);
-
     tf::Matrix3x3 matrix;
     matrix.setRPY(angular_velocities_[i].getY(),
                   angular_velocities_[i].getX(),
                   angular_velocities_[i].getZ());
     normals_[i] = matrix * normals_[i];
 
-    if (positions_[i].getX() > max_space_.getX()
-        || positions_[i].getX() < min_space_.getX())
+    bool max_x = positions_[i].getX() > max_space_.getX();
+    if (max_x || positions_[i].getX() < min_space_.getX())
     {
-      linear_velocities_[i].setX(linear_velocities_[i].getX() * -1.0f);
-      linear_accelerations_[i].setX(linear_accelerations_[i].getX() * -1.0f);
+      if (up_down_)
+      {
+        linear_velocities_[i].setX(linear_velocities_[i].getX() * -1.0f);
+        linear_accelerations_[i].setX(linear_accelerations_[i].getX() * -1.0f);
+      }
+      else
+      {
+        if (max_x)
+        {
+          positions_[i].setX(min_space_.getX());
+        }
+        else
+        {
+          positions_[i].setX(max_space_.getX());
+        }
+      }
     }
-    if (positions_[i].getY() > max_space_.getY()
-        || positions_[i].getY() < min_space_.getY())
+    bool max_y = positions_[i].getY() > max_space_.getY();
+    if (max_y || positions_[i].getY() < min_space_.getY())
     {
-      linear_velocities_[i].setY(linear_velocities_[i].getY() * -1.0f);
-      linear_accelerations_[i].setY(linear_accelerations_[i].getY() * -1.0f);
+      if (up_down_)
+      {
+        linear_velocities_[i].setY(linear_velocities_[i].getY() * -1.0f);
+        linear_accelerations_[i].setY(linear_accelerations_[i].getY() * -1.0f);
+      }
+      else
+      {
+        if (max_y)
+        {
+          positions_[i].setY(min_space_.getY());
+        }
+        else
+        {
+          positions_[i].setY(max_space_.getY());
+        }
+      }
     }
-    if (positions_[i].getZ() > max_space_.getZ()
-        || positions_[i].getZ() < min_space_.getZ())
+    bool max_z = positions_[i].getZ() > max_space_.getZ();
+    if (max_z || positions_[i].getZ() < min_space_.getZ())
     {
-      linear_velocities_[i].setZ(linear_velocities_[i].getZ() * -1.0f);
-      linear_accelerations_[i].setZ(linear_accelerations_[i].getZ() * -1.0f);
+      if (up_down_)
+      {
+        linear_velocities_[i].setZ(linear_velocities_[i].getZ() * -1.0f);
+        linear_accelerations_[i].setZ(linear_accelerations_[i].getZ() * -1.0f);
+      }
+      else
+      {
+        if (max_z)
+        {
+          positions_[i].setZ(min_space_.getZ());
+        }
+        else
+        {
+          positions_[i].setZ(max_space_.getZ());
+        }
+      }
     }
 
     // simulated_accelerations_[i] = accelerations_[i] * sin(data_->ros_time_sec_);
@@ -202,7 +242,6 @@ void DecLightShowPlaneCreator::integrate()
   convert(positions_[0], virtual_sensors_.markers[1].pose.position);
   virtual_sensors_.markers[0].pose.orientation = getOrientation(normals_[0]);
   virtual_sensors_.markers[1].pose.orientation = getOrientation(normals_[0]);
-
 }
 
 geometry_msgs::Quaternion DecLightShowPlaneCreator::getOrientation(tf::Vector3& normal)
@@ -210,11 +249,12 @@ geometry_msgs::Quaternion DecLightShowPlaneCreator::getOrientation(tf::Vector3& 
   normal.normalize();
   tf::Vector3 z_world = tf::Vector3(0.0, 0.0, 1.0);
   tf::Vector3 z_cross_p12 = z_world.cross(normal);
-  // ROS_WARN("%.2f %.2f %.2f", z_cross_p12.getX(), z_cross_p12.getY(), z_cross_p12.getZ());
   float angle = acos(normal.dot(z_world));
   tf::Quaternion quat = tf::Quaternion::getIdentity();
   if (fabs(angle) > 1e-4 && z_cross_p12.length() > 1e-4)
+  {
     quat.setRotation(z_cross_p12, angle);
+  }
   geometry_msgs::Quaternion q;
   convert(quat, q);
   return q;
@@ -255,6 +295,9 @@ void DecLightShowPlaneCreator::setupSpace(XmlRpc::XmlRpcValue& config)
   max_space_.setX(x_values.maxCoeff());
   max_space_.setY(y_values.maxCoeff());
   max_space_.setZ(z_values.maxCoeff());
+
+  min_space_.setZ(min_space_.getZ() + max_distance_);
+  max_space_.setZ(max_space_.getZ() - max_distance_);
 
   // max_space_ /= 2.0f;
   // min_space_ /= 2.0f;
@@ -311,6 +354,14 @@ void DecLightShowPlaneCreator::readParameters(XmlRpc::XmlRpcValue& config)
   ROS_ASSERT(positions_.size() == linear_accelerations_.size());
   ROS_ASSERT(positions_.size() == angular_accelerations_.size());
   ROS_ASSERT(positions_.size() == normals_.size());
+
+  DecLightShowUtilities::param(config, "up_down", up_down_, up_down_);
+
+  int profile_type = MathUtilities::eLINEAR;
+  DecLightShowUtilities::param(config, "profile_type", profile_type, profile_type);
+  ROS_ASSERT_MSG(profile_type >= 0 && profile_type < MathUtilities::eNUM_PROFILES,
+                 "Unknown filter type >%i< in >%s<.", profile_type, name_.c_str());
+  profile_type_ = static_cast<MathUtilities::Profile>(profile_type);
 }
 
 void DecLightShowPlaneCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
@@ -325,7 +376,9 @@ void DecLightShowPlaneCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
   ROS_VERIFY(DecLightShowUtilities::getParam(config, "max_color", max_color));
   ROS_ASSERT(max_color.size() == 4);
 
+  ROS_ASSERT(min_distance_ >= 0.0);
   ROS_ASSERT(max_distance_ > min_distance_);
+  distance_range_ = max_distance_ - min_distance_;
 
   std::vector<float> distances;
   distances.push_back(min_distance_);

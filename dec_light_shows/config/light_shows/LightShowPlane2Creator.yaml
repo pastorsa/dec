@@ -3,8 +3,8 @@ LightShowPlane2Creator:
   visualization_rate: 1 # every n-th frame
   min_color: [1.0, 0.0, 0.0, 0.6]
   max_color: [1.0, 0.0, 0.0, 0.4]
-  min_distance: 0.7
-  max_distance: 1.4
+  min_distance: 0.2
+  max_distance: 0.4
   initial_normal: [0.0, 0.0, 1.0]
   initial_position: [0.0, 0.0, 3.0]
   initial_linear_velocity: [0.0, 0.0, 0.0]

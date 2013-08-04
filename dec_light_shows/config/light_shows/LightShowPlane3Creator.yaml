@@ -3,8 +3,8 @@ LightShowPlane3Creator:
   visualization_rate: 1 # every n-th frame
   min_color: [1.0, 0.0, 0.0, 0.6]
   max_color: [1.0, 0.0, 0.0, 0.4]
-  min_distance: 0.7
-  max_distance: 1.4
+  min_distance: 0.1
+  max_distance: 0.6
   initial_normal: [0.0, 0.0, 1.0]
   initial_position: [0.0, 0.0, 3.0]
   initial_linear_velocity: [0.0, 0.0, 2.5]
@@ -12,3 +12,4 @@ LightShowPlane3Creator:
   initial_linear_acceleration: [0.0, 0.0, 0.0]
   initial_angular_acceleration: [0.0, 0.0, 0.0]
   virtual_cube_color: [0.0, 0.5, 0.5, 0.25]
+  up_down: false

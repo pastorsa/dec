@@ -3,11 +3,11 @@
 # They will be executed in this priority order:
 stack_groups:
   - PRE
-  - SENSOR
-  - LIGHT
-  - OPEN_LOOP
-  - IO
-  - COLOR
+  - SENSOR      # Computes sensor levels
+  - LIGHT       # Computes interactive light levels
+  - OPEN_LOOP   # Adds background lights
+  - IO          # Records/plays light shows
+  - COLOR       # Adjusts the color mapping
   - POST
 
 default_light_show_stacks:
@@ -16,6 +16,7 @@ default_light_show_stacks:
   - LightProcessorStack
 #  - OpenLoopLightStack
 #  - LightShowBallCreatorStack
-  - LightShowPlaneCreatorStack
-  - ColorProcessorStack
+#  - LightShowPlane0CreatorStack
+#  - ColorProcessorStack
+  - ColorBlackWhiteProcessorStack
 #  - StaticPostLightShowStack

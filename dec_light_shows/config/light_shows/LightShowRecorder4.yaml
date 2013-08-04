@@ -1,0 +1,3 @@
+LightShowRecorder4:
+  type: "dec_light_shows/DecLightShowRecorder"
+  bag_file_name: LightShow4

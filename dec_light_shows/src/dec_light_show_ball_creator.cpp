@@ -60,13 +60,6 @@ bool DecLightShowBallCreator::initialize(XmlRpc::XmlRpcValue& config)
     convert(data_->pixel_light_beam_led_poses_[i].position, pixel_light_beam_positions_[i]);
   }
 
-  led_positions_.insert(led_positions_.begin(),
-                        block_light_node_positions_.begin(), block_light_node_positions_.end());
-  led_positions_.insert(led_positions_.begin(),
-                        block_light_beam_positions_.begin(), block_light_beam_positions_.end());
-  led_positions_.insert(led_positions_.begin(),
-                        pixel_light_beam_positions_.begin(), pixel_light_beam_positions_.end());
-
   readParameters(config);
   setupSpace(config);
   setupSensorMarkers(config);
@@ -107,11 +100,10 @@ void DecLightShowBallCreator::computeDistance()
       float distance = (block_light_node_positions_[j] - positions_[i]).length();
       if (distance < max_distance_)
       {
-        // data_->node_led_levels_(j) = 0.9f;
-        data_->node_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
-        if (data_->node_led_levels_(j) > 1.0f)
+        data_->node_led_levels_(j) -= static_cast<float>((max_distance_ - distance) / max_distance_);
+        if (data_->node_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
         {
-          data_->node_led_levels_(j) = 1.0f;
+          data_->node_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
         }
       }
     }
@@ -124,11 +116,11 @@ void DecLightShowBallCreator::computeDistance()
       float distance = (block_light_beam_positions_[j] - positions_[i]).length();
       if (distance < max_distance_)
       {
-        data_->block_beam_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
+        data_->block_beam_led_levels_(j) -= static_cast<float>((max_distance_ - distance) / max_distance_);
       }
-      if (data_->block_beam_led_levels_(j) > 1.0f)
+      if (data_->block_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {
-        data_->block_beam_led_levels_(j) = 1.0f;
+        data_->block_beam_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
       }
     }
 
@@ -140,11 +132,11 @@ void DecLightShowBallCreator::computeDistance()
       float distance = (pixel_light_beam_positions_[j] - positions_[i]).length();
       if (distance < max_distance_)
       {
-        data_->pixel_beam_led_levels_(j) += static_cast<float>((max_distance_ - distance) / max_distance_);
+        data_->pixel_beam_led_levels_(j) -= static_cast<float>((max_distance_ - distance) / max_distance_);
       }
-      if (data_->pixel_beam_led_levels_(j) > 1.0f)
+      if (data_->pixel_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {
-        data_->pixel_beam_led_levels_(j) = 1.0f;
+        data_->pixel_beam_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
       }
     }
   }

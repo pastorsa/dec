@@ -1,0 +1,2 @@
+Idle:
+  type: "dec_light_shows/DecIdle"
