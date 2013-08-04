@@ -12,6 +12,7 @@ from dec_world_state.world_state import WorldState
 from dec_light_show_manager.light_show_stack_switcher import LightShowStackSwitcher
 from visualization_msgs.msg import Marker
 from tf import transformations
+import os
 import math
 import tf
 import shelve
@@ -34,6 +35,22 @@ def main():
   object_poses = world_state.object_poses
 
   print 'Initialized dec_command_line.'
+  light_show_cmd()
+
+def light_show_cmd():
+    os.system('clear')
+    light_show.list_stacks()
+    while True:
+        s = raw_input("Enter stack id:")
+        id = 0
+        try:
+            id = int(s)
+        except ValueError:
+            light_show.list_stacks()
+            print "ERROR: invalid input >%s<" % s
+            continue   
+        os.system('clear')
+        light_show.set(id)        
 
 def euler_to_quat_deg(roll, pitch, yaw):
     roll = roll * (math.pi / 180.0)

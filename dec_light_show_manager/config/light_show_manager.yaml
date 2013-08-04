@@ -16,7 +16,7 @@ default_light_show_stacks:
   - LightProcessorStack
 #  - OpenLoopLightStack
 #  - LightShowBallCreatorStack
-#  - LightShowPlane0CreatorStack
+  - LightShowPlane0CreatorStack
 #  - ColorProcessorStack
   - ColorBlackWhiteProcessorStack
 #  - StaticPostLightShowStack
