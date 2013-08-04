@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <splines/splines.h>
+#include <boost/shared_ptr.hpp>
 #include <dec_light_show_manager/dec_light_show.h>
 
 namespace dec_light_shows
@@ -35,7 +36,7 @@ private:
   std::vector<std::vector<float> > color_multipliers_;
   std::vector<float> starts_;
 
-  std::vector<std::vector<splines::QuinticSpline> > splines_;
+  std::vector<std::vector<boost::shared_ptr<splines::QuinticSpline> > > splines_;
 
 };
 
