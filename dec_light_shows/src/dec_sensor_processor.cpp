@@ -51,7 +51,7 @@ bool DecSensorProcessor::initialize(XmlRpc::XmlRpcValue& config)
 
 bool DecSensorProcessor::start()
 {
-  for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
+  for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
   {
     unfiltered_data_[i] = 0.0;
   }
@@ -67,24 +67,24 @@ bool DecSensorProcessor::start()
 
 bool DecSensorProcessor::update()
 {
-  //  for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
-  //  {
-  //    data_->sensor_levels_(i) = static_cast<float>(data_->sensor_values_(i));
-  //  }
-  //  return true;
-
-  for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
+  for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
   {
-    data_->sensor_levels_(i) = 0.0;
+    data_->sensor_levels_(i) = static_cast<float>(data_->sensor_values_(i));
   }
   return true;
 
-  for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
+  // for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
+  // {
+  //   data_->sensor_levels_(i) = 0.0;
+  // }
+  // return true;
+
+  for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
   {
     unfiltered_data_[i] = static_cast<float>(data_->sensor_values_(i));
   }
   ROS_VERIFY(filter_.update(unfiltered_data_, filtered_data_));
-  for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
+  for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
   {
     if (filtered_data_[i] < 0.0f)
       filtered_data_[i] = 0.0f;
