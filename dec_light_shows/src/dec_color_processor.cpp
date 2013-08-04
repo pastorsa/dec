@@ -52,7 +52,7 @@ bool DecColorProcessor::update()
     }
     for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
     {
-      splines_[color_index][j].sample((double)(data_->node_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+      splines_[color_index][j]->sample((double)(data_->node_led_levels_[i] - starts_[color_index]), x, xd, xdd);
       // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->node_led_levels_[i])) * 255.0f;
       data_->node_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
     }
@@ -75,7 +75,7 @@ bool DecColorProcessor::update()
       }
       for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
       {
-        splines_[color_index][j].sample((double)(data_->block_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+        splines_[color_index][j]->sample((double)(data_->block_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
         // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->block_beam_led_levels_[i])) * 255.0f;
         data_->block_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
       }
@@ -99,7 +99,7 @@ bool DecColorProcessor::update()
       ROS_ASSERT(found);
       for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
       {
-        splines_[color_index][j].sample((double)(data_->pixel_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+        splines_[color_index][j]->sample((double)(data_->pixel_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
         // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->pixel_beam_led_levels_[i])) * 255.0f;
         data_->pixel_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
       }
@@ -157,11 +157,11 @@ void DecColorProcessor::readParameters(XmlRpc::XmlRpcValue& config)
     }
     color_multipliers_.push_back(color_multiplier);
 
-    std::vector<splines::QuinticSpline> splines;
+    std::vector<boost::shared_ptr<splines::QuinticSpline> > splines;
     for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
     {
-      splines::QuinticSpline spline;
-      spline.setCoefficients(colors_[i][j], 0.0, 0.0, colors_[i + 1][j], 0.0, 0.0, starts_[i + 1] - starts_[i]);
+      boost::shared_ptr<splines::QuinticSpline> spline(new splines::QuinticSpline());
+      spline->setCoefficients(colors_[i][j], 0.0, 0.0, colors_[i + 1][j], 0.0, 0.0, starts_[i + 1] - starts_[i]);
       splines.push_back(spline);
     }
     splines_.push_back(splines);
