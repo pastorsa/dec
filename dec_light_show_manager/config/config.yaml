@@ -2,9 +2,9 @@
 control_frequency: 20.0
 
 # Switches between simulation and real communication mode
-simulation_mode: true
+simulation_mode: false
 # Switches visualization mode
-visualization_mode: true
+visualization_mode: false
 
 # Setup, Receive sensor and send light data
 # List of teensy ids which are included in the communication loop
