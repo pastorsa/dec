@@ -32,9 +32,9 @@ bool DecColorProcessor::start()
 
 bool DecColorProcessor::update()
 {
-  double x = 0.0;
-  double xd = 0.0;
-  double xdd = 0.0;
+  // double x = 0.0;
+  // double xd = 0.0;
+  // double xdd = 0.0;
   // take node_led_levels_ and beam_led_levels_ and process them into node_led_values_ and beam_led_values_
   // colors_ = low_level_color_;
   for (int i = 0; i < (int)data_->node_led_levels_.size(); ++i)
@@ -52,9 +52,10 @@ bool DecColorProcessor::update()
     }
     for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
     {
-      splines_[color_index][j]->sample((double)(data_->node_led_levels_[i] - starts_[color_index]), x, xd, xdd);
-      // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->node_led_levels_[i])) * 255.0f;
-      data_->node_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
+      // splines_[color_index][j]->sample((double)(data_->node_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+      // data_->node_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
+      float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->node_led_levels_[i])) * 255.0f;
+      data_->node_led_values_(j, i) = static_cast<led_channel_t>(value);
     }
   }
 
@@ -75,9 +76,10 @@ bool DecColorProcessor::update()
       }
       for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
       {
-        splines_[color_index][j]->sample((double)(data_->block_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
-        // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->block_beam_led_levels_[i])) * 255.0f;
-        data_->block_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
+        // splines_[color_index][j]->sample((double)(data_->block_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+        // data_->block_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
+        float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->block_beam_led_levels_[i])) * 255.0f;
+        data_->block_beam_led_values_(j, i) = static_cast<led_channel_t>(value);
       }
     }
   }
@@ -99,9 +101,10 @@ bool DecColorProcessor::update()
       ROS_ASSERT(found);
       for (unsigned int j = 0; j < NUM_COLOR_VALUES; ++j)
       {
-        splines_[color_index][j]->sample((double)(data_->pixel_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
-        // float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->pixel_beam_led_levels_[i])) * 255.0f;
-        data_->pixel_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
+        // splines_[color_index][j]->sample((double)(data_->pixel_beam_led_levels_[i] - starts_[color_index]), x, xd, xdd);
+        // data_->pixel_beam_led_values_(j, i) = static_cast<led_channel_t>(x * 255.0f);
+        float value = (colors_[color_index][j] + (color_multipliers_[color_index][j] * data_->pixel_beam_led_levels_[i])) * 255.0f;
+        data_->pixel_beam_led_values_(j, i) = static_cast<led_channel_t>(value);
       }
     }
   }
