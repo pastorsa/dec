@@ -37,7 +37,7 @@ bool DecColorProcessor::update()
   double xdd = 0.0;
   // take node_led_levels_ and beam_led_levels_ and process them into node_led_values_ and beam_led_values_
   // colors_ = low_level_color_;
-  for (unsigned int i = 0; i < data_->node_led_levels_.size(); ++i)
+  for (int i = 0; i < (int)data_->node_led_levels_.size(); ++i)
   {
     ROS_ASSERT(!(data_->node_led_levels_[i] < 0.0) && !(data_->node_led_levels_[i] > 1.0));
     unsigned int color_index = 0;
@@ -60,7 +60,7 @@ bool DecColorProcessor::update()
 
   if (data_->total_num_block_beam_leds_ > 0)
   {
-    for (unsigned int i = 0; i < data_->block_beam_led_levels_.size(); ++i)
+    for (int i = 0; i < (int)data_->block_beam_led_levels_.size(); ++i)
     {
       ROS_ASSERT(!(data_->block_beam_led_levels_[i] < 0.0) && !(data_->block_beam_led_levels_[i] > 1.0));
       unsigned int color_index = 0;
@@ -83,7 +83,7 @@ bool DecColorProcessor::update()
   }
   if (data_->total_num_pixel_beam_leds_ > 0)
   {
-    for (unsigned int i = 0; i < data_->pixel_beam_led_levels_.size(); ++i)
+    for (int i = 0; i < (int)data_->pixel_beam_led_levels_.size(); ++i)
     {
       ROS_ASSERT(!(data_->pixel_beam_led_levels_[i] < 0.0) && !(data_->pixel_beam_led_levels_[i] > 1.0));
       unsigned int color_index = 0;
