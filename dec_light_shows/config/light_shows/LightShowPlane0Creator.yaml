@@ -13,4 +13,4 @@ LightShowPlane0Creator:
   initial_angular_acceleration: [0.0, 0.0, 0.0]
   virtual_cube_color: [0.0, 0.5, 0.5, 0.25]
   up_down: true
-  profile_type: 1
+  profile_type: 0

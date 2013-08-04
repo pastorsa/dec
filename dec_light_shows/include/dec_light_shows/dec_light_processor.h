@@ -70,6 +70,15 @@ private:
   float wave_travel_distance_;
   float level_range_;
   MathUtilities::Profile profile_type_;
+
+  Eigen::MatrixXf block_node_filter_buffer_;
+  Eigen::MatrixXf block_beam_filter_buffer_;
+  Eigen::MatrixXf pixel_beam_filter_buffer_;
+
+  void processBlockNodes();
+  void processBlockBeams();
+  void processPixelBeams();
+
 };
 
 }

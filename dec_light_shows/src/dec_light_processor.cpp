@@ -144,6 +144,56 @@ bool DecLightProcessor::initialize(XmlRpc::XmlRpcValue& config)
     }
   }
 
+  block_node_filter_buffer_ = Eigen::MatrixXf::Zero(normalized_node_led_distances_to_sensor_.size(), filter_size_);
+  ROS_WARN("Created filter buffer of size >%i< with >%i< rows and >%i< cols.",
+           (int)block_node_filter_buffer_.size(), (int)block_node_filter_buffer_.rows(), (int)block_node_filter_buffer_.cols());
+  for (unsigned int i = 0; i < data_->sensor_levels_.size(); ++i)
+  {
+    for (unsigned int j = 0; j < data_->node_led_levels_.size(); ++j)
+    {
+      const int INDEX = i * data_->node_led_levels_.size() + j;
+      for (unsigned int n = 0; n < filter_size_; ++n)
+      {
+        block_node_filter_buffer_(INDEX, n) = getFilter(static_cast<float>(normalized_node_led_distances_to_sensor_(j, i)), n);
+      }
+    }
+  }
+
+  if (data_->total_num_block_beam_leds_ > 0)
+  {
+    block_beam_filter_buffer_ = Eigen::MatrixXf::Zero(normalized_block_beam_led_distances_to_sensor_.size(), filter_size_);
+    ROS_WARN("Created filter buffer of size >%i< with >%i< rows and >%i< cols.",
+             (int)block_beam_filter_buffer_.size(), (int)block_beam_filter_buffer_.rows(), (int)block_beam_filter_buffer_.cols());
+    for (unsigned int i = 0; i < data_->sensor_levels_.size(); ++i)
+    {
+      for (unsigned int j = 0; j < data_->block_beam_led_levels_.size(); ++j)
+      {
+        const int INDEX = i * data_->block_beam_led_levels_.size() + j;
+        for (unsigned int n = 0; n < filter_size_; ++n)
+        {
+          block_beam_filter_buffer_(INDEX, n) = getFilter(static_cast<float>(normalized_block_beam_led_distances_to_sensor_(j, i)), n);
+        }
+      }
+    }
+  }
+  if (data_->total_num_pixel_beam_leds_ > 0)
+  {
+    pixel_beam_filter_buffer_ = Eigen::MatrixXf::Zero(normalized_pixel_beam_led_distances_to_sensor_.size(), filter_size_);
+    ROS_WARN("Created filter buffer of size >%i< with >%i< rows and >%i< cols.",
+             (int)pixel_beam_filter_buffer_.size(), (int)pixel_beam_filter_buffer_.rows(), (int)pixel_beam_filter_buffer_.cols());
+    for (unsigned int i = 0; i < data_->sensor_levels_.size(); ++i)
+    {
+      for (unsigned int j = 0; j < data_->pixel_beam_led_levels_.size(); ++j)
+      {
+        const int INDEX = i * data_->pixel_beam_led_levels_.size() + j;
+        for (unsigned int n = 0; n < filter_size_; ++n)
+        {
+          pixel_beam_filter_buffer_(INDEX, n) = getFilter(static_cast<float>(normalized_pixel_beam_led_distances_to_sensor_(j, i)), n);
+        }
+      }
+    }
+  }
+
   // ROS_INFO_STREAM("filter\n" << filter_);
   return true;
 }
@@ -162,13 +212,14 @@ bool DecLightProcessor::start()
   return true;
 }
 
-float DecLightProcessor::getFilter(const float normalized_distance, const unsigned int index)
+inline float DecLightProcessor::getFilter(const float normalized_distance, const unsigned int index)
 {
   unsigned int wave_index = static_cast<unsigned int>(normalized_distance * static_cast<float>(filter_size_ - 1));
   float distance = 0.0;
   if (normalized_distance < wave_travel_distance_)
   {
     distance = (1.0f - MathUtilities::ramp(0.0, 1.0, wave_travel_distance_ - normalized_distance, profile_type_)) * filter_(wave_index, index);
+    // distance = filter_(wave_index, index);
   }
   return distance;
   // return filter_(wave_index, index);
@@ -182,15 +233,43 @@ bool DecLightProcessor::update()
   // Block Nodes
   // =====================================================
 
+  processBlockNodes();
+
+  // =====================================================
+  // Block Beams
+  // =====================================================
+
+  processBlockBeams();
+
+  // =====================================================
+  // Pixel Beams
+  // =====================================================
+
+  processPixelBeams();
+
+  // =====================================================
+
+  filter_ring_index_++;
+  if (filter_ring_index_ >= filter_size_)
+  {
+    filter_ring_index_ = 0;
+  }
+  return true;
+}
+
+void DecLightProcessor::processBlockNodes()
+{
   data_->node_led_levels_.setConstant(DecData::BASE_LIGHT_LEVEL);
   for (unsigned int i = 0; i < data_->sensor_levels_.size(); ++i)
   {
     for (unsigned int j = 0; j < data_->node_led_levels_.size(); ++j)
     {
       unsigned int current_filter_index = filter_ring_index_;
+      const int INDEX = i * data_->node_led_levels_.size() + j;
       for (unsigned int n = 0; n < filter_size_; ++n)
       {
-        block_node_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * getFilter(static_cast<float>(normalized_node_led_distances_to_sensor_(j, i)), n);
+        // block_node_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * getFilter(static_cast<float>(normalized_node_led_distances_to_sensor_(j, i)), n);
+        block_node_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * block_node_filter_buffer_(INDEX, n);
         current_filter_index++;
         if (current_filter_index >= filter_size_)
         {
@@ -211,11 +290,9 @@ bool DecLightProcessor::update()
   }
   // zero data
   block_node_buffer_.col(filter_ring_index_).setConstant(DecData::BASE_LIGHT_LEVEL);
-
-  // =====================================================
-  // Block Beams
-  // =====================================================
-
+}
+void DecLightProcessor::processBlockBeams()
+{
   if (data_->total_num_block_beam_leds_ > 0)
   {
     data_->block_beam_led_levels_.setConstant(DecData::BASE_LIGHT_LEVEL);
@@ -224,9 +301,11 @@ bool DecLightProcessor::update()
       for (unsigned int j = 0; j < data_->block_beam_led_levels_.size(); ++j)
       {
         unsigned int current_filter_index = filter_ring_index_;
+        const int INDEX = i * data_->block_beam_led_levels_.size() + j;
         for (unsigned int n = 0; n < filter_size_; ++n)
         {
-          block_beam_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * getFilter(static_cast<float>(normalized_block_beam_led_distances_to_sensor_(j, i)), n);
+          // block_beam_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * getFilter(static_cast<float>(normalized_block_beam_led_distances_to_sensor_(j, i)), n);
+          block_beam_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * block_beam_filter_buffer_(INDEX, n);
           current_filter_index++;
           if (current_filter_index >= filter_size_)
           {
@@ -248,11 +327,9 @@ bool DecLightProcessor::update()
     // zero data
     block_beam_buffer_.col(filter_ring_index_).setConstant(DecData::BASE_LIGHT_LEVEL);
   }
-
-  // =====================================================
-  // Pixel Beams
-  // =====================================================
-
+}
+void DecLightProcessor::processPixelBeams()
+{
   if (data_->total_num_pixel_beam_leds_ > 0)
   {
     data_->pixel_beam_led_levels_.setConstant(DecData::BASE_LIGHT_LEVEL);
@@ -260,10 +337,12 @@ bool DecLightProcessor::update()
     {
       for (unsigned int j = 0; j < data_->pixel_beam_led_levels_.size(); ++j)
       {
+        const int INDEX = i * data_->pixel_beam_led_levels_.size() + j;
         unsigned int current_filter_index = filter_ring_index_;
         for (unsigned int n = 0; n < filter_size_; ++n)
         {
-          pixel_beam_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * getFilter(static_cast<float>(normalized_pixel_beam_led_distances_to_sensor_(j, i)), n);
+          // pixel_beam_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * getFilter(static_cast<float>(normalized_pixel_beam_led_distances_to_sensor_(j, i)), n);
+          pixel_beam_buffer_(j, current_filter_index) += data_->sensor_levels_(i) * pixel_beam_filter_buffer_(INDEX, n);
           current_filter_index++;
           if (current_filter_index >= filter_size_)
           {
@@ -285,15 +364,6 @@ bool DecLightProcessor::update()
     // zero data
     pixel_beam_buffer_.col(filter_ring_index_).setConstant(DecData::BASE_LIGHT_LEVEL);
   }
-
-  // =====================================================
-
-  filter_ring_index_++;
-  if (filter_ring_index_ >= filter_size_)
-  {
-    filter_ring_index_ = 0;
-  }
-  return true;
 }
 
 bool DecLightProcessor::stop()

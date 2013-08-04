@@ -8,6 +8,6 @@ LightProcessor:
   # 2 = eEXP_SIMGA_1
   # 3 = eEXP_SIMGA_2
   # 4 = eEXP_SIMGA_3
-  profile_type: 3
+  profile_type: 0
   inverse_distance: false
   random_waves: false

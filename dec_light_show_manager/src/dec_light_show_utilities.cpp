@@ -31,7 +31,7 @@ bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config, const std::str
   int i = param;
   if (i < 0)
   {
-    ROS_ERROR("Invalid parameter >%i< read from configuration. Must be positive.", key.c_str());
+    ROS_ERROR("Invalid parameter >%s< read from configuration. Must be positive.", key.c_str());
     return false;
   }
   ui = static_cast<unsigned int>(i);
