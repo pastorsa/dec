@@ -6,6 +6,7 @@
  */
 
 #include <dec_utilities/assert.h>
+#include <dec_utilities/param_server.h>
 #include <conversions/tf_to_ros.h>
 #include <conversions/ros_to_tf.h>
 #include <dec_light_show_manager/dec_light_show_utilities.h>
@@ -24,14 +25,17 @@ namespace dec_light_shows
 {
 
 DecLightShowPlaneCreator::DecLightShowPlaneCreator() :
-    node_handle_("/DecLightShowManager"),
+    node_handle_("/DecLightShowManager"), visualization_mode_(false),
     visualization_rate_(0), visualization_counter_(0),
     min_distance_(0.0), max_distance_(0.0), distance_range_(0.0),
     up_down_(false), profile_type_(MathUtilities::eLINEAR)
 {
-  const int PUBLISHER_BUFFER_SIZE = 10;
-  rviz_pub_ = node_handle_.advertise<visualization_msgs::MarkerArray>("visualization_marker", PUBLISHER_BUFFER_SIZE, true);
-
+  ROS_VERIFY(dec_utilities::read(node_handle_, "visualization_mode", visualization_mode_));
+  if (visualization_mode_)
+  {
+    const int PUBLISHER_BUFFER_SIZE = 10;
+    rviz_pub_ = node_handle_.advertise<visualization_msgs::MarkerArray>("visualization_marker", PUBLISHER_BUFFER_SIZE, true);
+  }
 }
 
 bool DecLightShowPlaneCreator::initialize(XmlRpc::XmlRpcValue& config)
@@ -80,7 +84,8 @@ bool DecLightShowPlaneCreator::update()
   integrate();
   computeDistance();
 
-  publish();
+  if(visualization_mode_)
+    publish();
   return true;
 }
 

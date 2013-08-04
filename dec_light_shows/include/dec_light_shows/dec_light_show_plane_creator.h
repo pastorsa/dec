@@ -33,6 +33,7 @@ public:
 private:
 
   ros::NodeHandle node_handle_;
+  bool visualization_mode_;
   ros::Publisher rviz_pub_;
 
   visualization_msgs::MarkerArray virtual_sensors_;
