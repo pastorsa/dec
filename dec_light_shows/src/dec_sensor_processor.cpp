@@ -73,11 +73,11 @@ bool DecSensorProcessor::update()
   //  }
   //  return true;
 
-  for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
-  {
-   data_->sensor_levels_(i) = 0.0;
-  }
-  return true;
+  // for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
+  // {
+  //  data_->sensor_levels_(i) = 0.0;
+  // }
+  // return true;
 
   for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
   {

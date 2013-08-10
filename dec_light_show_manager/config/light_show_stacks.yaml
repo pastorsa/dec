@@ -69,6 +69,11 @@
   groups: ["OPEN_LOOP"]
   light_shows:
     - "LightShowPlane2Creator"
+-
+  name: "LightShowPlane3CreatorStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "LightShowPlane3Creator"
 
 ### IO
 ### -> RECORDER    

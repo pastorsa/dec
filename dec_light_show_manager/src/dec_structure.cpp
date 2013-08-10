@@ -69,6 +69,40 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
   ROS_WARN("Allocated >%i< bytes for sensor data.", (int)sizeof(_sensor_data));
   ROS_WARN("Allocated >%i< bytes for light data.", (int)sizeof(_light_data));
 
+  std::vector<unsigned int> light_nodes;
+  for (unsigned int n = 0; n < block_light_nodes_.size(); ++n)
+  {
+    for (unsigned int k = 0; k < block_light_nodes_[n].getNumComponents(); ++k)
+    {
+      light_nodes.push_back(block_light_nodes_[n].nodes_[k]);
+    }
+  }
+
+//  for (unsigned int i = 0; i < beams_.size(); ++i)
+//  {
+//    for (unsigned int j = 0; j < beams_[i].getNumComponents(); ++j)
+//    {
+//      bool found_first = false;
+//      bool found_second = false;
+//      for (unsigned int n = 0; !(found_first && found_second) && n < light_nodes.size(); ++n)
+//      {
+//        if (beams_[i].nodes_[j].first == light_nodes[n])
+//        {
+//          found_first = true;
+//        }
+//        if (beams_[i].nodes_[j].second == light_nodes[n])
+//        {
+//          found_second = true;
+//        }
+//      }
+//      if (found_first && found_second)
+//      {
+//        // Beam light_node_connecting_beam;
+//        // light_node_connecting_beams_
+//      }
+//    }
+//  }
+
   return true;
 }
 

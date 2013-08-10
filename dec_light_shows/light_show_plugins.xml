@@ -52,4 +52,10 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecAudioProcessor" type="dec_light_shows::DecAudioProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Uses sound input to modulate light values
+    </description>
+  </class>
+
 </library>

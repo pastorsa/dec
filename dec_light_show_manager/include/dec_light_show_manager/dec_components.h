@@ -302,6 +302,24 @@ private:
 
 };
 
+//// ===================================================================
+//// LightNodeConnectionBeam
+//// ===================================================================
+//class LightNodeConnectionBeam
+//{
+//
+//public:
+//  LightNodeConnectionBeam() {};
+//  virtual ~LightNodeConnectionBeam() {};
+//
+//  bool initialize(std::pair<unsigned int, unsigned int>& nodes);
+//
+//private:
+//
+//  unsigned int getNextBeam();
+//
+//};
+
 }
 
 #endif /* DEC_COMPONENTS_H_ */

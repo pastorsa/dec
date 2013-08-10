@@ -1,0 +1,28 @@
+<package>
+  <description brief="dec_audio">
+
+     dec_audio
+
+  </description>
+  <author>Peter Pastor</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/dec_audio</url>
+
+  <depend package="roscpp"/>
+  <depend package="dec_utilities"/>
+  <depend package="diagnostic_updater"/>
+
+  <depend package="visualization_msgs"/>
+  <depend package="geometry_msgs"/>
+  
+  <rosdep name="libfftw3-3"/>
+  <rosdep name="libfftw3-dev"/>
+  <rosdep name="libasound2"/>
+  <rosdep name="libasound2-dev"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include -I${prefix}/msg_gen/cpp" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldec_audio"/>
+  </export>
+  
+</package>

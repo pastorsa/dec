@@ -100,6 +100,10 @@ protected:
 
   /*!
    */
+  // std::vector<Beam> light_node_connecting_beams_;
+
+  /*!
+   */
   geometry_msgs::Vector3 nodes_size_;
   std::vector<double> nodes_color_;
   geometry_msgs::Vector3 beams_size_;

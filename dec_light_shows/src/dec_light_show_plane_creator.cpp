@@ -412,6 +412,8 @@ void DecLightShowPlaneCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
     marker.scale.x = 10.0f;
     marker.scale.y = 10.0f;
     marker.scale.z = distances[i];
+    if (marker.scale.z < 1e-6)
+      marker.scale.z = 1e-6;
     marker.color.r = colors[i][0];
     marker.color.g = colors[i][1];
     marker.color.b = colors[i][2];
@@ -425,8 +427,14 @@ void DecLightShowPlaneCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)
   marker.action = visualization_msgs::Marker::ADD;
   tf::Vector3 scale = (max_space_ - min_space_).absolute();
   marker.scale.x = scale.getX();
+  if (marker.scale.x < 1e-6)
+    marker.scale.x = 1e-6;
   marker.scale.y = scale.getY();
+  if (marker.scale.y < 1e-6)
+    marker.scale.y = 1e-6;
   marker.scale.z = scale.getZ();
+  if (marker.scale.z < 1e-6)
+    marker.scale.z = 1e-6;
   tf::Vector3 center = (max_space_ + min_space_) / 2.0f;
   convert(center, marker.pose.position);
   convert(tf::Quaternion::getIdentity(), marker.pose.orientation);
