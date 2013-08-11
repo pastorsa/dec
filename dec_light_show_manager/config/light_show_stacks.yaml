@@ -1,23 +1,26 @@
 ### PRE and POST ###
--
-  name: "StaticPreLightShowStack"
-  groups: ["PRE"]
-  light_shows:
-    - "SensorProcessor"
-    - "LightProcessor"
--
-  name: "StaticPostLightShowStack"
-  groups: ["POST"]
-  light_shows:
-    - "SensorProcessor"
-    - "LightProcessor"
+#-
+#  name: "StaticPreLightShowStack"
+#  groups: ["PRE"]
+#  light_shows:
+#    - "SensorProcessor"
+#-
+#  name: "StaticPostLightShowStack"
+#  groups: ["POST"]
+#  light_shows:
+#    - "SensorProcessor"
 
 ### SENSOR ###
 -
-  name: "SensorProcessorStack"
+  name: "SensorLinearDecayProcessorStack"
   groups: ["SENSOR"]
   light_shows:
-    - "SensorProcessor"
+    - "SensorLinearDecayProcessor"
+-
+  name: "SensorButterworthProcessorStack"
+  groups: ["SENSOR"]
+  light_shows:
+    - "SensorButterworthProcessor"
 
 ### LIGHT ###
 -
@@ -120,3 +123,11 @@
   groups: ["IO"]
   light_shows:
     - "Idle"
+
+### BRIGHTNESS
+-
+  name: "BrightnessProcessorStack"
+  groups: ["BRIGHTNESS"]
+  light_shows:
+    - "BrightnessProcessor"
+    

@@ -1,14 +1,14 @@
 output_sample_rate: 44100
 num_channels: 2
 
-desired_publishing_rate: 100.0
-# num_frames_per_period: 32768
-num_frames_per_period: 16384
+desired_publishing_rate: 20.0
+num_frames_per_period: 32768
+# num_frames_per_period: 16384
 # num_frames_per_period: 8192
 num_output_signals: 28
 
-output_start_index: 8
-output_end_index: 24
+output_start_index: 5
+output_end_index: 13
 
 # mel_filter_parameter_a: 700.0
 # mel_filter_parameter_b: 2595.0

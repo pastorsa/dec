@@ -40,7 +40,8 @@ def main():
 def light_show_cmd():
     os.system('clear')
     light_show.list_stacks()
-    while True:
+    stack_selection = True
+    while stack_selection:
         s = raw_input("Enter stack id:")
         id = 0
         try:
@@ -50,7 +51,10 @@ def light_show_cmd():
             print "ERROR: invalid input >%s<" % s
             continue   
         os.system('clear')
-        light_show.set(id)        
+        if id == -1:
+            stack_selection = False
+        else:
+            light_show.set(id)        
 
 def euler_to_quat_deg(roll, pitch, yaw):
     roll = roll * (math.pi / 180.0)

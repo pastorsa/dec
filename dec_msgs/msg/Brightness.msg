@@ -1,0 +1,2 @@
+int32 node_brightness
+int32 beam_brightness

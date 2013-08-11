@@ -8,15 +8,17 @@ stack_groups:
   - OPEN_LOOP   # Adds background lights
   - IO          # Records/plays light shows
   - COLOR       # Adjusts the color mapping
+  - BRIGHTNESS  # Adjusts the brightness
   - POST
 
 default_light_show_stacks:
 #  - StaticPreLightShowStack
-  - SensorProcessorStack
+  - SensorLinearDecayProcessorStack
   - LightProcessorStack
 #  - OpenLoopLightStack
 #  - LightShowBallCreatorStack
   - LightShowPlane0CreatorStack
 #  - ColorProcessorStack
   - ColorBlackWhiteProcessorStack
+  - BrightnessProcessorStack
 #  - StaticPostLightShowStack

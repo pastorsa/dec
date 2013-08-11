@@ -77,7 +77,7 @@ bool AudioProcessor::initialize()
   audio_sample_publisher_ = node_handle_.advertise<dec_audio::AudioSample> ("audio_samples", PUBLISHER_BUFFER_SIZE);
 
   visualization_markers_.reset(new visualization_msgs::MarkerArray());
-  visualization_markers_->markers.resize(num_output_signals_);
+  visualization_markers_->markers.resize(num_selected_output_signals_);
 
   std::string visualization_marker_topic;
   ROS_VERIFY(dec_utilities::read(node_handle_, "visualization_marker_topic", visualization_marker_topic));
@@ -89,9 +89,9 @@ bool AudioProcessor::initialize()
   double visualization_spectrum_length;
   ROS_VERIFY(dec_utilities::read(node_handle_, "visualization_spectrum_length", visualization_spectrum_length));
   ROS_ASSERT(visualization_spectrum_length > 0);
-  spectrum_marker_width_ = visualization_spectrum_length / static_cast<float>(num_output_signals_);
+  spectrum_marker_width_ = visualization_spectrum_length / static_cast<float>(num_selected_output_signals_);
 
-  for (unsigned int i = 0; i < num_output_signals_; ++i)
+  for (unsigned int i = 0; i < num_selected_output_signals_; ++i)
   {
     visualization_markers_->markers[i].header.frame_id = "/BASE";
     visualization_markers_->markers[i].ns.assign("spectrum_markers");
@@ -107,7 +107,7 @@ bool AudioProcessor::initialize()
   }
 
   audio_sample_.reset(new AudioSample());
-  audio_sample_->data.resize(num_output_signals_);
+  audio_sample_->data.resize(num_selected_output_signals_);
 
   if(!initializeAudio())
   {
@@ -405,7 +405,7 @@ void AudioProcessor::updateCB(const ros::TimerEvent& timer_event)
     audio_sample_->header.seq = frame_count_;
     frame_count_++;
     ROS_DEBUG_COND(frame_count_ % 100 == 0, "Publishing zeros because audio processor is either not initialized or failed to initialize.");
-    for (unsigned int i = 0; i < num_output_signals_; ++i)
+    for (unsigned int i = 0; i < num_selected_output_signals_; ++i)
     {
       audio_sample_->data[i] = 0.0;
     }
@@ -673,17 +673,19 @@ void AudioProcessor::processFrame()
 
   audio_sample_->header.stamp = now_time_;
   audio_sample_->header.seq = frame_count_;
-  for (unsigned int i = 0; i < num_output_signals_; ++i)
+  unsigned int index = 0;
+  for (unsigned int i = output_start_index_; i < output_end_index_; ++i)
   {
-    audio_sample_->data[i] = output_signal_spectrum_(i);
+    audio_sample_->data[index] = output_signal_spectrum_(i);
+    index++;
   }
   audio_sample_publisher_.publish(audio_sample_);
 
-  boost::mutex::scoped_lock lock(callback_mutex_);
-  if (recording_ && user_callback_enabled_)
-  {
-    user_callback_(audio_sample_);
-  }
+//  boost::mutex::scoped_lock lock(callback_mutex_);
+//  if (recording_ && user_callback_enabled_)
+//  {
+//    user_callback_(audio_sample_);
+//  }
 }
 
 bool AudioProcessor::initMelFilterBank()
@@ -812,18 +814,18 @@ void AudioProcessor::scaleOutput()
 
 }
 
-bool AudioProcessor::registerCallback(boost::function<void(const AudioSample::ConstPtr& audio_sample_msg)> callback)
-{
-  boost::mutex::scoped_lock lock(callback_mutex_);
-  if (user_callback_enabled_)
-  {
-    ROS_ERROR("User callback already enabled. Only one callback can be registered.");
-    return false;
-  }
-  user_callback_ = callback;
-  user_callback_enabled_ = true;
-  return true;
-}
+//bool AudioProcessor::registerCallback(boost::function<void(const AudioSample::ConstPtr& audio_sample_msg)> callback)
+//{
+//  boost::mutex::scoped_lock lock(callback_mutex_);
+//  if (user_callback_enabled_)
+//  {
+//    ROS_ERROR("User callback already enabled. Only one callback can be registered.");
+//    return false;
+//  }
+//  user_callback_ = callback;
+//  user_callback_enabled_ = true;
+//  return true;
+//}
 
 bool AudioProcessor::startRecording()
 {
@@ -851,23 +853,24 @@ bool AudioProcessor::stopRecording()
 
 void AudioProcessor::publishMarkers()
 {
-  for (unsigned int i = 0; i < num_output_signals_; ++i)
+  unsigned int index = 0;
+  for (unsigned int i = output_start_index_; i < output_end_index_; ++i)
   {
-    visualization_markers_->markers[i].header.stamp = now_time_;
-    visualization_markers_->markers[i].header.seq = frame_count_;
-    visualization_markers_->markers[i].lifetime = visualization_marker_lifetime_;
+    visualization_markers_->markers[index].header.stamp = now_time_;
+    visualization_markers_->markers[index].header.seq = frame_count_;
+    visualization_markers_->markers[index].lifetime = visualization_marker_lifetime_  + ros::Duration(0.5);
 
-    visualization_markers_->markers[i].scale.x = spectrum_marker_width_;
-    visualization_markers_->markers[i].scale.y = spectrum_marker_width_;
+    visualization_markers_->markers[index].scale.x = spectrum_marker_width_;
+    visualization_markers_->markers[index].scale.y = spectrum_marker_width_;
 
     // double normalized_height = output_signal_spectrum_(i) / visualization_spectrum_max_amplitude_;
     double normalized_height = output_signal_spectrum_(i);
     if (fabs(normalized_height) > 1.0) // overshoot
     {
-      visualization_markers_->markers[i].color.r = 0.0;
-      visualization_markers_->markers[i].color.g = 0.0;
-      visualization_markers_->markers[i].color.b = 1.0;
-      visualization_markers_->markers[i].color.a = 1.0;
+      visualization_markers_->markers[index].color.r = 0.0;
+      visualization_markers_->markers[index].color.g = 0.0;
+      visualization_markers_->markers[index].color.b = 1.0;
+      visualization_markers_->markers[index].color.a = 1.0;
     }
     else
     {
@@ -875,14 +878,15 @@ void AudioProcessor::publishMarkers()
       {
         normalized_height = 10e-6;
       }
-      visualization_markers_->markers[i].color.r = normalized_height;
-      visualization_markers_->markers[i].color.g = 1.0 - normalized_height;
-      visualization_markers_->markers[i].color.b = 0.0;
-      visualization_markers_->markers[i].color.a = 1.0;
+      visualization_markers_->markers[index].color.r = normalized_height;
+      visualization_markers_->markers[index].color.g = 1.0 - normalized_height;
+      visualization_markers_->markers[index].color.b = 0.0;
+      visualization_markers_->markers[index].color.a = 1.0;
     }
     double marker_height = normalized_height * visualization_spectrum_max_height_;
-    visualization_markers_->markers[i].scale.z = marker_height;
-    visualization_markers_->markers[i].pose.position.z = spectrum_base_frame_pose_.position.z + (marker_height / 2.0);
+    visualization_markers_->markers[index].scale.z = marker_height;
+    visualization_markers_->markers[index].pose.position.z = spectrum_base_frame_pose_.position.z + (marker_height / 2.0);
+    index++;
   }
   visualization_marker_publisher_.publish(*visualization_markers_);
 }
@@ -919,7 +923,7 @@ bool AudioProcessor::readParams()
 
   ROS_VERIFY(dec_utilities::read(node_handle_, "desired_publishing_rate", desired_publishing_rate_));
   ROS_ASSERT(desired_publishing_rate_ > 1.0);
-  ROS_ASSERT(desired_publishing_rate_ < 200.0);
+  // ROS_ASSERT(desired_publishing_rate_ < 200.0);
 
   //  ROS_VERIFY(dec_utilities::read(node_handle_, "num_overlapping_frames", num_overlapping_frames_));
   //  ROS_ASSERT(num_overlapping_frames_ < (int)num_frames_per_period_);

@@ -6,6 +6,7 @@ Client class for switching between light show stacks.
 
 import rospy
 from dec_light_show_msgs.srv import SwitchLightShowStack, SwitchLightShowStackResponse
+from dec_msgs.msg import Brightness
 
 class LightShowStackSwitcher:
     def __init__(self):
@@ -16,6 +17,7 @@ class LightShowStackSwitcher:
         [light_show_stacks, active_light_show_stacks], result = self.get_stacks() 
         self.current_light_show_stack = light_show_stacks
         self.current_active_light_show_stack = active_light_show_stacks
+        self.brightness_publisher = rospy.Publisher('//DecLightShowManager/BrightnessProcessor/command', Brightness)
 
     def get_stacks(self):
         ''' List stacks. Returns True on success and False on failure. '''
@@ -29,11 +31,31 @@ class LightShowStackSwitcher:
             return None, False
         return [response.light_show_stacks, response.active_light_show_stacks], True
 
+    def setBrightness(self):
+        brightness_set = False
+        while not brightness_set:
+            s = raw_input("Enter brightness:")
+            brightness = 0
+            try:
+                brightness = int(s)
+            except ValueError:            
+                print "ERROR: invalid brightness >%s<. Enter number between [0..255]." % s
+                continue
+        
+            bmsg = Brightness()
+            bmsg.node_brightness = brightness
+            bmsg.beam_brightness = brightness
+            self.brightness_publisher.publish(bmsg)
+            brightness_set = True        
+
     def set(self, id):
         if id < 0 or id >= len(self.current_light_show_stack):
             self.list_stacks()
             print "Invalid id >%i< must be within [0..%i]." % (id, len(self.current_light_show_stack) - 1)
             return False
+        
+        if self.current_light_show_stack[id] == "BrightnessProcessorStack":
+            self.setBrightness()
 
         print "Switching to stack >%s<." % self.current_light_show_stack[id]
         if self.switch_light_show_stack(self.current_light_show_stack[id]):

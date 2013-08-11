@@ -2,7 +2,7 @@
 control_frequency: 20.0
 
 # Switches between simulation and real communication mode
-simulation_mode: false
+simulation_mode: true
 # Switches visualization mode
 visualization_mode: true
 

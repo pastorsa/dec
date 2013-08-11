@@ -7,7 +7,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE Release)
+set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
 
@@ -21,7 +21,8 @@ include_directories(${EIGEN_INCLUDE_DIRS})
 add_definitions(${EIGEN_DEFINITIONS})
 
 rosbuild_add_library(${PROJECT_NAME}
-  src/dec_sensor_processor.cpp
+  src/dec_sensor_butterworth_processor.cpp
+  src/dec_sensor_decay_processor.cpp
   src/dec_light_processor.cpp
   src/dec_color_processor.cpp
   src/dec_open_loop_light_generator.cpp
@@ -31,6 +32,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_light_show_player.cpp
   src/dec_idle.cpp
   src/dec_audio_processor.cpp
+  src/dec_brightness_processor.cpp
 )
 
 #uncomment if you have defined messages

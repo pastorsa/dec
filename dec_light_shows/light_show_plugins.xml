@@ -1,8 +1,14 @@
 <library path="lib/libdec_light_shows">
 
-  <class name="dec_light_shows/DecSensorProcessor" type="dec_light_shows::DecSensorProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+  <class name="dec_light_shows/DecSensorButterworthProcessor" type="dec_light_shows::DecSensorButterworthProcessor" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
-      Processes sensors
+      Processes sensors using a butterworth filter
+    </description>
+  </class>
+
+  <class name="dec_light_shows/DecSensorDecayProcessor" type="dec_light_shows::DecSensorDecayProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Processes sensors decay 
     </description>
   </class>
 
@@ -55,6 +61,12 @@
   <class name="dec_light_shows/DecAudioProcessor" type="dec_light_shows::DecAudioProcessor" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
       Uses sound input to modulate light values
+    </description>
+  </class>
+
+  <class name="dec_light_shows/DecBrightnessProcessor" type="dec_light_shows::DecBrightnessProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Processes brightness
     </description>
   </class>
 

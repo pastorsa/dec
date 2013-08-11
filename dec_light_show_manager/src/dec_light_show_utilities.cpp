@@ -27,7 +27,10 @@ bool DecLightShowUtilities::getParam(XmlRpc::XmlRpcValue& config, const std::str
     return false;
   XmlRpc::XmlRpcValue param = config[key];
   if (param.getType() != XmlRpc::XmlRpcValue::TypeInt)
+  {
+    ROS_ERROR("Invalid parameter >%s<.", key.c_str());
     return false;
+  }
   int i = param;
   if (i < 0)
   {

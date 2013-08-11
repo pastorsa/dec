@@ -1,7 +1,5 @@
-SensorProcessor:
-  type: "dec_light_shows/DecSensorProcessor"
-  num_cycles_to_load: 10
-  num_cycles_to_unload: 2
+SensorButterworthProcessor:
+  type: "dec_light_shows/DecSensorButterworthProcessor"
   sensor_filter:
     name: Filter
     type: TransferFunctionFilter<float>

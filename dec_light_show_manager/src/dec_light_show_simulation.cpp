@@ -92,13 +92,11 @@ bool DecLightShowSimulation::copySimulatedSensorInformation()
         double distance = getMinimumDistance(object_pose.getOrigin(), light_show_data_->sensors_[i].nodes_);
         if (distance < simulation_sensor_object_threshold_)
         {
-          // ROS_DEBUG("Distance between object >%s< and sensor beam >%i< between node >%i< and >%i< is >%.2f< m.",
-          //           object_name.c_str(), i, light_show_data_->sensors_[i].first, light_show_data_->sensors_[i].second, distance);
           // scale distance to interval [0..1]
           // double sensor_value = 1.0 - (distance / simulation_sensor_object_threshold_);
           // sensor_value *= 255;
           // set sensor value
-          light_show_data_->sensor_values_(i) = (sensor_channel_t)1.0;
+          light_show_data_->sensor_values_(i) = static_cast<sensor_channel_t>(1);
         }
       }
     }

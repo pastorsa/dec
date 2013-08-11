@@ -7,7 +7,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE Release)
+set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
 
@@ -25,11 +25,12 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
-rosbuild_add_library(dec_data
-  src/dec_data.cpp
-)
+#rosbuild_add_library(dec_data
+#  src/dec_data.cpp
+#)
 
 rosbuild_add_library(${PROJECT_NAME}
+  src/dec_data.cpp
   src/dec_light_show_manager.cpp
   src/dec_light_show_factory.cpp
   src/dec_light_show_stack.cpp
@@ -40,7 +41,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_components.cpp
   src/dec_structure.cpp
 )
-target_link_libraries(${PROJECT_NAME} dec_data)
+#target_link_libraries(${PROJECT_NAME} dec_data)
 
 rosbuild_add_executable(dec_light_show_manager_node
   src/dec_light_show_manager_node.cpp
