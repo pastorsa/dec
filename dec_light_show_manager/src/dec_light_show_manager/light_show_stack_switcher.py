@@ -32,21 +32,33 @@ class LightShowStackSwitcher:
         return [response.light_show_stacks, response.active_light_show_stacks], True
 
     def setBrightness(self):
-        brightness_set = False
-        while not brightness_set:
-            s = raw_input("Enter brightness:")
-            brightness = 0
-            try:
-                brightness = int(s)
-            except ValueError:            
-                print "ERROR: invalid brightness >%s<. Enter number between [0..255]." % s
-                continue
+        node_brightness_set = False
+        beam_brightness_set = False
+        while not node_brightness_set and not beam_brightness_set:
+            if not node_brightness_set:
+                s = raw_input("Enter node brightness:")
+                node_brightness = 0
+                try:
+                    node_brightness = int(s)
+                except ValueError:            
+                    print "ERROR: invalid node brightness >%s<. Enter number between [0..255]." % s
+                    continue
+                node_brightness_set = True        
+        
+            if not beam_brightness_set:
+                s = raw_input("Enter beam brightness:")
+                beam_brightness = 0
+                try:
+                    beam_brightness = int(s)
+                except ValueError:            
+                    print "ERROR: invalid beam brightness >%s<. Enter number between [0..255]." % s
+                    continue
+                beam_brightness_set = True        
         
             bmsg = Brightness()
-            bmsg.node_brightness = brightness
-            bmsg.beam_brightness = brightness
+            bmsg.node_brightness = node_brightness
+            bmsg.beam_brightness = beam_brightness
             self.brightness_publisher.publish(bmsg)
-            brightness_set = True        
 
     def set(self, id):
         if id < 0 or id >= len(self.current_light_show_stack):

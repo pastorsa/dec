@@ -176,8 +176,6 @@ void parseLightData(uint8_t* buffer)
     _rx_buffer_length++;
     _light_data.block_leds[i].blue = (uint8_t)buffer[_rx_buffer_length];
     _rx_buffer_length++;
-    _light_data.block_leds[i].brightness = (uint8_t)buffer[_rx_buffer_length];
-    _rx_buffer_length++;
   }
 
   // second set light beams
@@ -190,8 +188,6 @@ void parseLightData(uint8_t* buffer)
       _light_data.pixel_leds[i].green[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
       _rx_buffer_length++;
       _light_data.pixel_leds[i].blue[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
-      _rx_buffer_length++;
-      _light_data.pixel_leds[i].brightness[_setup_data.pixel_leds[i].index + j] = (uint8_t)buffer[_rx_buffer_length];
       _rx_buffer_length++;
     }
   }
@@ -209,19 +205,16 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
 //  printf("Block Light: %u blocks.\n", _setup_data.num_block_leds);
   for (i = 0; i < _setup_data.num_block_leds; ++i)
   {
-//    printf("  >%u< - >%u< >%u< >%u< >%u<\n", i,
+//    printf("  >%u< - >%u< >%u< >%u<\n", i,
 //           (uint8_t)light_data->block_leds[i].red,
 //           (uint8_t)light_data->block_leds[i].green,
-//           (uint8_t)light_data->block_leds[i].blue,
-//           (uint8_t)light_data->block_leds[i].brightness);
+//           (uint8_t)light_data->block_leds[i].blue);
 
     buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].red;
     _rx_buffer_length++;
     buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].green;
     _rx_buffer_length++;
     buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].blue;
-    _rx_buffer_length++;
-    buffer[_rx_buffer_length] = (uint8_t)light_data->block_leds[i].brightness;
     _rx_buffer_length++;
   }
 
@@ -240,16 +233,13 @@ void generateLightData(uint8_t* buffer, const light_data_t* light_data)
 //      printf("   >%u< >%u< >%u<\n",
 //             (uint8_t)light_data->pixel_leds[i].red[j],
 //             (uint8_t)light_data->pixel_leds[i].green[j],
-//             (uint8_t)light_data->pixel_leds[i].blue[j]);//,
-//             // (uint8_t)light_data->pixel_leds[i].brightness[j]);
+//             (uint8_t)light_data->pixel_leds[i].blue[j]);
 
       buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].red[j];
       _rx_buffer_length++;
       buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].green[j];
       _rx_buffer_length++;
       buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].blue[j];
-      _rx_buffer_length++;
-      buffer[_rx_buffer_length] = (uint8_t)light_data->pixel_leds[i].brightness[j];
       _rx_buffer_length++;
     }
   }
@@ -328,7 +318,6 @@ void resetLightData(light_data_t* light_data)
     light_data->block_leds[i].red = (uint8_t)0;
     light_data->block_leds[i].blue = (uint8_t)0;
     light_data->block_leds[i].green = (uint8_t)0;
-    light_data->block_leds[i].brightness = (uint8_t)0;
   }
 
   for (i = 0; i < DEC_MAX_NUMBER_OF_PIXELS_PER_TEENSY; ++i)
@@ -338,7 +327,6 @@ void resetLightData(light_data_t* light_data)
       light_data->pixel_leds[i].red[j] = (uint8_t)0;
       light_data->pixel_leds[i].blue[j] = (uint8_t)0;
       light_data->pixel_leds[i].green[j] = (uint8_t)0;
-      light_data->pixel_leds[i].brightness[j] = (uint8_t)0;
     }
   }
 }

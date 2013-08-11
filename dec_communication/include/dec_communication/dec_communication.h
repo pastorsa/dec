@@ -156,7 +156,6 @@ typedef struct
   uint8_t red;
   uint8_t green;
   uint8_t blue;
-  uint8_t brightness;
 } led_block_data_t;
 
 typedef struct
@@ -164,7 +163,6 @@ typedef struct
   uint8_t red[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
   uint8_t green[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
   uint8_t blue[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
-  uint8_t brightness[DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP];
 } led_pixel_data_t;
 
 typedef struct

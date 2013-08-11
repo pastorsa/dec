@@ -22,7 +22,7 @@
 #define RED_OFFSET   0
 #define GREEN_OFFSET 1
 #define BLUE_OFFSET  2
-#define ALPHA_OFFSET 3
+#define BRIGHTNESS_OFFSET 3
 
 namespace dec_light_show_manager
 {

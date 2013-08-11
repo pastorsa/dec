@@ -110,7 +110,7 @@ bool DecLightShowVisualization::update()
     block_light_node_markers_.markers[i].color.r = (float)light_show_data_->node_led_values_(RED_OFFSET, i) / 255.0f;
     block_light_node_markers_.markers[i].color.g = (float)light_show_data_->node_led_values_(GREEN_OFFSET, i) / 255.0f;
     block_light_node_markers_.markers[i].color.b = (float)light_show_data_->node_led_values_(BLUE_OFFSET, i) / 255.0f;
-    block_light_node_markers_.markers[i].color.a = (float)light_show_data_->node_led_values_(ALPHA_OFFSET, i) / 255.0f;
+    block_light_node_markers_.markers[i].color.a = (float)light_show_data_->node_led_values_(BRIGHTNESS_OFFSET, i) / 255.0f;
   }
 
 
@@ -121,7 +121,7 @@ bool DecLightShowVisualization::update()
     block_light_beam_markers_.markers[i].color.r = static_cast<float>(light_show_data_->block_beam_led_values_(RED_OFFSET, i)) / 255.0f;
     block_light_beam_markers_.markers[i].color.g = static_cast<float>(light_show_data_->block_beam_led_values_(GREEN_OFFSET, i)) / 255.0f;
     block_light_beam_markers_.markers[i].color.b = static_cast<float>(light_show_data_->block_beam_led_values_(BLUE_OFFSET, i)) / 255.0f;
-    block_light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->block_beam_led_values_(ALPHA_OFFSET, i)) / 255.0f;
+    block_light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->block_beam_led_values_(BRIGHTNESS_OFFSET, i)) / 255.0f;
   }
 
   ROS_ASSERT(light_show_data_->total_num_pixel_beam_leds_ == light_show_data_->pixel_beam_led_values_.cols());
@@ -131,7 +131,7 @@ bool DecLightShowVisualization::update()
     pixel_light_beam_markers_.markers[i].color.r = static_cast<float>(light_show_data_->pixel_beam_led_values_(RED_OFFSET, i)) / 255.0f;
     pixel_light_beam_markers_.markers[i].color.g = static_cast<float>(light_show_data_->pixel_beam_led_values_(GREEN_OFFSET, i)) / 255.0f;
     pixel_light_beam_markers_.markers[i].color.b = static_cast<float>(light_show_data_->pixel_beam_led_values_(BLUE_OFFSET, i)) / 255.0f;
-    pixel_light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->pixel_beam_led_values_(ALPHA_OFFSET, i)) / 255.0f;
+    pixel_light_beam_markers_.markers[i].color.a = static_cast<float>(light_show_data_->pixel_beam_led_values_(BRIGHTNESS_OFFSET, i)) / 255.0f;
   }
 
   rviz_pub_.publish(sensor_markers_);

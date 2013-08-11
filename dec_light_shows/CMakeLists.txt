@@ -23,6 +23,7 @@ add_definitions(${EIGEN_DEFINITIONS})
 rosbuild_add_library(${PROJECT_NAME}
   src/dec_sensor_butterworth_processor.cpp
   src/dec_sensor_decay_processor.cpp
+  src/dec_sensor_rise_processor.cpp
   src/dec_light_processor.cpp
   src/dec_color_processor.cpp
   src/dec_open_loop_light_generator.cpp

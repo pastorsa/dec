@@ -47,14 +47,14 @@ bool DecBrightnessProcessor::update()
   boost::mutex::scoped_try_lock trylock(mutex_);
   for (int i = 0; i < (int)data_->node_led_levels_.size(); ++i)
   {
-    data_->node_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(node_brightness_);
+    data_->node_led_values_(BRIGHTNESS_OFFSET, i) = static_cast<led_channel_t>(node_brightness_);
   }
 
   if (data_->total_num_block_beam_leds_ > 0)
   {
     for (int i = 0; i < (int)data_->block_beam_led_levels_.size(); ++i)
     {
-      data_->block_beam_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(beam_brightness_);
+      data_->block_beam_led_values_(BRIGHTNESS_OFFSET, i) = static_cast<led_channel_t>(beam_brightness_);
     }
   }
 
@@ -62,7 +62,7 @@ bool DecBrightnessProcessor::update()
   {
     for (int i = 0; i < (int)data_->pixel_beam_led_levels_.size(); ++i)
     {
-      data_->pixel_beam_led_values_(ALPHA_OFFSET, i) = static_cast<led_channel_t>(beam_brightness_);
+      data_->pixel_beam_led_values_(BRIGHTNESS_OFFSET, i) = static_cast<led_channel_t>(beam_brightness_);
     }
   }
 
