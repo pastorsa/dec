@@ -24,7 +24,7 @@
   <depend package="dec_udp"/>
 
   <export>
-    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -ldec_light_show_manager -ldec_data -Wl,-rpath,${prefix}/lib"/>
+    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -ldec_light_show_manager -Wl,-rpath,${prefix}/lib"/>
   </export>
 
 </package>
