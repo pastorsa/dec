@@ -125,25 +125,25 @@ bool DecStructure::isUnique()
   }
 
   std::vector<std::pair<unsigned int, unsigned int> > uniqueness_test_vector;
-  for (unsigned int i = 0; i < block_light_beams_.size(); ++i)
-  {
-    for (unsigned int j = 0; j < block_light_beams_[i].getNumComponents(); ++j)
-    {
-      for (unsigned int n = 0; n < uniqueness_test_vector.size(); ++n)
-      {
-        if (((block_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].first)
-            && (block_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].second))
-            || ((block_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].second)
-                && (block_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].first)))
-        {
-          ROS_ERROR("Multiple block beams from >%i< to >%i< contained.",
-                    block_light_beams_[i].nodes_[j].first, block_light_beams_[i].nodes_[j].second);
-          return false;
-        }
-      }
-      uniqueness_test_vector.push_back(block_light_beams_[i].nodes_[j]);
-    }
-  }
+//  for (unsigned int i = 0; i < block_light_beams_.size(); ++i)
+//  {
+//    for (unsigned int j = 0; j < block_light_beams_[i].getNumComponents(); ++j)
+//    {
+//      for (unsigned int n = 0; n < uniqueness_test_vector.size(); ++n)
+//      {
+//        if (((block_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].first)
+//            && (block_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].second))
+//            || ((block_light_beams_[i].nodes_[j].first == uniqueness_test_vector[n].second)
+//                && (block_light_beams_[i].nodes_[j].second == uniqueness_test_vector[n].first)))
+//        {
+//          ROS_ERROR("Multiple block beams from >%i< to >%i< contained.",
+//                    block_light_beams_[i].nodes_[j].first, block_light_beams_[i].nodes_[j].second);
+//          return false;
+//        }
+//      }
+//      uniqueness_test_vector.push_back(block_light_beams_[i].nodes_[j]);
+//    }
+//  }
 
   uniqueness_test_vector.clear();
   for (unsigned int i = 0; i < pixel_light_beams_.size(); ++i)

@@ -80,6 +80,12 @@ private:
                                visualization_msgs::MarkerArray& beam_markers,
                                const std::vector<geometry_msgs::Pose>& poses,
                                const bool forever = false);
+  static void setupBlockBeamMarkers(ros::NodeHandle& node_handle,
+                                 const std::string& namespace_name,
+                                 visualization_msgs::MarkerArray& beam_markers,
+                                 const std::vector<BlockLightBeam>& block_light_beams,
+                                 const std::vector<geometry_msgs::Pose>& poses,
+                                 const bool forever = false);
   static void setupTextMarkers(ros::NodeHandle& node_handle,
                                const std::string& namespace_name,
                                const visualization_msgs::MarkerArray& markers,

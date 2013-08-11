@@ -346,7 +346,8 @@ bool LightBeam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
   length_.clear();
   for (unsigned int i = 0; i < num_leds_.size(); ++i)
   {
-    length_.push_back(static_cast<float>(num_leds_[i]) / static_cast<float>(num_leds_per_meter_));
+    float length = static_cast<float>(num_leds_[i]) / static_cast<float>(num_leds_per_meter_);
+    length_.push_back(length);
   }
 
   poses_.resize(nodes_.size());

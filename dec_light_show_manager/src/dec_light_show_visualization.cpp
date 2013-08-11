@@ -43,7 +43,7 @@ bool DecLightShowVisualization::initialize(boost::shared_ptr<DecLightShowData> l
   }
 
   setupNodeMarkers(node_handle_, "block_nodes", block_light_node_markers_, light_show_data_->block_light_node_positions_);
-  setupBeamMarkers(node_handle_, "block_beams", block_light_beam_markers_, light_show_data_->block_light_beam_poses_);
+  setupBlockBeamMarkers(node_handle_, "block_beams", block_light_beam_markers_, light_show_data_->block_light_beams_, light_show_data_->block_light_beam_poses_);
   setupPixelBeamMarkers(node_handle_, "pixel_beams", pixel_light_beam_markers_, light_show_data_->pixel_light_beams_, light_show_data_->pixel_light_beam_led_poses_);
 
   setupTextMarkers(node_handle_, "node", node_markers_, node_text_markers_, true);
@@ -307,6 +307,33 @@ void DecLightShowVisualization::setupBeamMarkers(ros::NodeHandle& node_handle,
   ROS_DEBUG("Created >%i< >%s< beams.", (int)beam_markers.markers.size(), namespace_name.c_str());
 }
 
+void DecLightShowVisualization::setupBlockBeamMarkers(ros::NodeHandle& node_handle,
+                                                 const std::string& namespace_name,
+                                                 visualization_msgs::MarkerArray& beam_markers,
+                                                 const std::vector<BlockLightBeam>& block_light_beams,
+                                                 const std::vector<geometry_msgs::Pose>& poses,
+                                                 const bool forever)
+{
+  setupBeamMarkers(node_handle, namespace_name, beam_markers, poses, forever);
+
+  std::vector<float> lengths;
+  for (unsigned int i = 0; i < block_light_beams.size(); ++i)
+  {
+    for (unsigned int j = 0; j < block_light_beams[i].getNumComponents(); ++j)
+    {
+      // float length = 1.0f / 60.0f;
+      // lengths.push_back(length);
+      lengths.push_back(block_light_beams[i].length_[j]);
+    }
+  }
+
+  for (unsigned int i = 0; i < poses.size(); ++i)
+  {
+    beam_markers.markers[i].scale.z = lengths[i];
+  }
+}
+
+
 void DecLightShowVisualization::setupPixelBeamMarkers(ros::NodeHandle& node_handle,
                                                       const std::string& namespace_name,
                                                       visualization_msgs::MarkerArray& beam_markers,
@@ -329,8 +356,9 @@ void DecLightShowVisualization::setupPixelBeamMarkers(ros::NodeHandle& node_hand
     {
       for (unsigned int n = 0; n < pixel_light_beams[i].getNumLeds(j); ++n)
       {
-        lengths.push_back(0.05);
-        // lengths.push_back(pixel_light_beams[i].length_[j]);
+        // float length = 1.0f / 60.0f;
+        // lengths.push_back(length);
+        lengths.push_back(pixel_light_beams[i].length_[j]);
       }
     }
   }
