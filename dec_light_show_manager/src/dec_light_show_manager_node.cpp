@@ -22,5 +22,6 @@ int main(int argc, char** argv)
   spinner.start();
   dec_light_show_manager.run();
   spinner.stop();
+
   return 0;
 }

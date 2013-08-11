@@ -19,6 +19,7 @@ using namespace dec_light_show_manager;
 namespace dec_light_shows
 {
 
+
 DecLightProcessor::DecLightProcessor()
   : filter_ring_index_(0),
     filter_size_(0),
@@ -333,6 +334,8 @@ void DecLightProcessor::processPixelBeams()
   if (data_->total_num_pixel_beam_leds_ > 0)
   {
     data_->pixel_beam_led_levels_.setConstant(DecData::BASE_LIGHT_LEVEL);
+#pragma omp parallel num_threads(2)
+#pragma omp for
     for (unsigned int i = 0; i < data_->sensor_levels_.size(); ++i)
     {
       for (unsigned int j = 0; j < data_->pixel_beam_led_levels_.size(); ++j)
