@@ -1,6 +1,6 @@
 SensorLinearDecayProcessor:
   type: "dec_light_shows/DecSensorDecayProcessor"
-  decay_delay_in_seconds: 0.5
+  decay_delay_in_seconds: 0.1
   decay_type: 0
   # options:
   # 0 = linear

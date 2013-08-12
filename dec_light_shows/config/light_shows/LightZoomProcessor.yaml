@@ -1,0 +1,13 @@
+LightWaveProcessor:
+  type: "dec_light_shows/DecLightProcessor"
+  wave_travel_speed: 3.0 # in m/s
+  wave_length: 1.6 # in m
+  wave_travel_distance: 3.0 # in m
+  # 0 = eLINEAR
+  # 1 = eEXP_SIMGA_0
+  # 2 = eEXP_SIMGA_1
+  # 3 = eEXP_SIMGA_2
+  # 4 = eEXP_SIMGA_3
+  profile_type: 0
+  inverse_distance: false
+  random_waves: false

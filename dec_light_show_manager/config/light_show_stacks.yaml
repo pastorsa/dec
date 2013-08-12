@@ -10,24 +10,34 @@
 #  light_shows:
 #    - "SensorProcessor"
 
-### SENSOR ###
+### SENSORS ###
+-
+  name: "SensorLinearRiseProcessorStack"
+  groups: ["SENSOR_RISE"]
+  light_shows:
+    - "SensorLinearRiseProcessor"
 -
   name: "SensorLinearDecayProcessorStack"
-  groups: ["SENSOR"]
+  groups: ["SENSOR_DECAY"]
   light_shows:
     - "SensorLinearDecayProcessor"
 -
   name: "SensorButterworthProcessorStack"
-  groups: ["SENSOR"]
+  groups: ["SENSOR_DECAY", "SENSOR_RISE"]
   light_shows:
     - "SensorButterworthProcessor"
 
 ### LIGHT ###
 -
-  name: "LightProcessorStack"
+  name: "LightInsideOutProcessorStack"
   groups: ["LIGHT"]
   light_shows:
-    - "LightProcessor"
+    - "LightInsideOutProcessor"
+-
+  name: "LightOutsideInProcessorStack"
+  groups: ["LIGHT"]
+  light_shows:
+    - "LightOutsideInProcessor"
 
 ### COLOR ###
 -
@@ -77,6 +87,11 @@
   groups: ["OPEN_LOOP"]
   light_shows:
     - "LightShowPlane3Creator"
+-
+  name: "LightShowIdleOpenLoopStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "Idle"
 
 ### IO
 ### -> RECORDER    
@@ -111,15 +126,8 @@
   groups: ["IO"]
   light_shows:
     - "LightShowPlayer3"
-
-### IDLE
 -
-  name: "IdleOpenLoopStack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "Idle"
--
-  name: "IdleIOStack"
+  name: "LightShowIdleIOStack"
   groups: ["IO"]
   light_shows:
     - "Idle"
@@ -127,7 +135,19 @@
 ### BRIGHTNESS
 -
   name: "BrightnessProcessorStack"
-  groups: ["BRIGHTNESS"]
+  groups: ["AUDIO", "BRIGHTNESS"]
   light_shows:
     - "BrightnessProcessor"
+    
+### AUDIO
+-
+  name: "AudioProcessorStack"
+  groups: ["AUDIO", "BRIGHTNESS"]
+  light_shows:
+    - "AudioProcessor"
+-
+  name: "AudioIdleStack"
+  groups: ["AUDIO"]
+  light_shows:
+    - "Idle"
     

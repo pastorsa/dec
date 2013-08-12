@@ -114,9 +114,12 @@ void DecLightShowPlaneCreator::computeDistance()
       float distance = computeDistance(block_light_node_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        // data_->node_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
-        float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
-        data_->node_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        if (data_->node_led_levels_(j) <= DecData::BASE_LIGHT_LEVEL)
+        {
+          // data_->node_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
+          float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
+          data_->node_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        }
       }
       if (data_->node_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {
@@ -132,9 +135,12 @@ void DecLightShowPlaneCreator::computeDistance()
       float distance = computeDistance(block_light_beam_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        // data_->block_beam_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
-        float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
-        data_->block_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        if (data_->block_beam_led_levels_(j) <= DecData::BASE_LIGHT_LEVEL)
+        {
+          // data_->block_beam_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
+          float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
+          data_->block_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        }
       }
       if (data_->block_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {
@@ -150,9 +156,12 @@ void DecLightShowPlaneCreator::computeDistance()
       float distance = computeDistance(pixel_light_beam_positions_[j], positions_[i], normals_[i]);
       if (distance < max_distance_)
       {
-        // data_->pixel_beam_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
-        float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
-        data_->pixel_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        if (data_->pixel_beam_led_levels_(j) <= DecData::BASE_LIGHT_LEVEL)
+        {
+          // data_->pixel_beam_led_levels_(j) -= DecData::BASE_LIGHT_LEVEL * static_cast<float>((max_distance_ - distance) / max_distance_);
+          float scaled_distance = DecData::MIN_LIGHT_LEVEL + (distance / max_distance_) * DecData::BASE_LIGHT_LEVEL;
+          data_->pixel_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        }
       }
       if (data_->pixel_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
       {

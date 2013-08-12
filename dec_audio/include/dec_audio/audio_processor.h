@@ -67,7 +67,9 @@ public:
   /*!
    * @return True on success, otherwise False
    */
-  bool initialize();
+  bool initialize(bool set_auto_update = true);
+
+  void get(AudioSample& audio_sample);
 
   /*!
    * Register a callback function which will be called every time a new frame is processed are updated
@@ -89,6 +91,12 @@ public:
    * @return
    */
   unsigned int getNumOutputSignals() const;
+
+  unsigned int getNumSelectedOutputSignals() const
+  {
+    ROS_ASSERT(initialized_);
+    return num_selected_output_signals_;
+  }
 
   /*!
    * @param request
@@ -128,6 +136,7 @@ private:
   double timer_update_rate_;
 
   double desired_publishing_rate_;
+  bool publish_audio_sample_;
 
   std::vector<int8_t> audio_buffer_;
   int audio_buffer_size_;
@@ -212,6 +221,8 @@ private:
   void setupOutput();
   void scaleOutput();
   bool initMelFilterBank();
+
+  boost::mutex audio_sample_mutex_;
 
   // Publising visualization markers
   void publishMarkers();

@@ -1,4 +1,4 @@
-/*D
+/*
  * dec_sensor_rise_processor.h
  *
  *  Created on: Jul 14, 2013
@@ -16,8 +16,7 @@ namespace dec_light_shows
 class DecSensorRiseProcessor : public dec_light_show_manager::DecLightShow
 {
 public:
-  DecSensorRiseProcessor()
-  : rise_type_(LINEAR), window_size_(0) {};
+  DecSensorRiseProcessor() : rise_type_(LINEAR), timeout_counts_(0), window_size_(0) {};
   virtual ~DecSensorRiseProcessor() {};
 
   virtual bool initialize(XmlRpc::XmlRpcValue& config);
@@ -34,11 +33,12 @@ private:
   };
   RiseType rise_type_;
 
+  unsigned int timeout_counts_;
+  std::vector<unsigned int> timeout_counter_;
+
   unsigned int window_size_;
   std::vector<unsigned int> indices_;
   std::vector<float> values_;
-
-
 
 };
 

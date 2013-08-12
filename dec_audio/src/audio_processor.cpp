@@ -42,7 +42,7 @@ AudioProcessor::AudioProcessor(ros::NodeHandle node_handle) :
   initialized_(false), node_handle_(node_handle), pcm_handle_(NULL), hw_params_(NULL),
   num_frames_per_period_(0), num_new_frames_per_period_(0), num_new_bytes_per_period_(0),
   num_previous_bytes_read_(0), output_sample_rate_(0), num_channels_(0), timer_update_period_duration_(0.0), timer_update_rate_(0.0),
-  desired_publishing_rate_(0.0), audio_buffer_size_(0), previous_audio_buffer_size_(0), current_audio_buffer_size_(0),
+  desired_publishing_rate_(0.0), publish_audio_sample_(true), audio_buffer_size_(0), previous_audio_buffer_size_(0), current_audio_buffer_size_(0),
   max_device_audio_buffer_size_(0), num_received_frames_(0),
   apply_hamming_window_(false), apply_dct_(false), mel_filter_parameter_a_(0.0), mel_filter_parameter_b_(0.0),
   num_output_signals_(0), fftw_input_(NULL), fftw_out_(NULL), fftw_plan_(), dctw_input_(NULL), dctw_output_(NULL), dctw_plan_(),
@@ -69,7 +69,7 @@ AudioProcessor::~AudioProcessor()
   }
 }
 
-bool AudioProcessor::initialize()
+bool AudioProcessor::initialize(bool set_auto_update)
 {
   ROS_VERIFY(readParams());
 
@@ -139,7 +139,11 @@ bool AudioProcessor::initialize()
   ROS_INFO("Setting update timer period to >%.2f< ms, i.e. >%.2f< Hz.", timer_update_period_duration_ * 1000, timer_update_rate_);
   min_freq_ = 0.97 * timer_update_rate_;
   max_freq_ = 1.03 * timer_update_rate_;
-  update_timer_ = node_handle_.createTimer(ros::Duration(timer_update_period_duration_), &AudioProcessor::updateCB,this);
+
+  if (set_auto_update)
+  {
+    update_timer_ = node_handle_.createTimer(ros::Duration(timer_update_period_duration_), &AudioProcessor::updateCB, this);
+  }
 
   int16_t aux = 0;
   cb_.reset(new CircularMessageBuffer<int16_t>(DUMP_RAW_AUDIO_BUFFER_SIZE, aux));
@@ -396,22 +400,33 @@ unsigned int AudioProcessor::getNumOutputSignals() const
   return num_output_signals_;
 }
 
+void AudioProcessor::get(AudioSample& audio_sample)
+{
+  boost::mutex::scoped_lock lock(audio_sample_mutex_);
+  ROS_ASSERT(audio_sample.data.size() == audio_sample_->data.size());
+  for (unsigned int i = 0; i < audio_sample_->data.size(); ++i)
+  {
+    audio_sample.data[i] = audio_sample_->data[i];
+    ROS_INFO("Audio: %.2f", audio_sample_->data[i]);
+  }
+}
+
 void AudioProcessor::updateCB(const ros::TimerEvent& timer_event)
 {
-  if(!initialized_)
-  {
-    // publish zeros because audio processor was not or failed to initialize
-    audio_sample_->header.stamp = ros::Time::now();
-    audio_sample_->header.seq = frame_count_;
-    frame_count_++;
-    ROS_DEBUG_COND(frame_count_ % 100 == 0, "Publishing zeros because audio processor is either not initialized or failed to initialize.");
-    for (unsigned int i = 0; i < num_selected_output_signals_; ++i)
-    {
-      audio_sample_->data[i] = 0.0;
-    }
-    audio_sample_publisher_.publish(audio_sample_);
-    return;
-  }
+//  if(!initialized_)
+//  {
+//    // publish zeros because audio processor was not or failed to initialize
+//    audio_sample_->header.stamp = ros::Time::now();
+//    audio_sample_->header.seq = frame_count_;
+//    frame_count_++;
+//    ROS_DEBUG_COND(frame_count_ % 100 == 0, "Publishing zeros because audio processor is either not initialized or failed to initialize.");
+//    for (unsigned int i = 0; i < num_selected_output_signals_; ++i)
+//    {
+//      audio_sample_->data[i] = 0.0;
+//    }
+//    audio_sample_publisher_.publish(audio_sample_);
+//    return;
+//  }
 
   // Make the call to capture the audio
   int pcm_rc = 0;
@@ -552,7 +567,7 @@ void AudioProcessor::updateCB(const ros::TimerEvent& timer_event)
   //  background_noise_mutex_.unlock();
 
   frame_count_++;
-  diagnostic_updater_.update();
+  // diagnostic_updater_.update();
 }
 
 void AudioProcessor::setupBuffer()
@@ -674,12 +689,15 @@ void AudioProcessor::processFrame()
   audio_sample_->header.stamp = now_time_;
   audio_sample_->header.seq = frame_count_;
   unsigned int index = 0;
+
+  boost::mutex::scoped_lock lock(audio_sample_mutex_);
   for (unsigned int i = output_start_index_; i < output_end_index_; ++i)
   {
     audio_sample_->data[index] = output_signal_spectrum_(i);
     index++;
   }
-  audio_sample_publisher_.publish(audio_sample_);
+  if(publish_audio_sample_)
+    audio_sample_publisher_.publish(audio_sample_);
 
 //  boost::mutex::scoped_lock lock(callback_mutex_);
 //  if (recording_ && user_callback_enabled_)
@@ -924,6 +942,8 @@ bool AudioProcessor::readParams()
   ROS_VERIFY(dec_utilities::read(node_handle_, "desired_publishing_rate", desired_publishing_rate_));
   ROS_ASSERT(desired_publishing_rate_ > 1.0);
   // ROS_ASSERT(desired_publishing_rate_ < 200.0);
+
+  ROS_VERIFY(dec_utilities::read(node_handle_, "publish_audio_sample", publish_audio_sample_));
 
   //  ROS_VERIFY(dec_utilities::read(node_handle_, "num_overlapping_frames", num_overlapping_frames_));
   //  ROS_ASSERT(num_overlapping_frames_ < (int)num_frames_per_period_);

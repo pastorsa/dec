@@ -55,6 +55,7 @@ bool DecSensorDecayProcessor::initialize(XmlRpc::XmlRpcValue& config)
     }
   }
   values_[window_size_ - 1] = 0.0;
+
   return true;
 }
 
@@ -73,16 +74,19 @@ bool DecSensorDecayProcessor::update()
   for (unsigned int i = 0; i < data_->sensor_values_.size(); ++i)
   {
     ROS_ASSERT(data_->sensor_values_[i] != 0 || data_->sensor_values_[i] != 1);
-    if (data_->sensor_values_[i] == 1)
+    if (data_->sensor_values_[i] == DecData::SENSOR_LOW)
+    {
+      // assign level
+      data_->sensor_levels_[i] = values_[indices_[i]];
+      // increment indices
+      if (indices_[i] < window_size_ - 1)
+      {
+        indices_[i]++;
+      }
+    }
+    else
     {
       indices_[i] = 0;
-    }
-    // assign level
-    data_->sensor_levels_[i] = values_[indices_[i]];
-    // increment indices
-    if (indices_[i] < window_size_ - 1)
-    {
-      indices_[i]++;
     }
   }
   return true;

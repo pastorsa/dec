@@ -44,6 +44,9 @@ public:
   static const float MAX_LIGHT_LEVEL = 1.0f;
   static const float MIN_LIGHT_LEVEL = 0.0f;
 
+  static const uint8_t SENSOR_HIGH = 1;
+  static const uint8_t SENSOR_LOW = 0;
+
 #ifdef DEC_EXTRA
   friend class DecLightShowVisualization;
   friend class DecLightShowSimulation;

@@ -2,12 +2,18 @@
 
   <arg name="dec_light_show_dir" value="$(find dec_light_shows)"/>
 
+  <group ns="/DecLightShowManager/Audio">
+    <rosparam command="load" file="$(find dec_audio)/config/audio_processor.yaml" />
+  </group>
+
   <group ns="/DecLightShowManager/light_shows">
 
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorButterworthProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearDecayProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearRiseProcessor.yaml" />
 
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightInsideOutProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightOutsideInProcessor.yaml" />
 
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBlackWhiteProcessor.yaml" />
@@ -35,6 +41,8 @@
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer3.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer4.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer5.yaml" />
+
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/AudioProcessor.yaml" />
   
   </group>
 

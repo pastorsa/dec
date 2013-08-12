@@ -12,6 +12,12 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecSensorRiseProcessor" type="dec_light_shows::DecSensorRiseProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Processes sensors rise 
+    </description>
+  </class>
+
   <class name="dec_light_shows/DecLightProcessor" type="dec_light_shows::DecLightProcessor" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
       Processes lights
