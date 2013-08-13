@@ -1,0 +1,3 @@
+[ ] setup structure.yaml (sensor + node lights +...)
+[ ] install tethereal on dem
+[ ] 
