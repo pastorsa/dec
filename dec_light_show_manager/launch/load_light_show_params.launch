@@ -21,6 +21,8 @@
     
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopLightGenerator.yaml" />
 
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/TestLightGenerator.yaml" />
+    
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/BrightnessProcessor.yaml" />
     
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowBallCreator.yaml" />

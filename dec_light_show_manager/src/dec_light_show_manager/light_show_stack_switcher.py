@@ -17,7 +17,7 @@ class LightShowStackSwitcher:
         [light_show_stacks, active_light_show_stacks], result = self.get_stacks() 
         self.current_light_show_stack = light_show_stacks
         self.current_active_light_show_stack = active_light_show_stacks
-        self.brightness_publisher = rospy.Publisher('//DecLightShowManager/BrightnessProcessor/command', Brightness)
+        self.brightness_publisher = rospy.Publisher('/DecLightShowManager/BrightnessProcessor/command', Brightness)
 
     def get_stacks(self):
         ''' List stacks. Returns True on success and False on failure. '''

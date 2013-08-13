@@ -150,8 +150,8 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
       // print(setup_data);
       parseSensorData(_rx_buffer, &setup_data);
       received_sensor_data_[node_id] = _sensor_data;
-      printf("Received data for node >%i< \n", node_id);
-      printData();
+      // printf("Received data for node >%i< \n", node_id);
+      // printData();
     }
     else
     {

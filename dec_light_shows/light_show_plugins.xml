@@ -76,4 +76,10 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecTestLightGenerator" type="dec_light_shows::DecTestLightGenerator" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Test light generator
+    </description>
+  </class>
+
 </library>

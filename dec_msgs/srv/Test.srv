@@ -1,0 +1,6 @@
+dec_msgs/LightShowFrame frame
+---
+dec_msgs/LightShowFrame frame
+int32 result
+int32 SUCCEEDED=1
+int32 FAILED=0

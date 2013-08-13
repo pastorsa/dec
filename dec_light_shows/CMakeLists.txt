@@ -36,6 +36,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_idle.cpp
   src/dec_audio_processor.cpp
   src/dec_brightness_processor.cpp
+  src/dec_test_light_generator.cpp
 )
 rosbuild_add_openmp_flags(${PROJECT_NAME})
 

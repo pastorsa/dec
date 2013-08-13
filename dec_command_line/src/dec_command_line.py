@@ -9,7 +9,8 @@ from dec_msgs.msg import Object
 import dec_msgs.msg
 import roslib.packages
 from dec_world_state.world_state import WorldState
-from dec_light_show_manager.light_show_stack_switcher import LightShowStackSwitcher
+from dec_command_line.light_show_stack_switcher import LightShowClient
+from dec_command_line.test_light_show_client import TestLightShowClient
 from visualization_msgs.msg import Marker
 from tf import transformations
 import os
@@ -30,7 +31,7 @@ def main():
   global world_state
   world_state = WorldState()
   global light_show
-  light_show = LightShowStackSwitcher()
+  light_show = LightShowClient()
   global object_poses
   object_poses = world_state.object_poses
 
@@ -39,7 +40,7 @@ def main():
 
 def light_show_cmd():
     os.system('clear')
-    light_show.list_stacks()
+    light_show.listStacks()
     stack_selection = True
     while stack_selection:
         s = raw_input("Enter stack id:")
@@ -47,7 +48,7 @@ def light_show_cmd():
         try:
             id = int(s)
         except ValueError:
-            light_show.list_stacks()
+            light_show.listStacks()
             print "ERROR: invalid input >%s<" % s
             continue   
         os.system('clear')

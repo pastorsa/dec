@@ -93,6 +93,14 @@
   light_shows:
     - "Idle"
 
+    
+### TEST
+-
+  name: "TestLightGeneratorStack"
+  groups: ["OPEN_LOOP", "LIGHT"]
+  light_shows:
+    - "TestLightGenerator"
+
 ### IO
 ### -> RECORDER    
 -

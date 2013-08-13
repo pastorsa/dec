@@ -1,0 +1,2 @@
+TestLightGenerator:
+  type: "dec_light_shows/DecTestLightGenerator"
