@@ -176,8 +176,8 @@ bool AudioProcessor::initializeAudio()
     ROS_ERROR("Unable to open pcm device %s.", snd_strerror(rc));
     ROS_WARN("Maybe you need to change the card and device id.");
     ROS_WARN("Use \"sudo arecord -l\" to list sound cards and devices.");
-    sound_card_id = 1;
-    device_id = 0;
+    sound_card_id = 0;
+    device_id = 2;
     ROS_WARN("Trying default settings for mandy (card: >%i< device: >%i<).", sound_card_id, device_id);
     hw_description.assign("hw:" + dec_utilities::getString(sound_card_id) + "," + dec_utilities::getString(device_id));
     rc = snd_pcm_open(&pcm_handle_, hw_description.c_str(), SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK);
