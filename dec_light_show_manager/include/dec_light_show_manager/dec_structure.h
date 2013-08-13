@@ -162,6 +162,8 @@ protected:
 
 private:
 
+  std::vector<uint8_t> teensy_to_net_map_;
+
   std::vector<unsigned int> num_block_node_leds_per_teensy_;
   std::vector<unsigned int> num_block_beam_leds_per_teensy_;
 

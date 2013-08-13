@@ -11,6 +11,9 @@ visualization_mode: true
 # list_of_teensys_to_exclude_from_communication: [0, 1, 2, 3, 4, 5, 6]
 list_of_teensys_to_exclude_from_communication: [0, 1, 2, 3, 4, 5, 6]
 
+# Which teensy is on which net (connected to which switch)
+teensy_to_net_map: [0, 0, 0, 0, 1, 1, 1]
+
 # Number of teensys in the structure (limited to 255)
 # number_of_teensys: 1
 

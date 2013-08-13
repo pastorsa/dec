@@ -21,8 +21,9 @@ int main(int argc, char** argv)
 
   const int NUM_NODES = 1;
   // int node_id = 1;
+  std::vector<uint8_t> nets(1, 1);
 
-  dec_udp::DecInterface dec_interface(NUM_NODES);
+  dec_udp::DecInterface dec_interface(NUM_NODES, nets);
 
   // if(!dec_interface.sendSetupData(node_id))
   {

@@ -57,7 +57,19 @@ bool DecStructure::initialize(ros::NodeHandle& node_handle)
   setupTeensyMap();
   ROS_VERIFY(isUnique());
 
-  dec_interface_.reset(new dec_udp::DecInterface((uint8_t)number_of_teensys_));
+  std::vector<unsigned int> teensy_to_net_map;
+  ROS_VERIFY(dec_utilities::read(node_handle, "teensy_to_net_map", teensy_to_net_map));
+  ROS_ASSERT_MSG(teensy_to_net_map.size() == number_of_teensys_, "Number of Teensys >%i< must correspond to number of nets specified >%i<.",
+                 (int)number_of_teensys_, (int)teensy_to_net_map.size());
+  teensy_to_net_map_.clear();
+  for (unsigned int i = 0; i < teensy_to_net_map.size(); ++i)
+  {
+    ROS_ASSERT_MSG(teensy_to_net_map[i] <= 255, "Teensy net specified for Teensy >%i< is invalid >%i<.", (int)i, (int)teensy_to_net_map[i]);
+    uint8_t net = static_cast<uint8_t>(teensy_to_net_map[i]);
+    teensy_to_net_map_.push_back(net);
+  }
+
+  dec_interface_.reset(new dec_udp::DecInterface((uint8_t)number_of_teensys_, teensy_to_net_map_));
   dec_interface_light_data_.resize((size_t)number_of_teensys_);
   //  for (unsigned int i = 0; i < dec_interface_setup_data_.size(); ++i)
   //  {

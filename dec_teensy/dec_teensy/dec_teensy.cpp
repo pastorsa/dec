@@ -50,8 +50,8 @@
 // =======================================================================================
 // =======================================================================================
 
-static const uint8_t IPAddr[4] = {10, 0, 0, NODE_ID};
-static uint8_t MACAddr[6] = {0x0, 0x0, 0x0, 0x0, 0x0, NODE_ID_HEX};
+static const uint8_t IPAddr[4] = {10, 0, NODE_NET, NODE_ID};
+static uint8_t MACAddr[6] = {0x0, 0x0, 0x0, 0x0, NODE_NET_HEX, NODE_ID_HEX};
 static const uint8_t node_id = (uint8_t)NODE_ID - 1;
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
@@ -76,7 +76,7 @@ void setupPins(const setup_data_t* setup_data)
     // Initialize all pixels to 'red'
     for (uint16_t j = 0; j < light_strips[i].numPixels(); ++j)
     {
-      light_strips[i].setPixelColor(j, (uint8_t)255, (uint8_t)0, (uint8_t)0);
+      light_strips[i].setPixelColor(j, (uint8_t)5, (uint8_t)0, (uint8_t)0);
     }
   }
 
@@ -241,54 +241,6 @@ void loop()
                                                       _light_data.block_leds[i].blue);
                     }
                   }
-
-//                  pixel_count = 0;
-//                  pixel_segment = 0;
-//                  for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
-//                  {
-//                    uint8_t pin = _setup_data.pixel_leds[i].pin;
-//                    uint8_t index = _setup_data.pixel_leds[i].index;
-//                    uint8_t num = index + _setup_data.pixel_leds[i].num_pixels;
-//                    if (pixel_count == 0)
-//                    {
-//                      pixel_segment = pin;
-//                      pixel_start = index;
-//                    }
-//                    for (uint8_t j = index; j < num; ++j)
-//                    {
-//                      red_buffer[j] = _light_data.pixel_leds[i].red[j];
-//                      green_buffer[j] = _light_data.pixel_leds[i].green[j];
-//                      blue_buffer[j] = _light_data.pixel_leds[i].blue[j];
-//                      pixel_count++;
-//                    }
-//
-//                    if (i+1 < _setup_data.num_pixel_leds)
-//                    {
-//                      // next segment is on the next pin
-//                      if(pixel_segment != _setup_data.pixel_leds[i+1].pin)
-//                      {
-//                        pixel_count = 0;
-//                        for (uint8_t j = pixel_start; j < pixel_count; ++j)
-//                        {
-//                          light_strips[pin].setPixelColor((uint16_t)j,
-//                                                          red_buffer[j],
-//                                                          green_buffer[j],
-//                                                          blue_buffer[j]);
-//                        }
-//                      }
-//                    }
-//                    else // last segment
-//                    {
-//                      pixel_count = 0;
-//                      for (uint8_t j = pixel_start; j < pixel_count; ++j)
-//                      {
-//                        light_strips[pin].setPixelColor((uint16_t)j,
-//                                                        red_buffer[j],
-//                                                        green_buffer[j],
-//                                                        blue_buffer[j]);
-//                      }
-//                    }
-//                  }
 
                   for (uint8_t i = 0; i < _setup_data.num_pixel_leds; ++i)
                   {

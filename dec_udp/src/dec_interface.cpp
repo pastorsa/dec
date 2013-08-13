@@ -14,11 +14,20 @@
 namespace dec_udp
 {
 
-DecInterface::DecInterface(const uint8_t num_sockets)
+DecInterface::DecInterface(const uint8_t num_sockets, std::vector<uint8_t>& nets)
 {
-  for (uint8_t i = 0; i < num_sockets; ++i )
+  assert((unsigned int)num_sockets == nets.size());
+
+  for (uint8_t i = 0; i < num_sockets; ++i)
   {
-    boost::shared_ptr<UDPSocket> udp_socket(new UDPSocket(SERVER_IP_ADDRESS, SERVER_PORT + i));
+    std::string base_ip = BASE + boost::lexical_cast<std::string>((int)nets[i]) + "." + boost::lexical_cast<std::string>((int)i + 1);
+    printf("base_ip %s\n", base_ip.c_str());
+    base_ip_addresses_.push_back(base_ip);
+    std::string server_ip = BASE + boost::lexical_cast<std::string>((int)nets[i]) + "." + SERVER;
+    server_ip_addresses_.push_back(server_ip);
+    printf("server_ip %s\n", server_ip.c_str());
+
+    boost::shared_ptr<UDPSocket> udp_socket(new UDPSocket(server_ip, SERVER_PORT + i));
     assert(udp_socket->setNonBlocking());
     printf("Created socket at %s:%i\n", udp_socket->getLocalAddress().c_str(), udp_socket->getLocalPort());
     udp_sockets_.push_back(udp_socket);
@@ -73,13 +82,10 @@ bool DecInterface::sendSetupData(const uint8_t node_id, const setup_data_t& setu
   generateSetupData(_rx_buffer);
   printData();
 
-  const int IP_FROM_NODE = node_id + 1;
-  std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
-
-  printf("Sending >%i< bytes of setup data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
+  printf("Sending >%i< bytes of setup data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, base_ip_addresses_[node_id].c_str(), (int)FOREIGN_PORT);
+  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, base_ip_addresses_[node_id], FOREIGN_PORT) != _rx_buffer_length)
   {
-    printf("Problems when sending setup data to node id >%i< to >%s:%i<.\n", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
+    printf("Problems when sending setup data to node id >%i< to >%s:%i<.\n", node_id, base_ip_addresses_[node_id].c_str(), (int)FOREIGN_PORT);
     return false;
   }
 
@@ -95,7 +101,7 @@ bool DecInterface::sendSetupData(const uint8_t node_id, const setup_data_t& setu
     return false;
   }
 
-  if(source_address.compare(foreign_address) != 0)
+  if(source_address.compare(base_ip_addresses_[node_id]) != 0)
   {
     printf("Missed sensor packet from node with id >%i<.\n", node_id);
     return false;
@@ -118,15 +124,11 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   // printf("Generating light data for node >%i<.\n", node_id);
   generateLightData(_rx_buffer, &light_data);
   // printData();
-
   // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
-  const int IP_FROM_NODE = node_id + 1;
-  std::string foreign_address = BASE_IP_ADDRESS + boost::lexical_cast<std::string>((int)IP_FROM_NODE);
-
   // printf("Sending >%i< bytes of light data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, foreign_address, FOREIGN_PORT) != _rx_buffer_length)
+  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, base_ip_addresses_[node_id], FOREIGN_PORT) != _rx_buffer_length)
   {
-    printf("Problems when sending light data to node id >%i< to >%s:%i<.\n", node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
+    printf("Problems when sending light data to node id >%i< to >%s:%i<.\n", node_id, base_ip_addresses_[node_id].c_str(), (int)FOREIGN_PORT);
     return false;
   }
 
@@ -143,7 +145,7 @@ bool DecInterface::sendLightData(const int node_id, const light_data_t& light_da
   }
   else
   {
-    if(source_address.compare(foreign_address) == 0)
+    if(source_address.compare(base_ip_addresses_[node_id]) == 0)
     {
       // printf("Return code of node %i is %i.\n", node_id, return_code);
       _rx_buffer_length = (uint16_t)return_code;
