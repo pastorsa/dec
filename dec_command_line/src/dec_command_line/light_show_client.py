@@ -42,14 +42,14 @@ class LightShowClient:
         for i, option_description in enumerate(options):
             print "[%i] %s" % (i, option_description)
         
-        option = self.getInput(prompt = "Enter option:", min = 0, max = len(options))        
+        option = self.getInput(prompt = "Enter option", min = 0, max = len(options), default = 0)        
 
         if option == 0:
             min = 0
             max = len(current_light_show_frame.block_node_levels)
-            node_id = self.getInput("Enter node id between " + str(min) + " and " + str(max) + ":", min, max + 1)
+            node_id = self.getInput("Enter node id between " + str(min) + " and " + str(max) + "", min, max + 1, default = 0)
             max = 100
-            node_level = self.getInput("Enter node level between " + str(min) + " and " + str(max) + ":", min, max + 1)
+            node_level = self.getInput("Enter node level between " + str(min) + " and " + str(max) + "", min, max + 1, default = 100)
             list_current = list(current_light_show_frame.block_node_levels)
             list_current[node_id] = node_level / 100.0 
             current_light_show_frame.block_node_levels = tuple(list_current)
@@ -60,13 +60,13 @@ class LightShowClient:
         if option == 1:
             min = 0
             max = len(current_light_show_frame.block_node_levels) - 1
-            start_node_id = self.getInput("Enter start node id between " + str(min) + " and " + str(max) + ":", min, max + 1)
+            start_node_id = self.getInput("Enter start node id between " + str(min) + " and " + str(max) + "", min, max + 1, default = 0)
             min = start_node_id
             max = len(current_light_show_frame.block_node_levels)
-            end_node_id = self.getInput("Enter end node id between " + str(min) + " and " + str(max) + ":", min, max + 1)
+            end_node_id = self.getInput("Enter end node id between " + str(min) + " and " + str(max) + "", min, max + 1, default = max)
             min = 0
             max = 100
-            node_level = self.getInput("Enter node level between " + str(min) + " and " + str(max) + ":", min, max + 1)
+            node_level = self.getInput("Enter node level between " + str(min) + " and " + str(max) + "", min, max + 1, default = 100)
             list_current = list(current_light_show_frame.block_node_levels)
             for i in range(start_node_id, end_node_id):
                 list_current[i] = node_level / 100.0 
@@ -78,7 +78,7 @@ class LightShowClient:
         if option == 2:
             min = 0
             max = 100
-            node_level = self.getInput("Enter node level between " + str(min) + " and " + str(max) + ":", min, max + 1)
+            node_level = self.getInput("Enter node level between " + str(min) + " and " + str(max) + "", min, max + 1, default = 100)
             list_current = list(current_light_show_frame.block_node_levels)
             for i in range(0, len(current_light_show_frame.block_node_levels)):
                 list_current[i] = node_level / 100.0 
@@ -88,17 +88,21 @@ class LightShowClient:
                 print "Problem when setting node level."
             os.system('clear')
 
-    def getInput(self, prompt, min, max):
+    def getInput(self, prompt, min, max, default):
         done = False
         input = 0
         while not done:
-            s = raw_input(prompt)
+            s = raw_input(prompt + " [" + str(default) + "]:")            
             try:
+                if s == "":
+                    input = default
+                    done = True
+                    continue
                 input = int(s)
                 if input >= min and input < max:
                     done = True
                 else:
-                   print "Input out of range [%i..%i]." %(min, max-1)
+                    print "Input out of range [%i..%i]." %(min, max-1)
             except ValueError:
                 print "ERROR: invalid input >%s<. Enter number between [%i..%i]." %(s, min, max-1)
                 continue

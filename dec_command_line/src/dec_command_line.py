@@ -9,8 +9,7 @@ from dec_msgs.msg import Object
 import dec_msgs.msg
 import roslib.packages
 from dec_world_state.world_state import WorldState
-from dec_command_line.light_show_stack_switcher import LightShowClient
-from dec_command_line.test_light_show_client import TestLightShowClient
+from dec_command_line.light_show_client import LightShowClient
 from visualization_msgs.msg import Marker
 from tf import transformations
 import os

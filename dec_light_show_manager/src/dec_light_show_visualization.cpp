@@ -195,17 +195,107 @@ void DecLightShowVisualization::setupTextMarkers(ros::NodeHandle& node_handle,
     marker.id = i;
     marker.text = namespace_name + "_" + boost::lexical_cast<std::string>(markers.markers[i].id);
 
-    marker.scale.x = 0.3;
-    marker.scale.y = 0.3;
-    marker.scale.z = 0.07;
+    geometry_msgs::Vector3 scale;
+    scale.x = 0.3;
+    scale.y = 0.3;
+    scale.z = 0.07;
+
+    std_msgs::ColorRGBA color;
+    color.r = 1.0;
+    color.g = 1.0;
+    color.b = 1.0;
+    color.a = 1.0;
+
+    float x_offset = marker.text.length() * 0.026f;
+    float y_offset = 0.0f;
+    float z_offset = 0.0f;
+
+    if (namespace_name.compare("node") == 0)
+    {
+      scale.x = 0.6;
+      scale.y = 0.6;
+      scale.z = 0.12;
+      color.r = 0.2;
+      color.g = 1.0;
+      color.b = 0.2;
+      color.a = 1.0;
+      x_offset = 0.0f;
+      z_offset = 0.1f;
+    }
+    else if (namespace_name.compare("beam") == 0)
+    {
+      scale.x = 0.6;
+      scale.y = 0.6;
+      scale.z = 0.12;
+      color.r = 1.0;
+      color.g = 0.2;
+      color.b = 0.2;
+      color.a = 1.0;
+      x_offset = 0.0f;
+      y_offset = 0.0f;
+      z_offset = 0.0f;
+    }
+    else if (namespace_name.compare("block_node") == 0)
+    {
+      scale.x = 0.6;
+      scale.y = 0.6;
+      scale.z = 0.12;
+      color.r = 0.2;
+      color.g = 0.2;
+      color.b = 1.0;
+      color.a = 1.0;
+      x_offset = 0.0f;
+      y_offset = 0.0f;
+      z_offset = -0.17f;
+    }
+    else if (namespace_name.compare("block_beam") == 0)
+    {
+      scale.x = 0.6;
+      scale.y = 0.6;
+      scale.z = 0.12;
+      color.r = 0.9;
+      color.g = 0.9;
+      color.b = 0.2;
+      color.a = 1.0;
+      x_offset = 0.0f;
+      y_offset = 0.0f;
+      z_offset = 0.0f;
+    }
+    else if (namespace_name.compare("sensor") == 0)
+    {
+      scale.x = 0.6;
+      scale.y = 0.6;
+      scale.z = 0.12;
+      color.r = 0.0;
+      color.g = 1.0;
+      color.b = 1.0;
+      color.a = 1.0;
+      x_offset = 0.0f;
+      y_offset = 0.0f;
+      z_offset = 0.0f;
+    }
+    else if (namespace_name.compare("avg_sensors") == 0)
+    {
+      scale.x = 0.6;
+      scale.y = 0.6;
+      scale.z = 0.12;
+      color.r = 0.0;
+      color.g = 1.0;
+      color.b = 1.0;
+      color.a = 1.0;
+      x_offset = 0.0f;
+      y_offset = 0.0f;
+      z_offset = 0.0f;
+    }
+
+    marker.scale = scale;
+    marker.color = color;
 
     marker.pose.position = markers.markers[i].pose.position;
-    marker.pose.position.x += (double)(marker.text.length() * 0.026);
+    marker.pose.position.x += x_offset;
+    marker.pose.position.y += y_offset;
+    marker.pose.position.z += z_offset;
 
-    marker.color.r = 1.0;
-    marker.color.g = 1.0;
-    marker.color.b = 1.0;
-    marker.color.a = 1.0;
     text_markers.markers.push_back(marker);
   }
 }
