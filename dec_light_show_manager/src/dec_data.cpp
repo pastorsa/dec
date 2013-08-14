@@ -325,7 +325,6 @@ bool DecData::copySensorInformationFromStructure()
 bool DecData::copyLightDataToStructure()
 {
 
-
   for (unsigned int i = 0; i < light_node_leds_to_teensy_map_.size(); ++i)
   {
     const uint8_t TEENSY_ID = static_cast<uint8_t>(light_node_leds_to_teensy_map_[i].first);
