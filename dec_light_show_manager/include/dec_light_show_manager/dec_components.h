@@ -146,7 +146,8 @@ public:
   virtual ~Beam() {};
 
   virtual bool initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
-                          const std::vector<geometry_msgs::Point>& node_positions);
+                          const std::vector<geometry_msgs::Point>& node_positions,
+                          const float center = 0.5f);
 
   std::vector<std::pair<unsigned int, unsigned int> > nodes_;
 
@@ -154,7 +155,7 @@ protected:
 
   void setPoses(const unsigned int local_index,
                 const std::vector<geometry_msgs::Point>& node_positions,
-                const float center = 0.5);
+                const float center = 0.5f);
 private:
 
 };

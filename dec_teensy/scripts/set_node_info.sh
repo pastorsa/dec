@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo "Node id must start at 1"
+echo "Net must be either 0 or 1"
+
+echo "Setting node id to $1 and net to $2"
+
 # fuerte
 source ${ROS_ROOT}/../rosbash/rosbash
 roscd dec_teensy/dec_teensy

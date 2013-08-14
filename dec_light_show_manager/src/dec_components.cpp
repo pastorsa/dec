@@ -180,7 +180,8 @@ bool Node::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id)
 // ===================================================================
 
 bool Beam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
-                      const std::vector<geometry_msgs::Point>& node_positions)
+                      const std::vector<geometry_msgs::Point>& node_positions,
+                      const float center)
 {
   ROS_VERIFY(read(config, "nodes", nodes_));
   ROS_ASSERT(nodes_.size() > 0);
@@ -197,7 +198,7 @@ bool Beam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
   poses_.resize(nodes_.size());
   for (unsigned int i = 0; i < nodes_.size(); ++i)
   {
-    setPoses(i, node_positions, 0.5);
+    setPoses(i, node_positions, center);
   }
 
   Component::setIds(id);
@@ -236,7 +237,8 @@ void Beam::setPoses(const unsigned int local_index,
 bool Sensor::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
                         const std::vector<geometry_msgs::Point>& node_positions)
 {
-  ROS_VERIFY(Beam::initialize(config, id, node_positions));
+  const float HALF_BEAM_LENGHT = 0.25f; // center is at the first half of the beam
+  ROS_VERIFY(Beam::initialize(config, id, node_positions, HALF_BEAM_LENGHT));
   ROS_VERIFY(Connector::initialize(config));
 
   setAvgPose();

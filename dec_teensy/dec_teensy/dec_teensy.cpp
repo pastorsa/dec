@@ -201,7 +201,8 @@ void loop()
                 {
                   // parse setup data and setup teensy
                   parseSetupData(buffer_ptr);
-                  setupPins(&_setup_data);
+                  if (!is_setup)
+                    setupPins(&_setup_data);
                   UDP_Send(_rx_buffer, ip_header_length, _rx_buffer_length, ModeReply);
                   is_setup = 1;
                 }
