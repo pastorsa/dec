@@ -1,9 +1,29 @@
 #!/bin/bash
 
-echo "Node id must start at 1"
-echo "Net must be either 0 or 1"
+if [ $# -ne 2 ]
+then
+  echo "Usage: `basename $0` <net> <node_id>"
+  exit -1
+fi
 
-echo "Setting node id to $1 and net to $2"
+if [ "$1" != "0" ] && [ "$1" != "1" ]
+then
+  echo "ERROR: Net must be either 0 or 1"
+  echo "ERROR: Net must be either 0 or 1"
+  echo "ERROR: Net must be either 0 or 1"
+  echo "ERROR: Net must be either 0 or 1"
+  exit -1
+fi
+
+if [ "$2" != "1" ] && [ "$2" != "2" ] && [ "$2" != "3" ] && [ "$2" != "4" ] && [ "$2" != "5" ] && [ "$2" != "6" ] && [ "$2" != "7" ] && [ "$2" != "8" ]
+then
+  echo "ERROR: Node id must be within 1..8"
+  echo "ERROR: Node id must be within 1..8"
+  echo "ERROR: Node id must be within 1..8"
+  echo "ERROR: Node id must be within 1..8"
+  exit -1
+fi
+
 
 # fuerte
 source ${ROS_ROOT}/../rosbash/rosbash
@@ -13,11 +33,14 @@ FILENAME=node_info.h
 
 echo "#ifndef NODE_INDE_H_" > $FILENAME
 echo "#define NODE_INDE_H_" >> $FILENAME
-
-echo "#define NODE_ID $1" >> $FILENAME
-echo "#define NODE_ID_HEX 0x0$1" >> $FILENAME
-
-echo "#define NODE_NET $2" >> $FILENAME
-echo "#define NODE_NET_HEX 0x0$2" >> $FILENAME
-
+echo "" >> $FILENAME
+echo "// Setting ip to 10.0.$1.$2" >> $FILENAME
+echo "" >> $FILENAME
+echo "#define NODE_ID $2" >> $FILENAME
+echo "#define NODE_ID_HEX 0x0$2" >> $FILENAME
+echo "" >> $FILENAME
+echo "#define NODE_NET 0x0$1" >> $FILENAME
+echo "" >> $FILENAME
 echo "#endif" >> $FILENAME
+
+echo "`cat node_info.h`"

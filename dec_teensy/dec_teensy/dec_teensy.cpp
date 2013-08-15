@@ -51,7 +51,7 @@
 // =======================================================================================
 
 static const uint8_t IPAddr[4] = {10, 0, NODE_NET, NODE_ID};
-static uint8_t MACAddr[6] = {0x0, 0x0, 0x0, 0x0, NODE_NET_HEX, NODE_ID_HEX};
+static uint8_t MACAddr[6] = {0x0, 0x0, 0x0, 0x0, 0x0, NODE_ID_HEX};
 // static const uint8_t node_id = (uint8_t)NODE_ID - 1;
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
