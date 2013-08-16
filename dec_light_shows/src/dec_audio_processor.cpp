@@ -34,6 +34,9 @@ bool DecAudioProcessor::initialize(XmlRpc::XmlRpcValue& config)
   const int SUBSCRIBER_BUFFER_SIZE = 1;
   audio_sub_ = data_->node_handle_.subscribe("/AudioProcessor/audio_samples", SUBSCRIBER_BUFFER_SIZE, &DecAudioProcessor::audioCB, this);
 
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "volume_base", volume_base_));
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "volume_scale", volume_scale_));
+
   return true;
 }
 
@@ -88,10 +91,11 @@ bool DecAudioProcessor::update()
       {
         volume_ = 1.0f;
       }
-      const led_channel_t BASE_BRIGHTNESS = 70;
-      led_channel_t brightness = BASE_BRIGHTNESS + static_cast<led_channel_t>(volume_ * 400);
-      if (brightness > 255)
-        brightness = 255;
+      led_channel_t brightness = static_cast<led_channel_t>(volume_base_ + volume_ * volume_scale_);
+      if (brightness > (led_channel_t)data_->getMaxBrightness())
+      {
+        brightness = (led_channel_t)data_->getMaxBrightness();
+      }
       // ROS_INFO("volume: %.2f -> brightness %i", volume_, brightness);
       for (int i = 0; i < (int)data_->node_led_levels_.size(); ++i)
       {

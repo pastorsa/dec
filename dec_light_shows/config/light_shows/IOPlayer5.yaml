@@ -1,3 +1,3 @@
-LightShowPlayer4:
+IOPlayer5:
   type: "dec_light_shows/DecLightShowPlayer"
-  bag_file_name: LightShow4
+  bag_file_name: LightShow5

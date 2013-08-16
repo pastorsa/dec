@@ -26,6 +26,7 @@ class LightShowClient:
         self.test_light_show_service_name = '/DecLightShowManager/test'
         rospy.wait_for_service(self.test_light_show_service_name)
         self.test_light_show_service = rospy.ServiceProxy(self.test_light_show_service_name, Test)
+        self.types = ['Sensor', 'Light', 'OpenLoop', 'IO', 'Color', ]
 
     def test(self):
         os.system('clear')
