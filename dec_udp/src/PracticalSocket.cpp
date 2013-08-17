@@ -494,10 +494,10 @@ if (rv == -1) {
 
 bool UDPSocket::setNonBlocking()
 {
-	struct timeval tv;
-	tv.tv_sec = 1;  /* 30 Secs Timeout */
-	tv.tv_usec = 0;  // Not init'ing this can cause strange errors
-	setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+  struct timeval tv;
+  tv.tv_sec = 0;
+  tv.tv_usec = 100000; // 1ms
+  setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 
   // int flags = fcntl(sockDesc, F_GETFL);
   // flags |= O_NONBLOCK;
