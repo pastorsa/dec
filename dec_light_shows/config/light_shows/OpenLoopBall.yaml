@@ -1,4 +1,4 @@
-LightShowBallCreator:
+OpenLoopBall:
   type: "dec_light_shows/DecLightShowBallCreator"
   visualization_rate: 1 # every n-th frame
   min_color: [1.0, 0.0, 0.0, 0.6]

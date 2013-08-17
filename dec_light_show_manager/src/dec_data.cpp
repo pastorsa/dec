@@ -29,7 +29,8 @@ DecData::DecData() :
     control_dt_(0.0),
     ros_time_sec_(0.0),
     recording_(true),
-    initialized_(false)
+    initialized_(false),
+    max_brightness_(0)
 {
 }
 
@@ -37,6 +38,8 @@ bool DecData::initialize(ros::NodeHandle node_handle)
 {
   node_handle_ = node_handle;
   ROS_VERIFY(DecStructure::initialize(node_handle));
+
+  ROS_VERIFY(dec_utilities::read(node_handle_, "max_brightness", max_brightness_));
 
   sensor_levels_ = Eigen::VectorXf::Zero(total_num_sensors_);
   sensor_values_ = VectorX_sensor_channel_t::Zero(total_num_sensors_);

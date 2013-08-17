@@ -417,6 +417,11 @@ int UDPSocket::recvFromNonBlocking(void *buffer, int bufferLen,
   timeout_value_.tv_sec = 0;
   timeout_value_.tv_usec = timeout_in_microseconds;
 
+  // clear the set ahead of time
+  FD_ZERO(&read_fds_);
+  // add our descriptors to the set
+  FD_SET(sockDesc, &read_fds_);
+
   // rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
   rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
 
@@ -489,18 +494,18 @@ if (rv == -1) {
 
 bool UDPSocket::setNonBlocking()
 {
-  int flags = fcntl(sockDesc, F_GETFL);
-  flags |= O_NONBLOCK;
-  if(fcntl(sockDesc, F_SETFL, flags) < 0)
-  {
-    throw SocketException("Problem when setting socket to non-blocking", true);
-    return false;
-  }
+	struct timeval tv;
+	tv.tv_sec = 1;  /* 30 Secs Timeout */
+	tv.tv_usec = 0;  // Not init'ing this can cause strange errors
+	setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 
-  // clear the set ahead of time
-  FD_ZERO(&read_fds_);
-  // add our descriptors to the set
-  FD_SET(sockDesc, &read_fds_);
+  // int flags = fcntl(sockDesc, F_GETFL);
+  // flags |= O_NONBLOCK;
+  // if(fcntl(sockDesc, F_SETFL, flags) < 0)
+  // {
+  //   throw SocketException("Problem when setting socket to non-blocking", true);
+  //   return false;
+  // }
 
   return true;
 }

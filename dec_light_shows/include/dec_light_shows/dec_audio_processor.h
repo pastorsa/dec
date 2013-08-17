@@ -31,7 +31,9 @@ public:
   audio_receveived_counter_(0),
   audio_consumed_counter_(0),
   volume_(0.0),
-  avg_volume_(0.0) {};
+  avg_volume_(0.0),
+  volume_base_(0),
+  volume_scale_(0) {};
   virtual ~DecAudioProcessor() {};
 
   virtual bool initialize(XmlRpc::XmlRpcValue& config);
@@ -54,6 +56,9 @@ private:
 
   float volume_;
   float avg_volume_;
+
+  unsigned int volume_base_;
+  unsigned int volume_scale_;
 
 };
 

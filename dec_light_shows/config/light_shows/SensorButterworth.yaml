@@ -1,4 +1,4 @@
-SensorButterworthProcessor:
+SensorButterworth:
   type: "dec_light_shows/DecSensorButterworthProcessor"
   sensor_filter:
     name: Filter

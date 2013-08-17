@@ -1,15 +1,14 @@
-LightShowPlane1Creator:
+OpenLoopPlane2:
   type: "dec_light_shows/DecLightShowPlaneCreator"
   visualization_rate: 1 # every n-th frame
   min_color: [1.0, 0.0, 0.0, 0.6]
   max_color: [1.0, 0.0, 0.0, 0.4]
-  min_distance: 0.0
-  max_distance: 5.4
+  min_distance: 0.2
+  max_distance: 0.4
   initial_normal: [0.0, 0.0, 1.0]
   initial_position: [0.0, 0.0, 3.0]
-  initial_linear_velocity: [0.0, 0.0, 2.5]
-  initial_angular_velocity: [0.0, 0.0, 0.0]
+  initial_linear_velocity: [0.0, 0.0, 0.0]
+  initial_angular_velocity: [0.05, 0.0, 0.00]
   initial_linear_acceleration: [0.0, 0.0, 0.0]
   initial_angular_acceleration: [0.0, 0.0, 0.0]
   virtual_cube_color: [0.0, 0.5, 0.5, 0.25]
-  up_down: true
