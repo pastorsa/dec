@@ -187,52 +187,53 @@ bool DecInterface::sendLightData(const std::vector<bool>& send_flags,
 
 bool DecInterface::sendLightData(const int node_id, const light_data_t& light_data, const setup_data_t& setup_data)
 {
-  // printf("Generating light data for node >%i<.\n", node_id);
-  generateLightData(_rx_buffer, &light_data);
-  // printData();
-  // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
-  // printf("Sending >%i< bytes of light data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
-  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, base_ip_addresses_[node_id], FOREIGN_PORT) != _rx_buffer_length)
-  {
-    printf("Problems when sending light data to node id >%i< to >%s:%i<.\n", node_id, base_ip_addresses_[node_id].c_str(), (int)FOREIGN_PORT);
-    return false;
-  }
-
-  _rx_buffer_length = 0;
-  unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000 + 100000;
-  std::string source_address;
-  unsigned int source_port;
-  // printf("Waiting to receive sensor data answer.\n");
-
-	// TODO: set recvFrom
-
-  int return_code = udp_sockets_[node_id]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
-  if (return_code < 0)
-  {
-    printf("Missed sensor packet from node with id >%i<.\n", node_id);
-    return false;
-  }
-  else
-  {
-    if(source_address.compare(base_ip_addresses_[node_id]) == 0)
-    {
-      // printf("Return code of node %i is %i.\n", node_id, return_code);
-      _rx_buffer_length = (uint16_t)return_code;
-      // print(setup_data);
-      parseSensorData(_rx_buffer, &setup_data);
-      received_sensor_data_[node_id] = _sensor_data;
-      // printf("Received data for node >%i< \n", node_id);
-      // printData();
-    }
-    else
-    {
-      printf("Missed sensor packet from node with id >%i<. Got package from >%s<.\n", node_id, source_address.c_str());
-      return false;
-    }
-  }
-
-  // printf("Done communicating light data and receiving sensor data.\n");
-  return true;
+  return false;
+//  // printf("Generating light data for node >%i<.\n", node_id);
+//  generateLightData(_rx_buffer, &light_data);
+//  // printData();
+//  // printf("Generated >%u< bytes of light data.\n", _rx_buffer_length);
+//  // printf("Sending >%i< bytes of light data for node id >%i< to >%s:%i<.\n", (int)_rx_buffer_length, node_id, foreign_address.c_str(), (int)FOREIGN_PORT);
+//  if(udp_sockets_[node_id]->sendTo((void*)_rx_buffer, (int)_rx_buffer_length, base_ip_addresses_[node_id], FOREIGN_PORT) != _rx_buffer_length)
+//  {
+//    printf("Problems when sending light data to node id >%i< to >%s:%i<.\n", node_id, base_ip_addresses_[node_id].c_str(), (int)FOREIGN_PORT);
+//    return false;
+//  }
+//
+//  _rx_buffer_length = 0;
+//  unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000 + 100000;
+//  std::string source_address;
+//  unsigned int source_port;
+//  // printf("Waiting to receive sensor data answer.\n");
+//
+//	// TODO: set recvFrom
+//
+//  int return_code = udp_sockets_[node_id]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
+//  if (return_code < 0)
+//  {
+//    printf("Missed sensor packet from node with id >%i<.\n", node_id);
+//    return false;
+//  }
+//  else
+//  {
+//    if(source_address.compare(base_ip_addresses_[node_id]) == 0)
+//    {
+//      // printf("Return code of node %i is %i.\n", node_id, return_code);
+//      _rx_buffer_length = (uint16_t)return_code;
+//      // print(setup_data);
+//      parseSensorData(_rx_buffer, &setup_data);
+//      received_sensor_data_[node_id] = _sensor_data;
+//      // printf("Received data for node >%i< \n", node_id);
+//      // printData();
+//    }
+//    else
+//    {
+//      printf("Missed sensor packet from node with id >%i<. Got package from >%s<.\n", node_id, source_address.c_str());
+//      return false;
+//    }
+//  }
+//
+//  // printf("Done communicating light data and receiving sensor data.\n");
+//  return true;
 }
 
 }
