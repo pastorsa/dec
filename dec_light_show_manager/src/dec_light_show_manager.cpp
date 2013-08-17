@@ -83,9 +83,20 @@ void DecLightShowManager::run()
   ROS_ASSERT(initialized_);
   ros::Rate rate(light_show_data_->control_frequency_);
   bool manager_is_running = true;
+  ros::Time start = ros::Time::now();
+  ros::Time now = ros::Time::now();
+  unsigned int counter = 0;
   while (ros::ok() && manager_is_running)
   {
     manager_is_running = update();
+    now = ros::Time::now();
+    if ((now - start).toSec() > 1.0)
+    {
+      ROS_INFO("Frequency is >%i< Hz.", static_cast<int>(counter));
+      counter = 0;
+      start = now;
+    }
+    counter++;
     rate.sleep();
   }
 }
