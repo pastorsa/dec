@@ -130,6 +130,7 @@ public:
 
 private:
   bool initialized_;
+  std::vector<bool> send_flags_;
 
   /*!
    * @param teensy_id
