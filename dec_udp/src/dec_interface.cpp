@@ -150,12 +150,12 @@ bool DecInterface::sendLightData(const std::vector<bool>& send_flags,
     if (send_flags[i])
     {
       _rx_buffer_length = 0;
-      unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000 + 100000;
       std::string source_address;
       unsigned int source_port;
-      printf("Waiting to receive sensor data answer for node >%i<.\n", (int)i+1);
-      int return_code = udp_sockets_[i]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE,
-                                                                       source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
+      // printf("Waiting to receive sensor data answer for node >%i<.\n", (int)i+1);
+      // unsigned long int TIMEOUT_LIGHT_IN_MICROSECONDS = 2000 + 100000;
+      // int return_code = udp_sockets_[i]->recvFromNonBlocking((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port, TIMEOUT_LIGHT_IN_MICROSECONDS);
+      int return_code = udp_sockets_[i]->recvFrom((void*)_rx_buffer, BUFFER_SIZE, source_address, source_port);
       if (return_code < 0)
       {
         printf("Missed sensor packet from node with id >%i<.\n", (int)i+1);
@@ -170,7 +170,7 @@ bool DecInterface::sendLightData(const std::vector<bool>& send_flags,
           // print(setup_data);
           parseSensorData(_rx_buffer, &(setup_data[i]));
           received_sensor_data_[i] = _sensor_data;
-          printf("Received data for node >%i<.\n", (int)i+1);
+          // printf("Received data for node >%i<.\n", (int)i+1);
           // printData();
         }
         else
