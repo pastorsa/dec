@@ -389,7 +389,8 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, string &sourceAddress, unsi
   int rtn;
   if ((rtn = recvfrom(sockDesc, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen)) < 0)
   {
-    throw SocketException("Receive failed (recvfrom())", true);
+    return -1;
+    // throw SocketException("Receive failed (recvfrom())", true);
   }
   sourceAddress = inet_ntoa(clntAddr.sin_addr);
   sourcePort = ntohs(clntAddr.sin_port);
@@ -400,9 +401,10 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, string &sourceAddress, unsi
 int UDPSocket::recvNonBlocking(void *buffer, int bufferLen,
                                const long int& timeout_in_microseconds)
 {
-  std::string sourceAddress;
-  unsigned int sourcePort;
-  return recvFromNonBlocking(buffer, bufferLen, sourceAddress, sourcePort, timeout_in_microseconds);
+//  std::string sourceAddress;
+//  unsigned int sourcePort;
+//  return recvFromNonBlocking(buffer, bufferLen, sourceAddress, sourcePort, timeout_in_microseconds);
+  return -1;
 }
 
 int UDPSocket::recvFromNonBlocking(void *buffer, int bufferLen,
@@ -410,49 +412,50 @@ int UDPSocket::recvFromNonBlocking(void *buffer, int bufferLen,
                                    const long int& timeout_in_microseconds)
   throw(SocketException)
 {
-  sockaddr_in clntAddr;
-  socklen_t addrLen = sizeof(clntAddr);
-  int rtn;
-
-  timeout_value_.tv_sec = 0;
-  timeout_value_.tv_usec = timeout_in_microseconds;
-
-  // clear the set ahead of time
-  FD_ZERO(&read_fds_);
-  // add our descriptors to the set
-  FD_SET(sockDesc, &read_fds_);
-
-  // rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
-  rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
-
-  if (rtn == -1)
-  {
-    throw SocketException("Select error (select())", true);
-  }
-  else if (rtn == 0)
-  {
-    // timeout
-    return -1;
-  }
-  else
-  {
-    // printf("Checking for message.\n");
-    // one or both of the descriptors have data
-    if (FD_ISSET(sockDesc, &read_fds_))
-    {
-      if ((rtn = recvfrom(sockDesc, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen)) < 0)
-      {
-        throw SocketException("Receive failed (recvfrom())", true);
-      }
-      sourceAddress = inet_ntoa(clntAddr.sin_addr);
-      sourcePort = ntohs(clntAddr.sin_port);
-    }
-    else
-    {
-      throw SocketException("Select failed, socket was empty", true);
-    }
-  }
-  return rtn;
+  return -1;
+//  sockaddr_in clntAddr;
+//  socklen_t addrLen = sizeof(clntAddr);
+//  int rtn;
+//
+//  timeout_value_.tv_sec = 0;
+//  timeout_value_.tv_usec = timeout_in_microseconds;
+//
+//  // clear the set ahead of time
+//  FD_ZERO(&read_fds_);
+//  // add our descriptors to the set
+//  FD_SET(sockDesc, &read_fds_);
+//
+//  // rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
+//  rtn = select(sockDesc + 1, &read_fds_, NULL, NULL, &timeout_value_);
+//
+//  if (rtn == -1)
+//  {
+//    throw SocketException("Select error (select())", true);
+//  }
+//  else if (rtn == 0)
+//  {
+//    // timeout
+//    return -1;
+//  }
+//  else
+//  {
+//    // printf("Checking for message.\n");
+//    // one or both of the descriptors have data
+//    if (FD_ISSET(sockDesc, &read_fds_))
+//    {
+//      if ((rtn = recvfrom(sockDesc, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen)) < 0)
+//      {
+//        throw SocketException("Receive failed (recvfrom())", true);
+//      }
+//      sourceAddress = inet_ntoa(clntAddr.sin_addr);
+//      sourcePort = ntohs(clntAddr.sin_port);
+//    }
+//    else
+//    {
+//      throw SocketException("Select failed, socket was empty", true);
+//    }
+//  }
+//  return rtn;
 }
 
 /*
@@ -496,7 +499,7 @@ bool UDPSocket::setNonBlocking()
 {
   struct timeval tv;
   tv.tv_sec = 0;
-  tv.tv_usec = 100000; // 1ms
+  tv.tv_usec = 500000; // 1ms
   setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 
   // int flags = fcntl(sockDesc, F_GETFL);
