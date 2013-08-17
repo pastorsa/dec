@@ -1,4 +1,4 @@
-SensorLinearRiseProcessor:
+SensorLinearRise:
   type: "dec_light_shows/DecSensorRiseProcessor"
   rise_timeout_in_seconds: 5.0
   rise_delay_in_seconds: 0.05

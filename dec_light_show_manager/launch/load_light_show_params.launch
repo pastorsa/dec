@@ -8,43 +8,48 @@
 
   <group ns="/DecLightShowManager/light_shows">
 
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorButterworthProcessor.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearDecayProcessor.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearRiseProcessor.yaml" />
+<!-- SENSORS -->
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorButterworth.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearDecay.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearRise.yaml" />
 
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightInsideOutProcessor.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightOutsideInProcessor.yaml" />
+<!-- LIGHT -->
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightInsideOut.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightOutsideIn.yaml" />
 
+<!-- COLOR -->
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBlackWhiteProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBackgroundForegroundProcessor.yaml" />
     
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopLightGenerator.yaml" />
+<!-- OPEN_LOOP -->
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopBall.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane0.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane1.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane2.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane3.yaml" />
 
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/TestLightGenerator.yaml" />
     
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/BrightnessProcessor.yaml" />
+<!-- IO -->
     
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowBallCreator.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane0Creator.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane1Creator.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane2Creator.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlane3Creator.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IORecorder1.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IORecorder2.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IORecorder3.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IORecorder4.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IORecorder5.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IOPlayer1.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IOPlayer2.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IOPlayer3.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IOPlayer4.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/IOPlayer5.yaml" />
+
+<!-- BRIGHTNESS -->
+
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/BrightnessProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/BrightnessAudioProcessor.yaml" />
 
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/Idle.yaml" />
-    
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder1.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder2.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder3.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder4.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowRecorder5.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer1.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer2.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer3.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer4.yaml" />
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightShowPlayer5.yaml" />
-
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/AudioProcessor.yaml" />
   
   </group>
 

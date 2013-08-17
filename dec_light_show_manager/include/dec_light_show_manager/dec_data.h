@@ -128,8 +128,21 @@ public:
    */
   ros::NodeHandle node_handle_;
 
+  /*!
+   * @return
+   */
+  unsigned int getMaxBrightness() const
+  {
+    return max_brightness_;
+  }
+
 private:
   bool initialized_;
+  std::vector<bool> send_flags_;
+
+  /*!
+   */
+  unsigned int max_brightness_;
 
   /*!
    * @param teensy_id

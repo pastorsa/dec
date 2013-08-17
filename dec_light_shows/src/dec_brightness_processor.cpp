@@ -20,8 +20,8 @@ namespace dec_light_shows
 
 bool DecBrightnessProcessor::initialize(XmlRpc::XmlRpcValue& config)
 {
-  ROS_VERIFY(DecLightShowUtilities::getParam(config, "max_brightness", max_brightness_));
   ROS_VERIFY(DecLightShowUtilities::getParam(config, "min_brightness", min_brightness_));
+  max_brightness_ = data_->getMaxBrightness();
   ROS_ASSERT(min_brightness_ < max_brightness_);
   ROS_VERIFY(DecLightShowUtilities::getParam(config, "initial_node_brightness", node_brightness_));
   ROS_ASSERT(min_brightness_ <= node_brightness_);

@@ -29,7 +29,8 @@ DecData::DecData() :
     control_dt_(0.0),
     ros_time_sec_(0.0),
     recording_(true),
-    initialized_(false)
+    initialized_(false),
+    max_brightness_(0)
 {
 }
 
@@ -37,6 +38,8 @@ bool DecData::initialize(ros::NodeHandle node_handle)
 {
   node_handle_ = node_handle;
   ROS_VERIFY(DecStructure::initialize(node_handle));
+
+  ROS_VERIFY(dec_utilities::read(node_handle_, "max_brightness", max_brightness_));
 
   sensor_levels_ = Eigen::VectorXf::Zero(total_num_sensors_);
   sensor_values_ = VectorX_sensor_channel_t::Zero(total_num_sensors_);
@@ -211,6 +214,18 @@ bool DecData::initialize(ros::NodeHandle node_handle)
     ROS_WARN("Not communicating to teensy with id >%i<.", (int)list_of_teensys_to_exclude_from_communication_[i]);
   }
 
+  send_flags_.resize(number_of_teensys_, true);
+  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+  {
+    for (unsigned int j = 0; send_flags_[i] && j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
+    {
+      if (i == list_of_teensys_to_exclude_from_communication_[j])
+      {
+        send_flags_[i] = false;
+      }
+    }
+  }
+
   return (initialized_ = true);
 }
 
@@ -325,7 +340,6 @@ bool DecData::copySensorInformationFromStructure()
 bool DecData::copyLightDataToStructure()
 {
 
-
   for (unsigned int i = 0; i < light_node_leds_to_teensy_map_.size(); ++i)
   {
     const uint8_t TEENSY_ID = static_cast<uint8_t>(light_node_leds_to_teensy_map_[i].first);
@@ -383,24 +397,30 @@ bool DecData::copyLightDataToStructure()
   }
 
   // send/receive light/sensor data
-  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+//  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+//  {
+//    bool send = true;
+//    for (unsigned int j = 0; send && j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
+//    {
+//      if (i == list_of_teensys_to_exclude_from_communication_[j])
+//      {
+//        send = false;
+//      }
+//    }
+//    if (send)
+//    {
+//      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i], dec_interface_setup_data_[i]))
+//      {
+//        ROS_WARN("Missed send/receive cycle for node >%i<.", i);
+//      }
+//    }
+//  }
+
+  if(!dec_interface_->sendLightData(send_flags_, dec_interface_light_data_, dec_interface_setup_data_))
   {
-    bool send = true;
-    for (unsigned int j = 0; send && j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
-    {
-      if (i == list_of_teensys_to_exclude_from_communication_[j])
-      {
-        send = false;
-      }
-    }
-    if (send)
-    {
-      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i], dec_interface_setup_data_[i]))
-      {
-        ROS_WARN("Missed send/receive cycle for node >%i<.", i);
-      }
-    }
+    ROS_WARN("Missed send/receive cycle");
   }
+
   return true;
 }
 

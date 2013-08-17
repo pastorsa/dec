@@ -58,7 +58,19 @@ public:
    * @param light_data
    * @return True on success, otherwise False
    */
-  bool sendLightData(const int node_id, const light_data_t& light_data, const setup_data_t& setup_data);
+  bool sendLightData(const int node_id,
+                     const light_data_t& light_data,
+                     const setup_data_t& setup_data);
+
+  /*!
+   * @param send_flags
+   * @param light_data
+   * @param setup_data
+   * @return True on success, otherwise False
+   */
+  bool sendLightData(const std::vector<bool>& send_flags,
+                     const std::vector<light_data_t>& light_data,
+                     const std::vector<setup_data_t>& setup_data);
 
   /*!
    */
