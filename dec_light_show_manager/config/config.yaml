@@ -2,7 +2,7 @@
 control_frequency: 20.0
 
 # Maximum brightness of all LEDs
-max_brightness: 200
+max_brightness: 100
 
 # Switches between simulation and real communication mode
 simulation_mode: true
