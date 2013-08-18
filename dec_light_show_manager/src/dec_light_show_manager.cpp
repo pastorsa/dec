@@ -22,7 +22,7 @@ static const int ROS_TIME_OFFSET = 1340100000;
 DecLightShowManager::DecLightShowManager() :
     initialized_(false), num_light_show_stacks_(0), num_light_shows_(0), light_shows_running_(false), switching_light_shows_(
         false), switching_light_shows_success_(false), local_node_handle_("~"), start_ros_time_in_sec_(0.0), simulation_mode_(
-        false), visualization_mode_(false)
+        false)
 {
   dec_mutex_init(&switching_light_shows_mutex_);
   dec_cond_init(&switching_light_shows_cond_);
@@ -68,8 +68,8 @@ bool DecLightShowManager::initialize()
     ROS_VERIFY(dec_light_show_simulation_->initialize(local_node_handle_));
   }
 
-  ROS_VERIFY(dec_utilities::read(local_node_handle_, "visualization_mode", visualization_mode_));
-  if (visualization_mode_)
+  ROS_VERIFY(dec_utilities::read(local_node_handle_, "visualization_mode", light_show_data_->visualization_mode_));
+  if (light_show_data_->visualization_mode_)
   {
     dec_light_show_visualization_.reset(new DecLightShowVisualization());
     ROS_VERIFY(dec_light_show_visualization_->initialize(light_show_data_, local_node_handle_));
@@ -462,7 +462,7 @@ bool DecLightShowManager::update()
     return false;
   }
 
-  if (visualization_mode_)
+  if (light_show_data_->visualization_mode_)
   {
     if (!dec_light_show_visualization_->update())
     {

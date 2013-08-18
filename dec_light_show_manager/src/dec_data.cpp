@@ -29,6 +29,7 @@ DecData::DecData() :
     control_dt_(0.0),
     ros_time_sec_(0.0),
     recording_(true),
+    visualization_mode_(false),
     initialized_(false),
     max_brightness_(0)
 {

@@ -136,6 +136,8 @@ public:
     return max_brightness_;
   }
 
+  bool visualization_mode_;
+
 private:
   bool initialized_;
   std::vector<bool> send_flags_;

@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <dec_light_shows/dec_light_show_math_utilities.h>
 
 #include <dec_light_show_manager/dec_light_show.h>
 
@@ -43,13 +44,25 @@ private:
   unsigned int visualization_rate_;
   unsigned int visualization_counter_;
 
+  bool integrate_;
   void integrate();
+  void computeIntegratedDistance();
   std::vector<tf::Vector3> positions_;
   std::vector<tf::Vector3> velocities_;
   std::vector<tf::Vector3> accelerations_;
   std::vector<tf::Vector3> simulated_accelerations_;
 
-  void computeDistance();
+  void expand();
+  void computeExpandedDistance();
+  std::vector<float> block_node_distances_;
+  std::vector<float> block_beam_distances_;
+  std::vector<float> pixel_beam_distances_;
+
+  float min_expansion_radius_;
+  float max_expansion_radius_;
+  float expansion_speed_;
+  float current_raduis_;
+
   /*! This buffer is of size >total_num_node_leds_<
    */
   Eigen::VectorXf block_node_buffer_;
@@ -70,6 +83,7 @@ private:
   std::vector<tf::Vector3> block_light_beam_positions_;
   std::vector<tf::Vector3> pixel_light_beam_positions_;
 
+  MathUtilities::Profile profile_type_;
 };
 
 }

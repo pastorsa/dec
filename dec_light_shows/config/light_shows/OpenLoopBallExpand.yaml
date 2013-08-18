@@ -1,0 +1,15 @@
+OpenLoopBallExpand:
+  type: "dec_light_shows/DecLightShowBallCreator"
+  visualization_rate: 1 # every n-th frame
+  min_color: [1.0, 0.0, 0.0, 0.6]
+  max_color: [1.0, 0.0, 0.0, 0.4]
+  min_distance: 1.7
+  max_distance: 2.4
+  initial_position: [0.0, 0.0, 3.75]
+  initial_velocity: [0.0, 0.0, 0.0]
+  initial_acceleration: [0.0, 0.0, 0.0]
+  virtual_cube_color: [0.0, 0.5, 0.5, 0.25]
+  min_expansion_radius: 0.0
+  max_expansion_radius: 9.5
+  expansion_speed: 2.0 # in m/s
+  profile_type: 0  

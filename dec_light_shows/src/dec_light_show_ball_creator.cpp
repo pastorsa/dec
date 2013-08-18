@@ -24,8 +24,9 @@ namespace dec_light_shows
 
 DecLightShowBallCreator::DecLightShowBallCreator() :
     node_handle_("/DecLightShowManager"),
-    visualization_rate_(0), visualization_counter_(0),
-    min_distance_(0.0), max_distance_(0.0)
+    visualization_rate_(0), visualization_counter_(0), integrate_(true),
+    min_expansion_radius_(0.0), max_expansion_radius_(0.0), expansion_speed_(0.0), current_raduis_(0.0),
+    min_distance_(0.0), max_distance_(0.0), profile_type_(MathUtilities::eLINEAR)
 {
   const int PUBLISHER_BUFFER_SIZE = 10;
   rviz_pub_ = node_handle_.advertise<visualization_msgs::MarkerArray>("visualization_marker", PUBLISHER_BUFFER_SIZE, true);
@@ -64,6 +65,32 @@ bool DecLightShowBallCreator::initialize(XmlRpc::XmlRpcValue& config)
   setupSpace(config);
   setupSensorMarkers(config);
 
+  ROS_ASSERT(positions_.size() == 1);
+  for (unsigned int i = 0; i < positions_.size(); ++i)
+  {
+    block_node_distances_.resize(block_light_node_positions_.size(), 0.0);
+    for (unsigned int j = 0; j < block_light_node_positions_.size(); ++j)
+    {
+      block_node_distances_[j] = (block_light_node_positions_[j] - positions_[i]).length();
+      if(block_node_distances_[j] < 0.0)
+       block_node_distances_[j] = 0.0;
+    }
+    block_beam_distances_.resize(block_light_beam_positions_.size(), 0.0);
+    for (unsigned int j = 0; j < block_light_beam_positions_.size(); ++j)
+    {
+      block_beam_distances_[j] = (block_light_beam_positions_[j] - positions_[i]).length();
+      if(block_beam_distances_[j] < 0.0)
+        block_beam_distances_[j] = 0.0;
+    }
+    pixel_beam_distances_.resize(pixel_light_beam_positions_.size(), 0.0);
+    for (unsigned int j = 0; j < pixel_light_beam_positions_.size(); ++j)
+    {
+      pixel_beam_distances_[j] = (pixel_light_beam_positions_[j] - positions_[i]).length();
+      if(pixel_beam_distances_[j] < 0.0)
+        pixel_beam_distances_[j] = 0.0;
+    }
+  }
+
   return true;
 }
 
@@ -75,10 +102,21 @@ bool DecLightShowBallCreator::start()
 
 bool DecLightShowBallCreator::update()
 {
-  integrate();
-  computeDistance();
+  if (integrate_)
+  {
+    integrate();
+    computeIntegratedDistance();
+  }
+  else
+  {
+    expand();
+    computeExpandedDistance();
+  }
 
-  publish();
+  if(data_->visualization_mode_)
+  {
+    publish();
+  }
   return true;
 }
 
@@ -88,7 +126,61 @@ bool DecLightShowBallCreator::stop()
   return true;
 }
 
-void DecLightShowBallCreator::computeDistance()
+void DecLightShowBallCreator::computeExpandedDistance()
+{
+  for (unsigned int i = 0; i < positions_.size(); ++i)
+  {
+    for (unsigned int j = 0; j < block_light_node_positions_.size(); ++j)
+    {
+      if (block_node_distances_[j] < current_raduis_)
+      {
+        if (data_->node_led_levels_(j) <= DecData::BASE_LIGHT_LEVEL)
+        {
+          float scaled_distance = DecData::MIN_LIGHT_LEVEL + (block_node_distances_[j] / current_raduis_) * DecData::BASE_LIGHT_LEVEL;
+          data_->node_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        }
+      }
+      if (data_->node_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
+      {
+        data_->node_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
+      }
+    }
+    for (unsigned int j = 0; j < block_light_beam_positions_.size(); ++j)
+    {
+
+      if (block_beam_distances_[j] < current_raduis_)
+      {
+        if (data_->block_beam_led_levels_(j) <= DecData::BASE_LIGHT_LEVEL)
+        {
+          float scaled_distance = DecData::MIN_LIGHT_LEVEL + (block_beam_distances_[j] / current_raduis_) * DecData::BASE_LIGHT_LEVEL;
+          data_->block_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        }
+      }
+      if (data_->block_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
+      {
+        data_->block_beam_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
+      }
+    }
+    for (unsigned int j = 0; j < pixel_light_beam_positions_.size(); ++j)
+    {
+
+      if (pixel_beam_distances_[j] < current_raduis_)
+      {
+        if (data_->pixel_beam_led_levels_(j) <= DecData::BASE_LIGHT_LEVEL)
+        {
+          float scaled_distance = DecData::MIN_LIGHT_LEVEL + (pixel_beam_distances_[j] / current_raduis_) * DecData::BASE_LIGHT_LEVEL;
+          data_->pixel_beam_led_levels_(j) -= MathUtilities::ramp(DecData::MIN_LIGHT_LEVEL, DecData::MIN_LIGHT_LEVEL + DecData::BASE_LIGHT_LEVEL, scaled_distance, profile_type_);
+        }
+      }
+      if (data_->pixel_beam_led_levels_(j) < DecData::MIN_LIGHT_LEVEL)
+      {
+        data_->pixel_beam_led_levels_(j) = DecData::MIN_LIGHT_LEVEL;
+      }
+    }
+  }
+}
+
+void DecLightShowBallCreator::computeIntegratedDistance()
 {
   for (unsigned int i = 0; i < positions_.size(); ++i)
   {
@@ -142,6 +234,22 @@ void DecLightShowBallCreator::computeDistance()
   }
 }
 
+void DecLightShowBallCreator::expand()
+{
+  for (unsigned int i = 0; i < positions_.size(); ++i)
+  {
+    current_raduis_ += expansion_speed_ * data_->control_dt_;
+    if (current_raduis_ > max_expansion_radius_)
+    {
+      expansion_speed_ *= -1.0f;
+    }
+    else if (current_raduis_ < min_expansion_radius_)
+    {
+      expansion_speed_ *= -1.0f;
+    }
+  }
+}
+
 void DecLightShowBallCreator::integrate()
 {
   for (unsigned int i = 0; i < positions_.size(); ++i)
@@ -181,6 +289,16 @@ void DecLightShowBallCreator::integrate()
 
 void DecLightShowBallCreator::publish()
 {
+  if (!integrate_)
+  {
+    for (unsigned int i = 0; i < virtual_sensors_.markers.size(); ++i)
+    {
+      virtual_sensors_.markers[i].scale.x = current_raduis_;
+      virtual_sensors_.markers[i].scale.y = current_raduis_;
+      virtual_sensors_.markers[i].scale.z = current_raduis_;
+    }
+  }
+
   ros::Time now = ros::Time::now();
   if(visualization_counter_ > visualization_rate_)
   {
@@ -246,8 +364,25 @@ void DecLightShowBallCreator::readParameters(XmlRpc::XmlRpcValue& config)
   accelerations_.push_back(acceleration);
   simulated_accelerations_ = accelerations_;
 
+  integrate_ = true;
+  if (velocity[0] < 0.001 && velocity[1] < 0.001 && velocity[2] < 0.001 && acceleration[0] < 0.001 && acceleration[1] < 0.001 && acceleration[2] < 0.001)
+  {
+    integrate_ = false;
+  }
+
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "min_expansion_radius", min_expansion_radius_));
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "max_expansion_radius", max_expansion_radius_));
+  ROS_VERIFY(DecLightShowUtilities::getParam(config, "expansion_speed", expansion_speed_));
+  current_raduis_ = min_expansion_radius_;
+
   ROS_ASSERT(positions_.size() == velocities_.size());
   ROS_ASSERT(positions_.size() == accelerations_.size());
+
+  int profile_type = MathUtilities::eLINEAR;
+  DecLightShowUtilities::param(config, "profile_type", profile_type, profile_type);
+  ROS_ASSERT_MSG(profile_type >= 0 && profile_type < MathUtilities::eNUM_PROFILES,
+                 "Unknown filter type >%i< in >%s<.", profile_type, name_.c_str());
+  profile_type_ = static_cast<MathUtilities::Profile>(profile_type);
 }
 
 void DecLightShowBallCreator::setupSensorMarkers(XmlRpc::XmlRpcValue& config)

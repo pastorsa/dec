@@ -142,7 +142,6 @@ private:
   bool copySensorInformationFromStructure();
   bool copyLightDataToStructure();
 
-  bool visualization_mode_;
   boost::shared_ptr<DecLightShowVisualization> dec_light_show_visualization_;
 
   void setDefaultStacks();

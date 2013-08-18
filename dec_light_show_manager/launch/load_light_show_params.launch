@@ -23,7 +23,8 @@
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBackgroundForegroundProcessor.yaml" />
     
 <!-- OPEN_LOOP -->
-    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopBall.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopBallRandom.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopBallExpand.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane0.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane1.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/OpenLoopPlane2.yaml" />

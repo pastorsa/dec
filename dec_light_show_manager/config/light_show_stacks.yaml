@@ -63,10 +63,15 @@
 #  light_shows:
 #    - "OpenLoopLightGenerator"
 -
-  name: "OpenLoopBallStack"
+  name: "OpenLoopBallRandomStack"
   groups: ["OPEN_LOOP"]
   light_shows:
-    - "OpenLoopBall"
+    - "OpenLoopBallRandom"
+-
+  name: "OpenLoopBallExpandStack"
+  groups: ["OPEN_LOOP"]
+  light_shows:
+    - "OpenLoopBallExpand"
 -
   name: "OpenLoopPlane0Stack"
   groups: ["OPEN_LOOP"]
