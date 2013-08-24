@@ -92,7 +92,7 @@ void DecLightShowManager::run()
     now = ros::Time::now();
     if ((now - start).toSec() > 1.0)
     {
-      ROS_INFO("Frequency is >%i< Hz.", static_cast<int>(counter));
+      ROS_DEBUG("Frequency is >%i< Hz.", static_cast<int>(counter));
       counter = 0;
       start = now;
     }

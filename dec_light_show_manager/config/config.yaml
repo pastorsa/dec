@@ -2,21 +2,22 @@
 control_frequency: 20.0
 
 # Maximum brightness of all LEDs
-max_brightness: 80
+max_brightness: 60
 
 # Switches between simulation and real communication mode
 simulation_mode: false
 # Switches visualization mode
-visualization_mode: false
+visualization_mode: true
 
 # Setup, Receive sensor and send light data
 # List of teensy ids which are included in the communication loop
 # list_of_teensys_to_exclude_from_communication: [1, 2, 3, 4, 5]
-#list_of_teensys_to_exclude_from_communication: [0, 1, 2, 3, 4, 5]
+#list_of_teensys_to_exclude_from_communication: [1, 2, 3, 4, 5, 6]
 list_of_teensys_to_exclude_from_communication: []
 
 # Which teensy is on which net (connected to which switch)
-teensy_to_net_map: [1, 1, 1, 1, 1, 1]
+# teensy_to_net_map: [1, 1, 1, 1, 1, 1, 1]
+teensy_to_net_map: [1]
 
 # Number of teensys in the structure (limited to 255)
 # number_of_teensys: 1

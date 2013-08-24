@@ -170,8 +170,8 @@ bool DecInterface::sendLightData(const std::vector<bool>& send_flags,
           // print(setup_data);
           parseSensorData(_rx_buffer, &(setup_data[i]));
           received_sensor_data_[i] = _sensor_data;
-          // printf("Received data for node >%i<.\n", (int)i+1);
-          // printData();
+          printf("Received data for node >%i<.\n", (int)i+1);
+          printData();
         }
         else
         {

@@ -22,6 +22,8 @@
     <rosparam command="load" file="$(find dec_light_show_manager)/config/simulation.yaml" />
   </node>
 
+<!--
   <include file="$(find dec_audio)/launch/dec_audio.launch"/>
+-->
 
 </launch>

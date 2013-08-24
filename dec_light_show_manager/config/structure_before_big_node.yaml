@@ -726,9 +726,9 @@ sensors:
     nodes: [[18,22], [18,17]]
     teensy: 0
 # orange strand
-#  -
-#    nodes: [[13,10], [13,11], [13,12], [13,16], [13,17], [13,14]]
-#    teensy: 0
+  -
+    nodes: [[13,10], [13,11], [13,12], [13,16], [13,17], [13,14]]
+    teensy: 0
   -
     nodes: [[14,13], [14,17]]
     teensy: 0
@@ -927,11 +927,11 @@ light_nodes:
     num_leds: [20, 20, 20]
     num_leds_per_meter: 60
     teensy: 0
-  -
-    nodes: [16, 12, 10]
-    num_leds: [20, 20, 20]
-    num_leds_per_meter: 60
-    teensy: 0
+#  -
+#    nodes: [17, 22, 23, 18]
+#    num_leds: [20, 20, 20, 20]
+#    num_leds_per_meter: 60
+#    teensy: 6
 #  -
 #    nodes: [42, 47, 41, 36]
 #    num_leds: [20, 20, 20, 20]
