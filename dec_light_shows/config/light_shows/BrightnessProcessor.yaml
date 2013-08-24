@@ -1,5 +1,5 @@
 BrightnessProcessor:
   type: "dec_light_shows/DecBrightnessProcessor"
-  initial_node_brightness: 25
-  initial_beam_brightness: 25
+  initial_node_brightness: 250
+  initial_beam_brightness: 250
   min_brightness: 0
