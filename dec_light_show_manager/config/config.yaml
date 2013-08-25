@@ -1,1 +1,52 @@
-config_test_single_strand.yaml
+# Frequency (in Hz) of the control loop
+control_frequency: 20.0
+
+# Maximum brightness of all LEDs
+max_brightness: 50
+
+# Switches between simulation and real communication mode
+simulation_mode: false
+# Switches visualization mode
+visualization_mode: true
+
+# Setup, Receive sensor and send light data
+# List of teensy ids which are included in the communication loop
+# list_of_teensys_to_exclude_from_communication: [1, 2, 3, 4, 5]
+#list_of_teensys_to_exclude_from_communication: [1, 2, 3, 4, 5, 6]
+list_of_teensys_to_exclude_from_communication: []
+
+# Which teensy is on which net (connected to which switch)
+# teensy_to_net_map: [1, 1, 1, 1, 1, 1, 1]
+teensy_to_net_map: [1, 1, 1]
+
+# Number of teensys in the structure (limited to 255)
+# number_of_teensys: 1
+
+# 38 Digital pins according to http://www.pjrc.com/teensy/td_digital.html for the Teensy++ 2.0
+#      =========================================================================================
+# Num | 0      | 1      | 2      | 3      | 4      |  5     | 6      | 7      | 8      | 9      |
+#     |        |        |        |        |        |        |        |        |        |        |
+# Pin | PIN_D0 | PIN_D1 | PIN_D2 | PIN_D3 | PIN_D4 | PIN_D5 | PIN_D6 | PIN_D7 | PIN_E0 | PIN_E1 |
+#      =========================================================================================
+# Num | 10     | 11     | 12     | 13     | 14     | 15     | 16     | 17     | 18     | 19     |
+#     |        |        |        |        |        |        |        |        |        |        |
+# Pin | PIN_C0 | PIN_C1 | PIN_C2 | PIN_C3 | PIN_C4 | PIN_C5 | PIN_C6 | PIN_C7 | PIN_E6 | PIN_E7 |
+#      =========================================================================================
+# Num | 20     | 21     | 22     | 23     | 24     | 25     | 26     | 27     | 28     | 29     |
+#     |        |        |        |        |        |        |        |        |        |        |
+# Pin | PIN_B0 | PIN_B1 | PIN_B2 | PIN_B3 | PIN_B4 | PIN_B5 | PIN_B6 | PIN_B7 | PIN_A0 | PIN_A1 |
+#      =========================================================================================
+# Num | 30     | 31     | 32     | 33     | 34     | 35     | 36     | 37     |
+#     |        |        |        |        |        |        |        |        |
+# Pin | PIN_A2 | PIN_A3 | PIN_A4 | PIN_A5 | PIN_A6 | PIN_A7 | PIN_E4 | PIN_E5 |
+#      =======================================================================
+# PWM Capable Pins (see http://www.pjrc.com/teensy/td_pulse.html) for the Teensy++ 2.0 are : 0, 1, 14, 15, 16, 24, 25, 26, 27
+# Note: the order of the pins needs to be the order at which the lights are hooked up to the teensy
+# Output pins used for the light nodes and beams (need to be PWM capable)
+# Note: First, the light nodes are being attached, next the light beams are being attached
+# For example if a teensy has 3 light nodes and 2 light beams attached then
+# the light node pins are the first three numbers in light_pins and the light beam pins are the 
+# next 2 numbers
+light_pins: [0, 1, 14, 15, 16, 24, 25, 26, 27]
+# Input pins used for the lights (need to be digital and not overlapping with the PWM capable pins)
+sensor_pins: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 18, 19, 28, 29, 30, 31, 32, 33, 34, 35]
