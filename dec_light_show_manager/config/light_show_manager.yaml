@@ -17,5 +17,5 @@ default_light_show_stacks:
   - SensorLinearRiseStack
   - LightInsideOutStack
   - OpenLoopPlane0Stack
-  - ColorBlackWhiteProcessorStack
+  - ColorProcessorStack
   - BrightnessProcessorStack
