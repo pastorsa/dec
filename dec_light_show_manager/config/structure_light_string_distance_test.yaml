@@ -754,7 +754,7 @@ block_light_beams:
     6, 6, 6, 6, 6, 7,
     6, 6, 6, 6, 6, 7]
     num_leds_per_meter: 30
-    teensy: 3
+    teensy: 4
   -
     nodes: [
     [76,57], [76,57], [76,57], [76,57], [76,57], [76,57],
@@ -772,7 +772,7 @@ block_light_beams:
     6, 6, 6, 6, 6, 7,
     6, 6, 6, 6, 6, 7]
     num_leds_per_meter: 30
-    teensy: 3
+    teensy: 4
   -
     nodes: [
     [80,66], [80,66], [80,66], [80,66], [80,66], [80,66],
@@ -790,7 +790,7 @@ block_light_beams:
     6, 6, 6, 6, 6, 7,
     6, 6, 6, 6, 6, 7]
     num_leds_per_meter: 30
-    teensy: 4
+    teensy: 5
   -
     nodes: [
     [85,73], [85,73], [85,73], [85,73], [85,73], [85,73],
@@ -808,7 +808,7 @@ block_light_beams:
     6, 6, 6, 6, 6, 7,
     6, 6, 6, 6, 6, 7]
     num_leds_per_meter: 30
-    teensy: 4
+    teensy: 5
   -
     nodes: [
     [84,71], [84,71], [84,71], [84,71], [84,71], [84,71],
@@ -826,7 +826,7 @@ block_light_beams:
     6, 6, 6, 6, 6, 7,
     6, 6, 6, 6, 6, 7]
     num_leds_per_meter: 30
-    teensy: 5
+    teensy: 3
 
   -
     nodes: [
@@ -845,7 +845,7 @@ block_light_beams:
     6, 6, 6, 6, 6, 7,
     6, 6, 6, 6, 6, 7]
     num_leds_per_meter: 30
-    teensy: 5
+    teensy: 3
 
 #  -
 #    nodes: [
