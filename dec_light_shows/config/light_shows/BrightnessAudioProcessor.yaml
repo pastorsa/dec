@@ -1,6 +1,6 @@
 BrightnessAudioProcessor:
   type: "dec_light_shows/DecAudioProcessor"
   calibration_time_in_seconds: 1.0
-  volume_base: 6
-  volume_scale: 200
+  volume_base: 2
+  volume_scale: 100
   
