@@ -1,0 +1,149 @@
+# This is the index into node_positions set
+# to determine the node which sets the zero coordinate of the structure
+offset_node_index: 0
+
+# List of all nodes in the structure
+# Values correspond to x,y,z in meters
+
+node_positions:
+  - position: [0.0,       0.0, 3000.0]
+  - position: [1000.0,    0.0, 3000.0]
+  - position: [2000.0,    0.0, 3000.0]
+
+  - position: [0.0,    1000.0, 3000.0]
+  - position: [1000.0, 1000.0, 3000.0]
+  - position: [2000.0, 1000.0, 3000.0]
+
+  - position: [0.0,    2000.0, 3000.0]
+  - position: [1000.0, 2000.0, 3000.0]
+  - position: [2000.0, 2000.0, 3000.0]
+
+  - position: [0.0,    3000.0, 3000.0]
+  - position: [1000.0, 3000.0, 3000.0]
+  - position: [2000.0, 3000.0, 3000.0]
+
+  - position: [0.0,    4000.0, 3000.0]
+  - position: [1000.0, 4000.0, 3000.0]
+  - position: [2000.0, 4000.0, 3000.0]
+
+  - position: [0.0,    5000.0, 3000.0]
+  - position: [1000.0, 5000.0, 3000.0]
+  - position: [2000.0, 5000.0, 3000.0]
+
+  - position: [0.0,    6000.0, 3000.0]
+  - position: [1000.0, 6000.0, 3000.0]
+  - position: [2000.0, 6000.0, 3000.0]
+
+  - position: [0.0,    7000.0, 3000.0]
+  - position: [1000.0, 7000.0, 3000.0]
+  - position: [2000.0, 7000.0, 3000.0]
+
+  - position: [0.0,    8000.0, 3000.0]
+  - position: [1000.0, 8000.0, 3000.0]
+  - position: [2000.0, 8000.0, 3000.0]
+
+  - position: [0.0,    9000.0, 3000.0]
+  - position: [1000.0, 9000.0, 3000.0]
+  - position: [2000.0, 9000.0, 3000.0]
+
+# List of all beams in the structure
+# List correspond to pairs of indices of nodes
+# nodes: [0, 1] constructs a beam from node 0 to node 1
+beams:
+  - nodes: [0,1]
+  - nodes: [1,2]
+
+  - nodes: [3,4]
+  - nodes: [4,5]
+
+  - nodes: [6,7]
+  - nodes: [7,8]
+
+  - nodes: [9,10]
+  - nodes: [10,11]
+
+  - nodes: [12,13]
+  - nodes: [13,14]
+
+  - nodes: [15,16]
+  - nodes: [16,17]
+
+  - nodes: [18,19]
+  - nodes: [19,20]
+
+  - nodes: [21,22]
+  - nodes: [22,23]
+
+  - nodes: [24,25]
+  - nodes: [25,26]
+
+  - nodes: [27,28]
+  - nodes: [28,29]  
+
+sensors:
+  -
+    nodes: [[0, 1]]
+    teensy: 0
+
+light_nodes: 
+  -
+    nodes: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    num_leds: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+    num_leds_per_meter: 60
+    teensy: 0
+  -
+    nodes: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    num_leds: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+    num_leds_per_meter: 60
+    teensy: 0
+
+# Size of the nodes and color
+nodes_size:
+  x: 0.1016
+  y: 0.1016
+  z: 0.1016
+nodes_color: [0.8, 0.8, 0.8, 1.0] # r,g,b,a
+
+# Size of the light nodes and color
+block_nodes_size:
+  x: 0.23
+  y: 0.23
+  z: 0.23
+block_nodes_color: [0.6, 0.6, 0.6, 1.0] # r,g,b,a
+
+# Size of the beams and color
+beams_size:
+  x: 0.0317
+  y: 0.0317
+  z: 1.4 
+beams_color: [0.9, 0.9, 0.9, 0.7] # r,g,b,a
+
+# Size of the block light beams and color
+block_beams_size:
+  x: 0.12
+  y: 0.12
+  z: 0.9 
+block_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
+
+# Size of the pixel light beams and color
+pixel_beams_size:
+  x: 0.12
+  y: 0.12
+  z: 0.9
+pixel_beams_color: [0.8, 0.4, 0.4, 1.0] # r,g,b,a
+
+# Size of the sensors and color
+sensors_size:
+  x: 0.045
+  y: 0.045
+  z: 0.7
+sensors_color: [0.8, 0.8, 0.9, 0.4] # r,g,b,a
+avg_sensors_size:
+  x: 0.75
+  y: 0.75
+  z: 0.75
+avg_sensors_color: [0.8, 0.8, 0.9, 0.25] # r,g,b,a
+
+# panels: [10,11,13, 12,13,16, 13,14,17, 15,16,20, 17,18,22, 19,20,24, 20,21,25, 21,22,26, 22,23,27, 28,29,32, 29,30,33, 31,32,36,32,33,37, 33,34,38, 35,36,41, 36,37,42, 37,38,43, 38,39,44, 40,41,46, 41,42,47, 42,43,48, 43,44,49, 44,45,50, 46,47,51, 48,49,53, 49,50,54, 47,48,52]
+panels_color: [0.9, 0.9, 0.9, 0.4] # r,g,b,a
+
