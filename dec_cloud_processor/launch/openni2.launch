@@ -13,7 +13,7 @@
          "2@3"             : Use device on USB bus 2, address 3
 	 "2@0"             : Use first device found on USB bus 2
     -->
-  <arg name="device_id" default="#1" />
+  <arg name="device_id" default="#2" />
 
   <!-- By default, calibrations are stored to file://${ROS_HOME}/camera_info/${NAME}.yaml,
        where ${NAME} is of the form "[rgb|depth]_[serial#]", e.g. "depth_B00367707227042B".
@@ -86,7 +86,7 @@
 
   <!-- Load reasonable defaults for the relative pose between cameras -->
   <include if="$(arg publish_tf)"
-	   file="$(find dec_cloud_processor)/launch/camera2.launch">
+	   file="$(find dec_cloud_processor)/launch/kinect_frame2.launch">
     <arg name="camera" value="$(arg camera)" />
   </include>
 

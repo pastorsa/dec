@@ -29,6 +29,7 @@ namespace dec_cloud_processor
 {
 
 CloudProcessor::CloudProcessor(ros::NodeHandle node_handle)
+	: node_handle_(node_handle)
 {
   std::string point_cloud_topic;
   ROS_VERIFY(read(node_handle_, "point_cloud_topic", point_cloud_topic));
