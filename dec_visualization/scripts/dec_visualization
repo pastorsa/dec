@@ -1,6 +1,0 @@
-#!/bin/bash
-mkdir -p ~/.rviz
-DEC=`rospack find dec_visualization`
-cp $DEC/rviz/rviz_config ~/.rviz/config
-cp $DEC/rviz/rviz_display_config ~/.rviz/display_config
-rosrun rviz rviz -d $DEC/rviz/dec_rviz.vcg

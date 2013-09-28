@@ -36,6 +36,11 @@ rosbuild_add_executable(test_udp_dec
 )
 target_link_libraries(test_udp_dec ${PROJECT_NAME})
 
+rosbuild_add_executable(dec_sniffer
+  src/dec_sniffer.cpp
+)
+
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
