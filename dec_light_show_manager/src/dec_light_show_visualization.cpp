@@ -136,8 +136,8 @@ bool DecLightShowVisualization::update()
 
   rviz_pub_.publish(sensor_markers_);
   rviz_pub_.publish(block_light_node_markers_);
-  rviz_pub_.publish(block_light_beam_markers_);
-  rviz_pub_.publish(pixel_light_beam_markers_);
+  //rviz_pub_.publish(block_light_beam_markers_);
+  //rviz_pub_.publish(pixel_light_beam_markers_);
   rviz_pub_.publish(avg_sensor_markers_);
 
   static_publish_counter_++;
@@ -148,12 +148,12 @@ bool DecLightShowVisualization::update()
     rviz_pub_.publish(beam_markers_);
     rviz_pub_.publish(sensor_markers_);
     rviz_pub_.publish(node_text_markers_);
-    rviz_pub_.publish(beam_text_markers_);
+    //rviz_pub_.publish(beam_text_markers_);
     rviz_pub_.publish(sensor_text_markers_);
     rviz_pub_.publish(avg_sensor_text_markers_);
     rviz_pub_.publish(block_light_node_text_markers_);
-    rviz_pub_.publish(block_light_beam_text_markers_);
-    rviz_pub_.publish(pixel_light_beam_text_markers_);
+    //rviz_pub_.publish(block_light_beam_text_markers_);
+    //rviz_pub_.publish(pixel_light_beam_text_markers_);
     rviz_pub_.publish(panel_markers_);
   }
 

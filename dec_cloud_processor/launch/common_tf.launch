@@ -1,0 +1,6 @@
+<launch>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_to_structure"
+        args="0.0 0.0 2.8 0.0 0.0 0.0 /BASE /BASE_STRUCTURE 100" />  
+
+</launch>

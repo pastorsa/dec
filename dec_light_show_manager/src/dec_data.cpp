@@ -105,7 +105,7 @@ bool DecData::initialize(ros::NodeHandle node_handle)
     }
   }
 
-  if (total_num_block_beam_leds_)
+  if (total_num_block_beam_leds_ > 0)
   {
     sensor_to_block_beam_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_block_beam_leds_);
     for (unsigned int i = 0; i < total_num_sensors_; ++i)
@@ -122,7 +122,7 @@ bool DecData::initialize(ros::NodeHandle node_handle)
     }
   }
 
-  if (total_num_pixel_beam_leds_)
+  if (total_num_pixel_beam_leds_ > 0)
   {
     sensor_to_pixel_beam_led_distances = Eigen::MatrixXf::Zero(total_num_sensors_, total_num_pixel_beam_leds_);
     for (unsigned int i = 0; i < total_num_sensors_; ++i)
@@ -398,24 +398,24 @@ bool DecData::copyLightDataToStructure()
   }
 
   // send/receive light/sensor data
-//  for (unsigned int i = 0; i < number_of_teensys_; ++i)
-//  {
-//    bool send = true;
-//    for (unsigned int j = 0; send && j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
-//    {
-//      if (i == list_of_teensys_to_exclude_from_communication_[j])
-//      {
-//        send = false;
-//      }
-//    }
-//    if (send)
-//    {
-//      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i], dec_interface_setup_data_[i]))
-//      {
-//        ROS_WARN("Missed send/receive cycle for node >%i<.", i);
-//      }
-//    }
-//  }
+  //  for (unsigned int i = 0; i < number_of_teensys_; ++i)
+  //  {
+  //    bool send = true;
+  //    for (unsigned int j = 0; send && j < list_of_teensys_to_exclude_from_communication_.size(); ++j)
+  //    {
+  //      if (i == list_of_teensys_to_exclude_from_communication_[j])
+  //      {
+  //        send = false;
+  //      }
+  //    }
+  //    if (send)
+  //    {
+  //      if(!dec_interface_->sendLightData(i, dec_interface_light_data_[i], dec_interface_setup_data_[i]))
+  //      {
+  //        ROS_WARN("Missed send/receive cycle for node >%i<.", i);
+  //      }
+  //    }
+  //  }
 
   if(!dec_interface_->sendLightData(send_flags_, dec_interface_light_data_, dec_interface_setup_data_))
   {

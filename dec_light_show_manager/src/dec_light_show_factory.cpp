@@ -30,7 +30,7 @@ bool DecLightShowFactory::createLightShowByName(const std::string& class_name,
   bool success = false;
   try
   {
-    ROS_DEBUG("Creating light show instance >%s<.", class_name.c_str());
+    ROS_INFO("Creating light show instance >%s<.", class_name.c_str());
     light_show = light_show_loader_->createInstance(class_name);
     light_show->initializeBase(name, data, id);
     success = true;
@@ -46,6 +46,5 @@ void DecLightShowFactory::reset()
 {
   light_show_loader_.reset(new pluginlib::ClassLoader<DecLightShow>("dec_light_show_manager", "dec_light_show_manager::DecLightShow"));
 }
-
 
 }

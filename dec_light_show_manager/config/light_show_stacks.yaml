@@ -21,11 +21,11 @@
   groups: ["SENSOR_DECAY"]
   light_shows:
     - "SensorLinearDecay"
--
-  name: "SensorButterworthStack"
-  groups: ["SENSOR_DECAY", "SENSOR_RISE"]
-  light_shows:
-    - "SensorButterworth"
+#-
+#  name: "SensorButterworthStack"
+#  groups: ["SENSOR_DECAY", "SENSOR_RISE"]
+#  light_shows:
+#    - "SensorButterworth"
 
 ### LIGHT ###
 -
@@ -40,21 +40,21 @@
     - "LightOutsideIn"
 
 ### COLOR ###
--
-  name: "ColorProcessorStack"
-  groups: ["COLOR"]
-  light_shows:
-    - "ColorProcessor"
+#-
+#  name: "ColorProcessorStack"
+#  groups: ["COLOR"]
+#  light_shows:
+#    - "ColorProcessor"
 -  
   name: "ColorBlackWhiteProcessorStack"
   groups: ["COLOR"]
   light_shows:
     - "ColorBlackWhiteProcessor"
--  
-  name: "ColorBackgroundForegroundProcessorStack"
-  groups: ["COLOR"]
-  light_shows:
-    - "ColorBackgroundForegroundProcessor"
+#-  
+#  name: "ColorBackgroundForegroundProcessorStack"
+#  groups: ["COLOR"]
+#  light_shows:
+#    - "ColorBackgroundForegroundProcessor"
 
 ### OPEN_LOOP
 #-
@@ -62,41 +62,41 @@
 #  groups: ["OPEN_LOOP"]
 #  light_shows:
 #    - "OpenLoopLightGenerator"
--
-  name: "OpenLoopBallRandomStack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "OpenLoopBallRandom"
--
-  name: "OpenLoopBallExpandStack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "OpenLoopBallExpand"
--
-  name: "OpenLoopPlane0Stack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "OpenLoopPlane0"
--
-  name: "OpenLoopPlane1Stack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "OpenLoopPlane1"
--
-  name: "OpenLoopPlane2Stack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "OpenLoopPlane2"
--
-  name: "OpenLoopPlane3Stack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "OpenLoopPlane3"
--
-  name: "OpenLoopIdleOpenLoopStack"
-  groups: ["OPEN_LOOP"]
-  light_shows:
-    - "Idle"
+#-
+#  name: "OpenLoopBallRandomStack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "OpenLoopBallRandom"
+#-
+#  name: "OpenLoopBallExpandStack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "OpenLoopBallExpand"
+#-
+#  name: "OpenLoopPlane0Stack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "OpenLoopPlane0"
+#-
+#  name: "OpenLoopPlane1Stack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "OpenLoopPlane1"
+#-
+#  name: "OpenLoopPlane2Stack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "OpenLoopPlane2"
+#-
+#  name: "OpenLoopPlane3Stack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "OpenLoopPlane3"
+#-
+#  name: "OpenLoopIdleOpenLoopStack"
+#  groups: ["OPEN_LOOP"]
+#  light_shows:
+#    - "Idle"
 
 ### TEST
 -
@@ -107,42 +107,42 @@
 
 ### IO
 ### -> RECORDER    
--
-  name: "IORecorder1Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IORecorder1"
--
-  name: "IORecorder2Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IORecorder2"
--
-  name: "IORecorder3Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IORecorder3"
-### -> PLAYER
--
-  name: "IOPlayer1Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IOPlayer1"
--
-  name: "IOPlayer2Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IOPlayer2"
--
-  name: "IOPlayer3Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IOPlayer3"
--
-  name: "IOIdleIOStack"
-  groups: ["IO"]
-  light_shows:
-    - "Idle"
+#-
+#  name: "IORecorder1Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IORecorder1"
+#-
+#  name: "IORecorder2Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IORecorder2"
+#-
+#  name: "IORecorder3Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IORecorder3"
+#### -> PLAYER
+#-
+#  name: "IOPlayer1Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IOPlayer1"
+#-
+#  name: "IOPlayer2Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IOPlayer2"
+#-
+#  name: "IOPlayer3Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IOPlayer3"
+#-
+#  name: "IOIdleIOStack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "Idle"
 
 ### BRIGHTNESS
 -
@@ -150,8 +150,8 @@
   groups: ["BRIGHTNESS"]
   light_shows:
     - "BrightnessProcessor"
--
-  name: "BrightnessAudioProcessorStack"
-  groups: ["BRIGHTNESS"]
-  light_shows:
-    - "BrightnessAudioProcessor"
+#-
+#  name: "BrightnessAudioProcessorStack"
+#  groups: ["BRIGHTNESS"]
+#  light_shows:
+#    - "BrightnessAudioProcessor"

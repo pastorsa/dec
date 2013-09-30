@@ -8,6 +8,12 @@
   <arg if="$(arg valgrind)" name="valgrind_launch_prefix" value="valgrind --leak-check=full"/>
   <arg unless="$(arg valgrind)" name="valgrind_launch_prefix" value=""/>
 
+<!--
+  <include file="$(find dec_cloud_processor)/launch/tf_camera1.launch">
+    <arg name="camera" value="camera1" />
+  </include>
+-->
+  
   <node pkg="dec_cloud_processor" type="cloud_processor" name="CloudProcessor1" output="screen" launch-prefix="$(arg launch_prefix) $(arg valgrind_launch_prefix)">
     <rosparam command="load" file="$(find dec_cloud_processor)/config/cloud_processor.yaml" />
     <rosparam command="load" file="$(find dec_cloud_processor)/config/cloud_processor1.yaml" />

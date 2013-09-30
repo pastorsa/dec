@@ -56,8 +56,8 @@ bool Component::read(XmlRpc::XmlRpcValue& config,
   }
   node_pair.first = (int)config[0];
   node_pair.second = (int)config[1];
-  ROS_ASSERT_MSG(node_pair.first != node_pair.second,
-                 "Invalid >%s< configuration. Node indices must differ.", key.c_str());
+  // ROS_ASSERT_MSG(node_pair.first != node_pair.second,
+  //               "Invalid >%s< configuration. Node indices must differ.", key.c_str());
   return true;
 }
 
@@ -191,7 +191,7 @@ bool Beam::initialize(XmlRpc::XmlRpcValue& config, const unsigned int id,
     ROS_ASSERT_MSG((nodes_[i].first < node_positions.size()) && (nodes_[i].second < node_positions.size()),
         "Invalid nodes index read from >%i< to >%i<. It must be within [0, %i].",
         (int)nodes_[i].first, (int)nodes_[i].second, (int)(node_positions.size() - 1));
-    ROS_ASSERT_MSG(nodes_[i].first != nodes_[i].second, "Invalid beam read. Node indices must differ.");
+    // ROS_ASSERT_MSG(nodes_[i].first != nodes_[i].second, "Invalid beam read. Node indices must differ.");
   }
 
   // this will be updated by light beams and friends
@@ -218,14 +218,21 @@ void Beam::setPoses(const unsigned int local_index,
   tf::Vector3 beam_center_position = (p1 + (center * p1p2));
   convert(beam_center_position, led_pose.position);
 
-  tf::Vector3 p12 = p2 - p1;
-  p12.normalize();
-  tf::Vector3 z_world = tf::Vector3(0.0, 0.0, 1.0);
-  tf::Vector3 z_cross_p12 = z_world.cross(p12);
-  float angle = acos(p12.dot(z_world));
-  tf::Quaternion q;
-  q.setRotation(z_cross_p12, angle);
-  convert(q, led_pose.orientation);
+  if (nodes_[local_index].first == nodes_[local_index].second)
+  {
+    convert(tf::Quaternion::getIdentity(), led_pose.orientation);
+  }
+  else
+    {
+    tf::Vector3 p12 = p2 - p1;
+    p12.normalize();
+    tf::Vector3 z_world = tf::Vector3(0.0, 0.0, 1.0);
+    tf::Vector3 z_cross_p12 = z_world.cross(p12);
+    float angle = acos(p12.dot(z_world));
+    tf::Quaternion q;
+    q.setRotation(z_cross_p12, angle);
+    convert(q, led_pose.orientation);
+  }
 
   poses_[local_index] = led_pose;
 }

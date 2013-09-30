@@ -186,6 +186,8 @@ private:
    * @param node_index
    */
   void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions, const int node_index);
+  void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions, const geometry_msgs::Point& offset_node);
+  void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions, const std::vector<int>& offset_indices);
 
 };
 

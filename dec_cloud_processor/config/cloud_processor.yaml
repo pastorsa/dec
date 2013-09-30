@@ -1,1 +1,12 @@
-parameter: true
+sensor_area_width: 2.0 # in meters
+sensor_area_length: 4.0 # in meters
+
+# min/max height at which the sensor is active
+sensor_area_min_height: 1.0 # in meters
+sensor_area_max_height: 2.2 # in meters
+
+num_x_sections: 4
+num_y_sections: 5
+
+detection_radius: 0.25 
+downsampling_leaf_size: 0.04

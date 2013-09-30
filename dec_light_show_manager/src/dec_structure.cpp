@@ -403,6 +403,39 @@ void DecStructure::setupTeensyMap()
 }
 
 void DecStructure::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
+                                       const std::vector<int>& offset_indices)
+{
+  ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
+  ROS_ASSERT_MSG(!offset_indices.empty(), "Empty list of node indices provided, cannot offset.");
+  geometry_msgs::Point node_offset;
+  node_offset.x = 0.0;
+  node_offset.y = 0.0;
+  node_offset.z = 0.0;
+  for (unsigned int i = 0; i < offset_indices.size(); ++i)
+  {
+    node_offset.x += node_positions[i].x;
+    node_offset.y += node_positions[i].y;
+    // node_offset.z += node_positions[i].z;
+  }
+  node_offset.x /= static_cast<double>(offset_indices.size());
+  node_offset.y /= static_cast<double>(offset_indices.size());
+  // node_offset.z /= static_cast<double>(offset_indices.size());
+  offsetNodePositions(node_positions, node_offset);
+}
+
+void DecStructure::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
+                                  const geometry_msgs::Point& offset_node)
+{
+  ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
+  for (unsigned int i = 0; i < node_positions.size(); ++i)
+  {
+    node_positions[i].x -= offset_node.x;
+    node_positions[i].y -= offset_node.y;
+    node_positions[i].z -= offset_node.z;
+  }
+}
+
+void DecStructure::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
                                   const int node_index)
 {
   ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
@@ -410,15 +443,11 @@ void DecStructure::offsetNodePositions(std::vector<geometry_msgs::Point>& node_p
                  "Provided node index >%i< is invalid. Need to be within [0..%i]. Cannot offset node positions.",
                  node_index, int(node_positions.size())-1);
 
-  double offset_x = node_positions[node_index].x;
-  double offset_y = node_positions[node_index].y;
-  double offset_z = node_positions[node_index].z;
-  for (unsigned int i = 0; i < node_positions.size(); ++i)
-  {
-    node_positions[i].x -= offset_x;
-    node_positions[i].y -= offset_y;
-    node_positions[i].z -= offset_z;
-  }
+  geometry_msgs::Point node_offset;
+  node_offset.x = node_positions[node_index].x;
+  node_offset.y = node_positions[node_index].y;
+  node_offset.z = node_positions[node_index].z;
+  offsetNodePositions(node_positions, node_offset);
 }
 
 void DecStructure::setNumberOfTeensys()
@@ -547,11 +576,49 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<Node>& nodes)
   }
 
   ROS_ASSERT_MSG(!node_positions_.empty(), "No node positions specified. Structure must contain at least one node.");
-  int offset_node_index = 0;
-  ROS_VERIFY(dec_utilities::read(node_handle, "offset_node_index", offset_node_index));
-  ROS_ASSERT_MSG(offset_node_index >= 0 && offset_node_index < (int)node_positions_.size(),
-             "Offset node index >%i< needs to be within [0..%i].", offset_node_index, (int)node_positions_.size()-1);
-  offsetNodePositions(node_positions_, offset_node_index);
+  std::vector<int> offset_node_indices;
+  ROS_VERIFY(dec_utilities::read(node_handle, "offset_node_indices", offset_node_indices));
+  ROS_ASSERT(!offset_node_indices.empty());
+  if (offset_node_indices.size() == 1 && offset_node_indices[0] == -1)
+  {
+    double min_x = std::numeric_limits<double>::max();
+    double min_y = std::numeric_limits<double>::max();
+    double max_x = -std::numeric_limits<double>::max();
+    double max_y = -std::numeric_limits<double>::max();
+    for (unsigned int i = 0; i < node_positions_.size(); ++i)
+    {
+      if (node_positions_[i].x > max_x)
+        max_x = node_positions_[i].x;
+      if (node_positions_[i].y > max_y)
+        max_y = node_positions_[i].y;
+      if (node_positions_[i].x < min_x)
+        min_x = node_positions_[i].x;
+      if (node_positions_[i].y < min_y)
+        min_y = node_positions_[i].y;
+    }
+    double avg_x = (max_x - min_x) / 2.0;
+    ROS_ASSERT(avg_x > 0.0);
+    double avg_y = (max_y - min_y) / 2.0;
+    ROS_ASSERT(avg_y > 0.0);
+    ROS_INFO("Min X: %.2f", min_x);
+    ROS_INFO("Min Y: %.2f", min_y);
+    ROS_INFO("Max X: %.2f", max_x);
+    ROS_INFO("Max Y: %.2f", max_y);
+    geometry_msgs::Point offset;
+    offset.x = avg_x;
+    offset.y = avg_y;
+    offset.z = 0.0;
+    offsetNodePositions(node_positions_, offset);
+  }
+  else
+  {
+    for (unsigned int i = 0; i < offset_node_indices.size(); ++i)
+    {
+      ROS_ASSERT_MSG(offset_node_indices[i] >= 0 && offset_node_indices[i] < (int)node_positions_.size(),
+                     "Offset node index >%i< needs to be within [0..%i].", offset_node_indices[i], (int)node_positions_.size()-1);
+    }
+    offsetNodePositions(node_positions_, offset_node_indices);
+  }
   for(unsigned int i = 0; i < nodes_.size(); ++i)
   {
     nodes_[i].update(node_positions_[i]);

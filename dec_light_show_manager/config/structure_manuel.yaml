@@ -1,6 +1,6 @@
 # This is the index into node_positions set
 # to determine the node which sets the zero coordinate of the structure
-offset_node_index: 0
+offset_node_index: [14]
 
 # List of all nodes in the structure
 # Values correspond to x,y,z in meters

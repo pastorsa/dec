@@ -1,0 +1,8 @@
+<launch>
+
+  <include file="$(find dec_cloud_processor)/launch/common_tf.launch"/>
+
+  <include file="$(find dec_cloud_processor)/launch/cloud_processor_1.launch"/>
+  <include file="$(find dec_cloud_processor)/launch/cloud_processor_2.launch"/>
+
+</launch>

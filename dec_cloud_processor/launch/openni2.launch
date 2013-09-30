@@ -72,7 +72,7 @@
     </include>
 
     <!-- Load standard constellation of processing nodelets -->
-    <include file="$(find openni_launch)/launch/includes/processing.launch">
+    <include file="$(find dec_cloud_processor)/launch/processing.launch">
       <arg name="manager"               value="/$(arg manager)" /> <!-- Fully resolved -->
       <arg name="rgb"                   value="$(arg rgb)" />
       <arg name="ir"                    value="$(arg ir)" />
@@ -86,7 +86,7 @@
 
   <!-- Load reasonable defaults for the relative pose between cameras -->
   <include if="$(arg publish_tf)"
-	   file="$(find dec_cloud_processor)/launch/kinect_frame2.launch">
+	   file="$(find dec_cloud_processor)/launch/tf_camera2.launch">
     <arg name="camera" value="$(arg camera)" />
   </include>
 

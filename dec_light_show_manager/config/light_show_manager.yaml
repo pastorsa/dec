@@ -13,9 +13,9 @@ stack_groups:
   - POST
 
 default_light_show_stacks:
-  - SensorLinearDecayStack
-  - SensorLinearRiseStack
-  - LightInsideOutStack
-  - OpenLoopPlane0Stack
-  - ColorProcessorStack
+#  - SensorLinearDecayStack
+#  - SensorLinearRiseStack
+#  - LightInsideOutStack
+#  - OpenLoopPlane0Stack
+  - ColorBlackWhiteProcessorStack
   - BrightnessProcessorStack
