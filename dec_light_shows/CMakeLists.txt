@@ -27,6 +27,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_sensor_decay_processor.cpp
   src/dec_sensor_rise_processor.cpp
   src/dec_light_processor.cpp
+  src/dec_lightswitch_processor.cpp
   src/dec_color_processor.cpp
   src/dec_open_loop_light_generator.cpp
   src/dec_light_show_ball_creator.cpp
@@ -36,6 +37,7 @@ rosbuild_add_library(${PROJECT_NAME}
   src/dec_idle.cpp
   src/dec_audio_processor.cpp
   src/dec_brightness_processor.cpp
+  src/dec_sensor_windowing.cpp
   src/dec_test_light_generator.cpp
 )
 rosbuild_add_openmp_flags(${PROJECT_NAME})

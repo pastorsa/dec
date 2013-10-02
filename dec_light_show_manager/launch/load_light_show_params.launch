@@ -12,8 +12,10 @@
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorButterworth.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearDecay.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorLinearRise.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/SensorWindowing.yaml" />
 
 <!-- LIGHT -->
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightSwitch.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightInsideOut.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/LightOutsideIn.yaml" />
 

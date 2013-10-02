@@ -33,11 +33,10 @@ namespace dec_cloud_processor
 {
 
 CloudProcessor::CloudProcessor(ros::NodeHandle node_handle)
-	: node_handle_(node_handle), detection_radius_(-1.0), downsampling_leaf_size_(0.01)
+: node_handle_(node_handle), detection_radius_(-1.0), downsampling_leaf_size_(0.01), transform_using_tf_(false), id_counter_(0)
 {
-  rviz_pub_ = node_handle_.advertise<visualization_msgs::Marker>("visualization_marker", 10);
-
   const unsigned int BUFFER_SIZE = 1;
+  rviz_pub_ = node_handle_.advertise<visualization_msgs::Marker>("visualization_marker", BUFFER_SIZE);
 
   // cloud_all_pub_ = node_handle_.advertise<pcl::PointCloud<pcl::PointXYZ> >("cloud_all", 100);
   cloud_cropped_pub_ = node_handle_.advertise<pcl::PointCloud<pcl::PointXYZ> >("cloud_cropped", BUFFER_SIZE);
@@ -56,7 +55,8 @@ bool CloudProcessor::initialize()
   // do this last
   std::string point_cloud_topic;
   ROS_VERIFY(read(node_handle_, "point_cloud_topic", point_cloud_topic));
-  point_cloud_sub_ = node_handle_.subscribe(point_cloud_topic, 10, &CloudProcessor::pointCloudCallback, this);
+  const unsigned int BUFFER_SIZE = 1;
+  point_cloud_sub_ = node_handle_.subscribe(point_cloud_topic, BUFFER_SIZE, &CloudProcessor::pointCloudCallback, this);
   // ros::Duration(1.0).sleep();
 
   return true;
@@ -65,8 +65,8 @@ bool CloudProcessor::initialize()
 void CloudProcessor::run()
 {
   ROS_INFO("%s is up and running.", node_handle_.getNamespace().c_str());
-  ros::MultiThreadedSpinner mts;
-  mts.spin();
+  // ros::MultiThreadedSpinner mts;
+  ros::spin();
 }
 
 void CloudProcessor::readParams()
@@ -98,6 +98,35 @@ void CloudProcessor::readParams()
     node_positions_.push_back(tf::Vector3(values[0], values[1], 0.0));
   }
 
+  double min_x = std::numeric_limits<double>::max();
+  double min_y = std::numeric_limits<double>::max();
+  double max_x = -std::numeric_limits<double>::max();
+  double max_y = -std::numeric_limits<double>::max();
+  for (unsigned int i = 0; i < node_positions_.size(); ++i)
+  {
+    if (node_positions_[i].getX() > max_x)
+      max_x = node_positions_[i].getX();
+    if (node_positions_[i].getY() > max_y)
+      max_y = node_positions_[i].getY();
+    if (node_positions_[i].getX() < min_x)
+      min_x = node_positions_[i].getX();
+    if (node_positions_[i].getY() < min_y)
+      min_y = node_positions_[i].getY();
+  }
+  double avg_x = (max_x - min_x) / 2.0;
+  ROS_ASSERT(avg_x > 0.0);
+  double avg_y = (max_y - min_y) / 2.0;
+  ROS_ASSERT(avg_y > 0.0);
+  // ROS_INFO("Min X: %.2f", min_x);
+  // ROS_INFO("Min Y: %.2f", min_y);
+  // ROS_INFO("Max X: %.2f", max_x);
+  // ROS_INFO("Max Y: %.2f", max_y);
+  geometry_msgs::Point offset;
+  offset.x = avg_x;
+  offset.y = avg_y;
+  offset.z = 0.0;
+  offsetNodePositions(node_positions_, offset);
+
   ROS_VERIFY(read(node_handle_, "detection_radius", detection_radius_));
   detection_radius_ = detection_radius_ * detection_radius_;
   ROS_ASSERT(detection_radius_ > 0.0);
@@ -117,15 +146,16 @@ void CloudProcessor::readParams()
 
   std::vector<double> kinect_to_base_transform;
   ROS_VERIFY(read(node_handle_, "kinect_to_base_transform", kinect_to_base_transform));
-  ROS_ASSERT(kinect_to_base_transform.size() == 6);
+  ROS_ASSERT(kinect_to_base_transform.size() == 7);
   point_cloud_to_base_transform_.setOrigin(tf::Vector3(kinect_to_base_transform[0],
                                                        kinect_to_base_transform[1],
                                                        kinect_to_base_transform[2]));
-  tf::Matrix3x3 point_cloud_to_base_rotation;
-  point_cloud_to_base_rotation.setRPY(kinect_to_base_transform[3],
-                                      kinect_to_base_transform[4],
-                                      kinect_to_base_transform[5]);
-  point_cloud_to_base_transform_.setBasis(point_cloud_to_base_rotation);
+  point_cloud_to_base_transform_.setRotation(tf::Quaternion(kinect_to_base_transform[3],
+                                                            kinect_to_base_transform[4],
+                                                            kinect_to_base_transform[5],
+                                                            kinect_to_base_transform[6]));
+
+  ROS_VERIFY(read(node_handle_, "transform_using_tf", transform_using_tf_));
 
   Eigen::Vector4f sensor_area_min;
   Eigen::Vector4f sensor_area_max;
@@ -169,13 +199,14 @@ void CloudProcessor::readParams()
   crop_box_marker.scale.x = sensor_area_width;
   crop_box_marker.scale.y = sensor_area_length;
   crop_box_marker.scale.z = sensor_area_height;
-  crop_box_marker.color.a = 0.3;
+  crop_box_marker.color.a = 0.18;
   crop_box_marker.color.r = 0.0;
-  crop_box_marker.color.g = 0.7;
+  crop_box_marker.color.g = 1.0;
   crop_box_marker.color.b = 0.0;
   rviz_pub_.publish(crop_box_marker);
 
   light_frame_.binned_points.resize(node_positions_.size(), 0);
+  light_frame_.header.frame_id = BASE_FRAME_ID;
 
 //  double x_length = sensor_area_width / (double)num_x_sections;
 //  double y_length = sensor_area_length / (double)num_y_sections;
@@ -209,36 +240,50 @@ void CloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr
   voxelgrid.setLeafSize (downsampling_leaf_size_, downsampling_leaf_size_, Z_LEAF_SIZE);
   voxelgrid.filter (*voxel_cloud);
 
+
   // transform into BASE frame
-  tf::StampedTransform point_cloud_to_base_transform;
-  try
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in_base_frame (new pcl::PointCloud<pcl::PointXYZ>);
+  if(transform_using_tf_)
   {
-    if (tf_listener_.waitForTransform(BASE_FRAME_ID,
-                                      point_cloud->header.frame_id,
-                                      point_cloud->header.stamp,
-                                      ros::Duration(0.5)))
+    tf::StampedTransform point_cloud_to_base_transform;
+    try
     {
-      tf_listener_.lookupTransform(BASE_FRAME_ID,
-                                   point_cloud->header.frame_id,
-                                   point_cloud->header.stamp,
-                                   point_cloud_to_base_transform);
+      if (tf_listener_.waitForTransform(BASE_FRAME_ID,
+                                        point_cloud->header.frame_id,
+                                        point_cloud->header.stamp,
+                                        ros::Duration(0.5)))
+      {
+        tf_listener_.lookupTransform(BASE_FRAME_ID,
+                                     point_cloud->header.frame_id,
+                                     point_cloud->header.stamp,
+                                     point_cloud_to_base_transform);
+      }
+      else
+      {
+        ROS_ERROR("Did not receive any transformations yet.");
+        return;
+      }
     }
-    else
+    catch (tf::TransformException& ex)
     {
-      ROS_ERROR("Did not receive any transformations yet.");
+      ROS_ERROR("Could not get transform from >%s< to >%s<...", BASE_FRAME_ID.c_str(), point_cloud->header.frame_id.c_str());
       return;
     }
+        //    ROS_WARN("%s: kinect_to_base_transform: [%f, %f, %f, %f, %f, %f, %f]",
+        //             node_handle_.getNamespace().c_str(),
+        //             point_cloud_to_base_transform.getOrigin().getX(),
+        //             point_cloud_to_base_transform.getOrigin().getY(),
+        //             point_cloud_to_base_transform.getOrigin().getZ(),
+        //             point_cloud_to_base_transform.getRotation().getW(),
+        //             point_cloud_to_base_transform.getRotation().getX(),
+        //             point_cloud_to_base_transform.getRotation().getY(),
+        //             point_cloud_to_base_transform.getRotation().getZ());
+    pcl_ros::transformPointCloud<pcl::PointXYZ>(*voxel_cloud, *cloud_in_base_frame, point_cloud_to_base_transform);
   }
-  catch (tf::TransformException& ex)
+  else
   {
-    ROS_ERROR("Could not get transform from >%s< to >%s<...", BASE_FRAME_ID.c_str(), point_cloud->header.frame_id.c_str());
-    return;
+    pcl_ros::transformPointCloud<pcl::PointXYZ>(*voxel_cloud, *cloud_in_base_frame, point_cloud_to_base_transform_);
   }
-
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_in_base_frame (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl_ros::transformPointCloud<pcl::PointXYZ>(*voxel_cloud, *cloud_in_base_frame, point_cloud_to_base_transform);
-  // pcl_ros::transformPointCloud <pcl::PointXYZ> (*input_cloud, *cloud_in_base_frame, point_cloud_to_base_transform_);
-
 
   cloud_in_base_frame->header.frame_id = BASE_FRAME_ID;
   cloud_in_base_frame->header.stamp = point_cloud->header.stamp;
@@ -254,7 +299,7 @@ void CloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr
   Eigen::Vector4f vmin = crop_box_.getMin();
   Eigen::Vector4f vmax = crop_box_.getMax();
 
-  ROS_INFO("Pass Z. >%i< points left.", (int)cloud_in_base_frame->size());
+  // ROS_INFO("Pass Z. >%i< points left.", (int)cloud_in_base_frame->size());
   pcl::PassThrough<pcl::PointXYZ> pass_z;
   pass_z.setInputCloud (cloud_in_base_frame);
   pass_z.setFilterFieldName("z");
@@ -262,7 +307,7 @@ void CloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr
   pass_z.filter (*cloud_filtered);
   *cloud_in_base_frame = *cloud_filtered;
 
-  ROS_INFO("Pass X. >%i< points left.", (int)cloud_in_base_frame->size());
+  // ROS_INFO("Pass X. >%i< points left.", (int)cloud_in_base_frame->size());
   pcl::PassThrough<pcl::PointXYZ> pass_x;
   pass_x.setInputCloud (cloud_in_base_frame);
   pass_x.setFilterFieldName("x");
@@ -270,7 +315,7 @@ void CloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr
   pass_x.filter (*cloud_filtered);
   *cloud_in_base_frame = *cloud_filtered;
 
-  ROS_INFO("Pass Y. >%i< points left.", (int)cloud_in_base_frame->size());
+  // ROS_INFO("Pass Y. >%i< points left.", (int)cloud_in_base_frame->size());
   pcl::PassThrough<pcl::PointXYZ> pass_y;
   pass_y.setInputCloud (cloud_in_base_frame);
   pass_y.setFilterFieldName("y");
@@ -296,20 +341,38 @@ void CloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr
   }
 
   light_frame_.header.stamp = point_cloud->header.stamp;
+  light_frame_.header.seq = id_counter_++;
+
   light_frame_pub_.publish(light_frame_);
 
+}
+
+void CloudProcessor::offsetNodePositions(std::vector<tf::Vector3>& node_positions,
+                                         const geometry_msgs::Point& offset_node)
+{
+  ROS_ASSERT_MSG(!node_positions.empty(), "Empty list of nodes provided, cannot offset.");
+  for (unsigned int i = 0; i < node_positions.size(); ++i)
+  {
+    node_positions[i].setX(node_positions[i].getX() - offset_node.x);
+    node_positions[i].setY(node_positions[i].getY() - offset_node.y);
+    node_positions[i].setZ(node_positions[i].getZ() - offset_node.z);
+  }
 }
 
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "DecCloudProcessor");
+  ros::init(argc, argv, "~");
   ros::NodeHandle node_handle("~");
+
+  ROS_INFO("Starting >%s<.", node_handle.getNamespace().c_str());
   dec_cloud_processor::CloudProcessor cloud_processor(node_handle);
 
   if(!cloud_processor.initialize())
     return -1;
-  cloud_processor.run();
+
+  ros::spin();
+  // cloud_processor.run();
   return 0;
 }

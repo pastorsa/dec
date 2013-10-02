@@ -14,7 +14,8 @@ stack_groups:
 
 default_light_show_stacks:
 #  - SensorLinearDecayStack
-#  - SensorLinearRiseStack
+  - SensorWindowingStack
+  - LightSwitchStack
 #  - LightInsideOutStack
 #  - OpenLoopPlane0Stack
   - ColorBlackWhiteProcessorStack

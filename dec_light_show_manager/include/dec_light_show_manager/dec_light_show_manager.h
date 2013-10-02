@@ -22,11 +22,15 @@
 
 #include <dec_light_show_msgs/SwitchLightShowStack.h>
 
+#include <dec_msgs/LightFrame.h>
+
 namespace dec_light_show_manager
 {
 
 class DecLightShowManager
 {
+
+  //
 
 public:
   DecLightShowManager();
@@ -68,6 +72,13 @@ public:
    * Gets a pointer to a light show by name
    */
   bool getLightShowByName(const std::string& name, boost::shared_ptr<DecLightShow>& light_show);
+
+  /**
+   * @param ligth_frame1
+   * @param ligth_frame2
+   */
+  void lightFrame(const dec_msgs::LightFrame::ConstPtr ligth_frame1,
+                  const dec_msgs::LightFrame::ConstPtr ligth_frame2);
 
 private:
 
@@ -145,6 +156,10 @@ private:
   boost::shared_ptr<DecLightShowVisualization> dec_light_show_visualization_;
 
   void setDefaultStacks();
+
+  int num_points_;
+  // boost::shared_ptr<message_filters::Synchronizer<SyncPolicy> > sync_;
+
 
 };
 

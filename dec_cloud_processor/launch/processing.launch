@@ -26,11 +26,13 @@
 -->
 
   <!-- IR processing -->
+<!--
   <include file="$(find openni_launch)/launch/includes/ir.launch"
 	   ns="$(arg ir)">
     <arg name="manager" value="$(arg manager)" />
     <arg name="respawn" value="$(arg respawn)" />
   </include>
+-->
 
   <!-- Unregistered depth processing -->
   <include file="$(find openni_launch)/launch/includes/depth.launch"
@@ -58,7 +60,7 @@
     <arg name="projector" value="$(arg projector)" />
     <arg name="respawn" value="$(arg respawn)" />    
   </include>
-->
+-->
 
   <!-- Registered disparity image -->
 <!--

@@ -21,6 +21,11 @@
   groups: ["SENSOR_DECAY"]
   light_shows:
     - "SensorLinearDecay"
+-
+  name: "SensorWindowingStack"
+  groups: ["SENSOR_RISE"]
+  light_shows:
+    - "SensorWindowing"
 #-
 #  name: "SensorButterworthStack"
 #  groups: ["SENSOR_DECAY", "SENSOR_RISE"]
@@ -28,6 +33,11 @@
 #    - "SensorButterworth"
 
 ### LIGHT ###
+-
+  name: "LightSwitchStack"
+  groups: ["LIGHT"]
+  light_shows:
+    - "LightSwitch"
 -
   name: "LightInsideOutStack"
   groups: ["LIGHT"]
@@ -40,21 +50,21 @@
     - "LightOutsideIn"
 
 ### COLOR ###
-#-
-#  name: "ColorProcessorStack"
-#  groups: ["COLOR"]
-#  light_shows:
-#    - "ColorProcessor"
+-
+  name: "ColorProcessorStack"
+  groups: ["COLOR"]
+  light_shows:
+    - "ColorProcessor"
 -  
   name: "ColorBlackWhiteProcessorStack"
   groups: ["COLOR"]
   light_shows:
     - "ColorBlackWhiteProcessor"
-#-  
-#  name: "ColorBackgroundForegroundProcessorStack"
-#  groups: ["COLOR"]
-#  light_shows:
-#    - "ColorBackgroundForegroundProcessor"
+-  
+  name: "ColorBackgroundForegroundProcessorStack"
+  groups: ["COLOR"]
+  light_shows:
+    - "ColorBackgroundForegroundProcessor"
 
 ### OPEN_LOOP
 #-

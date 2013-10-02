@@ -72,7 +72,7 @@ bool DecSensorRiseProcessor::initialize(XmlRpc::XmlRpcValue& config)
 bool DecSensorRiseProcessor::start()
 {
   // once in the beginning
-  for (int i = 0; i < (int)data_->sensor_values_.size(); ++i)
+  for (int i = 0; i < (int)data_->sensor_levels_.size(); ++i)
   {
     data_->sensor_levels_[i] = 0.0f;
   }

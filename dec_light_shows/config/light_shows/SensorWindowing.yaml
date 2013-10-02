@@ -1,0 +1,5 @@
+SensorWindowing:
+  type: "dec_light_shows/DecSensorWindowing"
+  up_window_size: 2
+  down_window_size: 80
+  

@@ -331,10 +331,10 @@ bool DecData::copySensorInformationToStructure()
 
 bool DecData::copySensorInformationFromStructure()
 {
-  for (unsigned int i = 0; i < sensor_to_teensy_map_.size(); ++i)
-  {
-    sensor_values_(i) = (int)dec_interface_->received_sensor_data_[sensor_to_teensy_map_[i].first].sensor_value[sensor_to_teensy_map_[i].second];
-  }
+  //  for (unsigned int i = 0; i < sensor_to_teensy_map_.size(); ++i)
+  //  {
+  //    sensor_values_(i) = (int)dec_interface_->received_sensor_data_[sensor_to_teensy_map_[i].first].sensor_value[sensor_to_teensy_map_[i].second];
+  //  }
   return true;
 }
 

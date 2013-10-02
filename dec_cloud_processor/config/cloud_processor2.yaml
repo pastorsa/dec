@@ -1,8 +1,8 @@
-point_cloud_topic: /camera2/depth_registered/points
-light_frame_topic: light_frame2
+point_cloud_topic: /camera2/depth/points
 
 # x, y, z, roll, pitch, yaw (in meters and degrees)
-kinect_to_base_transform: [0.0, 0.0, -1.0, -40.0, 0.0, 0.0]
+# kinect_to_base_transform: [0.0, 0.0, -1.0, -40.0, 0.0, 0.0]
+kinect_to_base_transform: [-0.020000, 0.600000, 2.800000, 0.000000, -0.000000, 0.959550, -0.281540]
 
 # x, y, z, roll, pitch, yaw (in meters and degrees)
-base_to_sensor_area_transform: [0.0, -2.0, 1.3, 0.0, 0.0, 0.0]
+base_to_sensor_area_transform: [0.2, 0.2, 1.3, 0.0, 0.0, 0.0]

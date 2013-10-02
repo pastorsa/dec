@@ -80,27 +80,27 @@ double DecLightShowSimulation::getDistance(tf::Point point, std::pair<unsigned i
 
 bool DecLightShowSimulation::copySimulatedSensorInformation()
 {
-  light_show_data_->sensor_values_.setZero();
-  for (int object_index = 0; object_index < number_of_simulated_objects_; ++object_index)
-  {
-    tf::Pose object_pose;
-    std::string object_name = simulated_object_name_ + "_" + boost::lexical_cast<std::string>(object_index);
-    if (world_state_.getObjectPose(object_name, object_pose, false))
-    {
-      for (unsigned int i = 0; i < light_show_data_->sensors_.size(); ++i)
-      {
-        double distance = getMinimumDistance(object_pose.getOrigin(), light_show_data_->sensors_[i].nodes_);
-        if (distance < simulation_sensor_object_threshold_)
-        {
-          // scale distance to interval [0..1]
-          // double sensor_value = 1.0 - (distance / simulation_sensor_object_threshold_);
-          // sensor_value *= 255;
-          // set sensor value
-          light_show_data_->sensor_values_(i) = static_cast<sensor_channel_t>(1);
-        }
-      }
-    }
-  }
+//  light_show_data_->sensor_values_.setZero();
+//  for (int object_index = 0; object_index < number_of_simulated_objects_; ++object_index)
+//  {
+//    tf::Pose object_pose;
+//    std::string object_name = simulated_object_name_ + "_" + boost::lexical_cast<std::string>(object_index);
+//    if (world_state_.getObjectPose(object_name, object_pose, false))
+//    {
+//      for (unsigned int i = 0; i < light_show_data_->sensors_.size(); ++i)
+//      {
+//        double distance = getMinimumDistance(object_pose.getOrigin(), light_show_data_->sensors_[i].nodes_);
+//        if (distance < simulation_sensor_object_threshold_)
+//        {
+//          // scale distance to interval [0..1]
+//          // double sensor_value = 1.0 - (distance / simulation_sensor_object_threshold_);
+//          // sensor_value *= 255;
+//          // set sensor value
+//          light_show_data_->sensor_values_(i) = static_cast<sensor_channel_t>(1);
+//        }
+//      }
+//    }
+//  }
 
   return true;
 }

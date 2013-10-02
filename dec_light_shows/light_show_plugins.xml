@@ -12,6 +12,12 @@
     </description>
   </class>
 
+  <class name="dec_light_shows/DecSensorWindowing" type="dec_light_shows::DecSensorWindowing" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Processes sensors using avg window 
+    </description>
+  </class>
+
   <class name="dec_light_shows/DecSensorRiseProcessor" type="dec_light_shows::DecSensorRiseProcessor" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
       Processes sensors rise 
@@ -19,6 +25,12 @@
   </class>
 
   <class name="dec_light_shows/DecLightProcessor" type="dec_light_shows::DecLightProcessor" base_class_type="dec_light_show_manager::DecLightShow">
+    <description>
+      Processes lights
+    </description>
+  </class>
+
+  <class name="dec_light_shows/DecLightSwitchProcessor" type="dec_light_shows::DecLightSwitchProcessor" base_class_type="dec_light_show_manager::DecLightShow">
     <description>
       Processes lights
     </description>

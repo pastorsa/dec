@@ -6,8 +6,13 @@
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
+<!--
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_to_base"
-        args="0.0 -0.6 0.0 $(arg pi/2) 1.0 0.4 /BASE_STRUCTURE /$(arg camera)_link 100" />  
+        args="0.0 -0.1 0.0 $(arg pi/2) 1.4 0.4 /BASE_STRUCTURE /$(arg camera)_link 100" />  
+-->
+
+  <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_to_base"
+        args="-0.05 0.0 0.0 $(arg pi/2) 1.05 1.96 /BASE_STRUCTURE /$(arg camera)_link 100" />  
 
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_base_link"
         args="0 -0.02  0 0 0 -0.4  /$(arg camera)_link /$(arg camera)_depth_frame 100" />  

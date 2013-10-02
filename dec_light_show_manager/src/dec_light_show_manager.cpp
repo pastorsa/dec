@@ -43,6 +43,9 @@ bool DecLightShowManager::initialize()
     return false;
   }
 
+  ROS_VERIFY(dec_utilities::read(local_node_handle_, "num_points", num_points_));
+  ROS_ASSERT(num_points_ > 0);
+
   ROS_VERIFY(dec_utilities::read(local_node_handle_, "control_frequency", light_show_data_->control_frequency_));
   ROS_ASSERT(light_show_data_->control_frequency_ > 0.0);
   light_show_data_->control_dt_ = (double)1.0 / light_show_data_->control_frequency_;
@@ -81,25 +84,51 @@ bool DecLightShowManager::initialize()
 void DecLightShowManager::run()
 {
   ROS_ASSERT(initialized_);
-  ros::Rate rate(light_show_data_->control_frequency_);
-  bool manager_is_running = true;
-  ros::Time start = ros::Time::now();
-  ros::Time now = ros::Time::now();
-  unsigned int counter = 0;
-  while (ros::ok() && manager_is_running)
-  {
-    manager_is_running = update();
-    now = ros::Time::now();
-    if ((now - start).toSec() > 1.0)
-    {
-      ROS_DEBUG("Frequency is >%i< Hz.", static_cast<int>(counter));
-      counter = 0;
-      start = now;
-    }
-    counter++;
-    rate.sleep();
-  }
+  //  ros::Rate rate(light_show_data_->control_frequency_);
+  //  bool manager_is_running = true;
+  //  ros::Time start = ros::Time::now();
+  //  ros::Time now = ros::Time::now();
+  //  unsigned int counter = 0;
+  //  while (ros::ok() && manager_is_running)
+  //  {
+  //    manager_is_running = update();
+  //    now = ros::Time::now();
+  //    if ((now - start).toSec() > 1.0)
+  //    {
+  //      ROS_DEBUG("Frequency is >%i< Hz.", static_cast<int>(counter));
+  //      counter = 0;
+  //      start = now;
+  //    }
+  //    counter++;
+  //    rate.sleep();
+  //  }
+
+  // sync_.reset(new message_filters::Synchronizer<SyncPolicy>(SyncPolicy(3), light_frame1_sub, light_frame2_sub));
+  // sync_->registerCallback(boost::bind(&DecLightShowManager::lightFrame, this, _1, _2));
 }
+
+void DecLightShowManager::lightFrame(const dec_msgs::LightFrame::ConstPtr light_frame1,
+                                     const dec_msgs::LightFrame::ConstPtr light_frame2)
+{
+  ROS_ASSERT(light_frame1->binned_points.size() == light_frame2->binned_points.size());
+  ROS_ASSERT(int(light_frame1->binned_points.size()) == light_show_data_->sensor_values_.size());
+  for (int i = 0; i < light_show_data_->sensor_values_.size(); ++i)
+  {
+    int num_points = 0;
+    num_points += light_frame1->binned_points[i];
+    num_points += light_frame2->binned_points[i];
+
+    light_show_data_->sensor_values_(i) = static_cast<sensor_channel_t>(0);
+    if (num_points > num_points_)
+      light_show_data_->sensor_values_(i) = static_cast<sensor_channel_t>(1);
+  }
+
+  // update
+  bool manager_is_running = update();
+  if (!manager_is_running)
+    ros::shutdown();
+}
+
 
 bool DecLightShowManager::loadLightShows()
 {
@@ -238,8 +267,10 @@ bool DecLightShowManager::switchLightShowStack(const std::vector<std::string>& l
   switching_light_shows_ = true;
 
   bool ret = false;
+  // if (abs(
+     // dec_cond_timedwait_relative(&switching_light_shows_cond_, &switching_light_shows_mutex_, 3000000000))==ETIMEDOUT)
   if (abs(
-      dec_cond_timedwait_relative(&switching_light_shows_cond_, &switching_light_shows_mutex_, 3000000000))==ETIMEDOUT)
+      dec_cond_timedwait_relative(&switching_light_shows_cond_, &switching_light_shows_mutex_, 6000000000))==ETIMEDOUT)
   {
     ret = false;
     ROS_ERROR("Time out reached when switching light show stack.");

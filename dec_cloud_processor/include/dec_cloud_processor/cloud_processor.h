@@ -16,6 +16,9 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl/filters/crop_box.h>
 
+#include <geometry_msgs/Point.h>
+
+
 #include <dec_msgs/LightFrame.h>
 
 namespace dec_cloud_processor
@@ -68,6 +71,13 @@ private:
 
   double detection_radius_;
   double downsampling_leaf_size_;
+
+  bool transform_using_tf_;
+  int id_counter_;
+
+  void offsetNodePositions(std::vector<tf::Vector3>& node_positions,
+                           const geometry_msgs::Point& offset_node);
+
 
 };
 
