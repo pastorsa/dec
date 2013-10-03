@@ -117,13 +117,19 @@ void CloudProcessor::readParams()
   ROS_ASSERT(avg_x > 0.0);
   double avg_y = (max_y - min_y) / 2.0;
   ROS_ASSERT(avg_y > 0.0);
-  // ROS_INFO("Min X: %.2f", min_x);
-  // ROS_INFO("Min Y: %.2f", min_y);
-  // ROS_INFO("Max X: %.2f", max_x);
-  // ROS_INFO("Max Y: %.2f", max_y);
+  ROS_INFO("Min X: %.2f", min_x);
+  ROS_INFO("Min Y: %.2f", min_y);
+  ROS_INFO("Max X: %.2f", max_x);
+  ROS_INFO("Max Y: %.2f", max_y);
+
+  std::vector<double> xy_offset;
+  ROS_VERIFY(dec_utilities::read(node_handle_, "xy_offset", xy_offset));
+
   geometry_msgs::Point offset;
-  offset.x = avg_x;
-  offset.y = avg_y;
+  //  offset.x = avg_x;
+  //  offset.y = avg_y;
+  offset.x = xy_offset[0];
+  offset.y = xy_offset[1];
   offset.z = 0.0;
   offsetNodePositions(node_positions_, offset);
 

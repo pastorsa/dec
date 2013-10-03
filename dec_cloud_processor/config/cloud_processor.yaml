@@ -1,20 +1,22 @@
 light_frame_topic: light_frame
 
-sensor_area_width: 2.0 # in meters
-sensor_area_length: 4.0 # in meters
+xy_offset: [0.927, 1.976]
+
+sensor_area_width: 1.74 # in meters
+sensor_area_length: 4.4 # in meters
 #sensor_area_width: 100.0 # in meters
 #sensor_area_length: 100.0 # in meters
 
 transform_using_tf: true
 
 # min/max height at which the sensor is active
-sensor_area_min_height: 0.8 # in meters
-sensor_area_max_height: 2.3 # in meters
+sensor_area_min_height: 0.9 # in meters
+sensor_area_max_height: 2.5 # in meters
 #sensor_area_min_height: -100.0 # in meters
 #sensor_area_max_height: 100.5 # in meters
 
 num_x_sections: 4
 num_y_sections: 5
 
-detection_radius: 0.18
-downsampling_leaf_size: 0.02
+detection_radius: 0.3
+downsampling_leaf_size: 0.05
