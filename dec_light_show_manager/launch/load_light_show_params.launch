@@ -19,6 +19,8 @@
 
 <!-- COLOR -->
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor2.yaml" />
+    <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorProcessor3.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBlackWhiteProcessor.yaml" />
     <rosparam command="load" file="$(arg dec_light_show_dir)/config/light_shows/ColorBackgroundForegroundProcessor.yaml" />
     

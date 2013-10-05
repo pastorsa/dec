@@ -45,6 +45,16 @@
   groups: ["COLOR"]
   light_shows:
     - "ColorProcessor"
+-
+  name: "ColorProcessor2Stack"
+  groups: ["COLOR"]
+  light_shows:
+    - "ColorProcessor2"
+-
+  name: "ColorProcessor3Stack"
+  groups: ["COLOR"]
+  light_shows:
+    - "ColorProcessor3"
 -  
   name: "ColorBlackWhiteProcessorStack"
   groups: ["COLOR"]
@@ -107,42 +117,42 @@
 
 ### IO
 ### -> RECORDER    
--
-  name: "IORecorder1Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IORecorder1"
--
-  name: "IORecorder2Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IORecorder2"
--
-  name: "IORecorder3Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IORecorder3"
-### -> PLAYER
--
-  name: "IOPlayer1Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IOPlayer1"
--
-  name: "IOPlayer2Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IOPlayer2"
--
-  name: "IOPlayer3Stack"
-  groups: ["IO"]
-  light_shows:
-    - "IOPlayer3"
--
-  name: "IOIdleIOStack"
-  groups: ["IO"]
-  light_shows:
-    - "Idle"
+#-
+#  name: "IORecorder1Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IORecorder1"
+#-
+#  name: "IORecorder2Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IORecorder2"
+#-
+#  name: "IORecorder3Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IORecorder3"
+#### -> PLAYER
+#-
+#  name: "IOPlayer1Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IOPlayer1"
+#-
+#  name: "IOPlayer2Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IOPlayer2"
+#-
+#  name: "IOPlayer3Stack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "IOPlayer3"
+#-
+#  name: "IOIdleIOStack"
+#  groups: ["IO"]
+#  light_shows:
+#    - "Idle"
 
 ### BRIGHTNESS
 -

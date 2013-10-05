@@ -7,7 +7,7 @@ OpenLoopPlane3:
   max_distance: 0.6
   initial_normal: [0.0, 0.0, 1.0]
   initial_position: [0.0, 0.0, 0.77]
-  initial_linear_velocity: [0.0, 0.0, 2.5]
+  initial_linear_velocity: [0.0, 0.0, 0.5]
   initial_angular_velocity: [0.05, 0.0, 0.0]
   initial_linear_acceleration: [0.0, 0.0, 0.0]
   initial_angular_acceleration: [0.0, 0.0, 0.0]
