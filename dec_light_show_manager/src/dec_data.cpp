@@ -353,7 +353,11 @@ bool DecData::copyLightDataToStructure()
                    (int)dec_interface_setup_data_[TEENSY_ID].num_block_leds, (int)BLOCK_INDEX);
     // ROS_DEBUG("Node : >%i< - >%i< >%i< >%i< >%i<", (int)i, node_led_values_(RED_OFFSET, i), node_led_values_(GREEN_OFFSET, i), node_led_values_(BLUE_OFFSET, i), node_led_values_(ALPHA_OFFSET, i));
     float alpha = node_led_values_(BRIGHTNESS_OFFSET, i) / 255.0f;
-    ROS_ASSERT(!(alpha < 0) && !(alpha > 1.0f));
+    // ROS_ASSERT(!(alpha < 0) && !(alpha > 1.0f));
+    if (alpha < 0.0)
+      alpha = 0.0;
+    else if (alpha > 1.0)
+      alpha = 1.0;
     dec_interface_light_data_[TEENSY_ID].block_leds[BLOCK_INDEX].red = (uint8_t) static_cast<float>(node_led_values_(RED_OFFSET, i)) * alpha;
     dec_interface_light_data_[TEENSY_ID].block_leds[BLOCK_INDEX].green = (uint8_t) static_cast<float>(node_led_values_(GREEN_OFFSET, i)) * alpha;
     dec_interface_light_data_[TEENSY_ID].block_leds[BLOCK_INDEX].blue = (uint8_t) static_cast<float>(node_led_values_(BLUE_OFFSET, i)) * alpha;
@@ -369,7 +373,11 @@ bool DecData::copyLightDataToStructure()
     ROS_ASSERT_MSG(BLOCK_INDEX < dec_interface_setup_data_[TEENSY_ID].num_block_leds, "Number of beam blocks is >%i< and BLOCK_INDEX is >%i<.", (int)dec_interface_setup_data_[TEENSY_ID].num_block_leds, (int)BLOCK_INDEX);
     // ROS_DEBUG("Beam >%i< - >%i< >%i< >%i< >%i<", (int)i, block_beam_led_values_(RED_OFFSET, i), block_beam_led_values_(GREEN_OFFSET, i), block_beam_led_values_(BLUE_OFFSET, i), block_beam_led_values_(ALPHA_OFFSET, i));
     float alpha = block_beam_led_values_(BRIGHTNESS_OFFSET, i) / 255.0f;
-    ROS_ASSERT(!(alpha < 0) && !(alpha > 1.0f));
+    // ROS_ASSERT(!(alpha < 0) && !(alpha > 1.0f));
+    if (alpha < 0.0)
+      alpha = 0.0;
+    else if (alpha > 1.0)
+      alpha = 1.0;
     dec_interface_light_data_[TEENSY_ID].block_leds[BLOCK_INDEX].red = (uint8_t) static_cast<float>(block_beam_led_values_(RED_OFFSET, i)) * alpha;
     dec_interface_light_data_[TEENSY_ID].block_leds[BLOCK_INDEX].green = (uint8_t) static_cast<float>(block_beam_led_values_(GREEN_OFFSET, i)) * alpha;
     dec_interface_light_data_[TEENSY_ID].block_leds[BLOCK_INDEX].blue = (uint8_t) static_cast<float>(block_beam_led_values_(BLUE_OFFSET, i)) * alpha;
@@ -391,7 +399,11 @@ bool DecData::copyLightDataToStructure()
                    (int)DEC_MAX_NUMBER_OF_PIXELS_PER_LIGHT_STRIP, (int)STRIP_INDEX);
     // ROS_DEBUG("PIXEL BEAM >%i<: TEENSY_ID %i | PIXEL_STRIP %i | STRIP_INDEX %i |", (int)i, (int)TEENSY_ID, (int)PIXEL_INDEX, (int)STRIP_INDEX);
     float alpha = pixel_beam_led_values_(BRIGHTNESS_OFFSET, i) / 255.0f;
-    ROS_ASSERT(!(alpha < 0) && !(alpha > 1.0f));
+    // ROS_ASSERT(!(alpha < 0) && !(alpha > 1.0f));
+    if (alpha < 0.0)
+      alpha = 0.0;
+    else if (alpha > 1.0)
+      alpha = 1.0;
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].red[STRIP_INDEX] = (uint8_t) static_cast<float>(pixel_beam_led_values_(RED_OFFSET, i)) * alpha;
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].green[STRIP_INDEX] = (uint8_t) static_cast<float>(pixel_beam_led_values_(GREEN_OFFSET, i)) * alpha;
     dec_interface_light_data_[TEENSY_ID].pixel_leds[PIXEL_INDEX].blue[STRIP_INDEX] = (uint8_t) static_cast<float>(pixel_beam_led_values_(BLUE_OFFSET, i)) * alpha;
