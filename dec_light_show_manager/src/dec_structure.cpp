@@ -7,6 +7,8 @@
 
 #include <dec_utilities/param_server.h>
 #include <dec_utilities/assert.h>
+#include <conversions/tf_to_ros.h>
+#include <conversions/ros_to_tf.h>
 
 #include <dec_light_show_manager/dec_structure.h>
 
@@ -402,6 +404,32 @@ void DecStructure::setupTeensyMap()
   }
 }
 
+void DecStructure::rotateNodes(std::vector<geometry_msgs::Point>& node_positions,
+                               const int node_index, const double angle)
+{
+  geometry_msgs::Point node = node_positions[node_index];
+  tf::Transform center_node = tf::Transform::getIdentity();
+  ROS_ASSERT(node_index >= 0 && node_index < (int)node_positions.size());
+  tf::Vector3 center_node_position;
+  conversions::convert(node_positions[node_index], center_node_position);
+  center_node.setOrigin(center_node_position);
+
+  for (unsigned int i = 0; i < node_positions.size(); ++i)
+  {
+    tf::Transform node = tf::Transform::getIdentity();
+    tf::Vector3 node_position;
+    conversions::convert(node_positions[i], node_position);
+    node.setOrigin(node_position);
+
+    tf::Transform rotation_node = tf::Transform::getIdentity();
+    tf::Quaternion quat(tf::Vector3(1,0,0), angle);
+    rotation_node.setRotation(quat);
+
+    tf::Transform new_node = rotation_node * node;
+    conversions::convert(new_node.getOrigin(), node_positions[i]);
+  }
+}
+
 void DecStructure::offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions,
                                   const int node_index)
 {
@@ -552,9 +580,15 @@ bool DecStructure::read(ros::NodeHandle& node_handle, std::vector<Node>& nodes)
   ROS_ASSERT_MSG(offset_node_index >= 0 && offset_node_index < (int)node_positions_.size(),
              "Offset node index >%i< needs to be within [0..%i].", offset_node_index, (int)node_positions_.size()-1);
   offsetNodePositions(node_positions_, offset_node_index);
+
+//  double offset_angle = 0.0;
+//  ROS_VERIFY(dec_utilities::read(node_handle, "offset_angle", offset_angle));
+//  rotateNodes(node_positions_, offset_node_index, offset_angle);
+
   for(unsigned int i = 0; i < nodes_.size(); ++i)
   {
     nodes_[i].update(node_positions_[i]);
+    printf("  - position: [%.3f, %.3f, %.3f]\n", node_positions_[i].x * 1000.0, node_positions_[i].y * 1000.0, node_positions_[i].z * 1000.0);
   }
 
   return true;

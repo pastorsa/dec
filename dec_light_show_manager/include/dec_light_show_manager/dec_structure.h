@@ -186,7 +186,7 @@ private:
    * @param node_index
    */
   void offsetNodePositions(std::vector<geometry_msgs::Point>& node_positions, const int node_index);
-
+  void rotateNodes(std::vector<geometry_msgs::Point>& node_positions, const int node_index, const double angle);
 };
 
 }
